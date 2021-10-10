@@ -1,0 +1,19 @@
+{
+    "name": "palcarazm/mystreamers",
+    "type": "project",
+    "license": "GPL-3.0",
+    "authors": [
+        {
+            "name": "palcarazm",
+            "email": "pabloalcarazm@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Model\\" : "./models",
+            "Controller\\" : "./controllers",
+            "MVC\\" : "./"
+        }
+    }
+}
