@@ -9,23 +9,25 @@ const rename = require("gulp-rename");
 const notify = require("gulp-notify");
 
 const paths = {
-  css: { src: "src/css/**/*.css", dest: "./dist/public/css" },
+  admincss: { src: "src/css/**/admin/*.css", dest: "./dist/public/css" },
   theme: { src: "src/theme/**/*.css", dest: "./dist/public/themes/mystreamers" },
-  js: { src: "src/js/**/*.js", dest: "./dist/public/js" },
+  adminjs: { src: "src/js/**/admin/*.js", dest: "./dist/public/js" },
 };
 
 /* COMPILACIÓN DE CSS
 ========================== */
-function css() {
-  return src(paths.css.src)
+function admincss() {
+  return src(paths.admincss.src)
     .pipe(sourcemaps.init())
+    .pipe(concat("admin-style.css"))
     .pipe(postcss([autoprefixer(), cssnano()]))
-    .pipe(sourcemaps.write("."))
     .pipe(rename({ suffix: ".min" }))
-    .pipe(dest(paths.css.dest))
-    .pipe(notify({message: 'CSS Actualizado'}));
+    .pipe(sourcemaps.write("."))
+    .pipe(dest(paths.admincss.dest))
+    //.pipe(notify({message: 'CSS Actualizado'}))
+    ;
 }
-exports.css = css;
+exports.admincss = admincss;
 
 /* COMPILACIÓN DE THEME
 ========================== */
@@ -33,34 +35,36 @@ function theme() {
     return src(paths.theme.src)
       .pipe(sourcemaps.init())
       .pipe(postcss([autoprefixer(), cssnano()]))
-      .pipe(sourcemaps.write("."))
       .pipe(rename({ suffix: ".min" }))
+      .pipe(sourcemaps.write("."))
       .pipe(dest(paths.theme.dest))
-      .pipe(notify({message: 'THEME Actualizado'}));
+      //.pipe(notify({message: 'THEME Actualizado'}))
+      ;
   }
   exports.theme = theme;
 
 
 /* COMPILACIÓN DE JS
 ========================== */
-function js() {
-  return src(paths.js.src)
+function adminjs() {
+  return src(paths.adminjs.src)
     .pipe(sourcemaps.init())
-    .pipe(concat("bundle.js"))
+    .pipe(concat("admin.js"))
     .pipe(terser())
-    .pipe(sourcemaps.write("."))
     .pipe(rename({ suffix: ".min" }))
-    .pipe(dest(paths.js.dest))
-    .pipe(notify({message: 'JS Actualizado'}));
+    .pipe(sourcemaps.write("."))
+    .pipe(dest(paths.adminjs.dest))
+    //.pipe(notify({message: 'JS Actualizado'}))
+    ;
 }
-exports.js = js;
+exports.adminjs = adminjs;
 
 /* BUILD
 ========================== */
 function watchDev() {
-  watch(paths.css.src, css);
-  watch(paths.js.src, js);
+  watch(paths.admincss.src, admincss);
+  watch(paths.adminjs.src, adminjs);
   watch(paths.theme.src, theme);
 }
 exports.default = watchDev;
-exports.build = parallel(css, js, theme);
+exports.build = parallel(admincss, adminjs, theme);

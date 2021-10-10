@@ -1,0 +1,19 @@
+.lockscreen-wrapper{
+    max-width: 100%;
+}
+.step .card-subtitle{
+    display: flex;
+    align-items: center;
+    line-height: 1;
+}
+.step .card-subtitle i{
+    font-size: medium;
+    margin-right: .5rem;
+}
+.step .card-subtitle span{
+    font-size: x-large;
+}
+.step form{
+    border-left: 1px solid;
+    margin: .5rem 0 0 1.5rem;
+}
