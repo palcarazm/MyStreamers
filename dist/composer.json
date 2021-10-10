@@ -10,10 +10,10 @@
     ],
     "require": {},
     "autoload": {
-        "psr-4": {
-            "Model\\" : "./models",
-            "Controller\\" : "./controllers",
-            "MVC\\" : "./"
-        }
+        "classmap": [
+            "app/controllers",
+            "app/models",
+            "app/route"
+        ]
     }
 }
