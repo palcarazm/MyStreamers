@@ -16,7 +16,7 @@ class ConfigurationApi
     {
         if (!isset($_POST['action'])) {
             $response = array(
-                'status' => '500',
+                'status' => '400',
                 'message' => 'Se debe especificar la action a realizar',
                 'content' => array()
             );
