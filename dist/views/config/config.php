@@ -1,13 +1,13 @@
 <h1 class="card-header">Configuración</h1>
 <div class="card-body">
     <div class="progress mb-3">
-        <div class="progress-bar progress-bar-striped" role="progressbar" style="width: 10%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
+        <div class="progress-bar progress-bar-striped" role="progressbar" style="width: 0%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100" id="progreso"></div>
     </div>
     <ul class="list-group list-group-flush">
         <li class="list-group-item step" id="verifyDB">
             <h2 class="card-subtitle"><i class="far fa-circle text-muted"></i><span>Configiuración de la base de datos</span></h2>
-            <form action="/api/config" method="post" class="border-primary">
-                <div class="card-body pt-2">
+            <form action="/api/config" method="post" class="border-secondary">
+                <div class="card-body pt-2 pb-2">
                     <p class="card-text">Vamos a iniciar la configuración autoguiada del sitio.</p>
                     <div class="form-group row">
                         <label for="dbhost" class="col-sm-3 col-md-2 col-form-label">Host</label>
@@ -29,12 +29,13 @@
                     </div>
                     <div class="form-group row">
                         <label for="dbpass" class="col-sm-3 col-md-2 col-form-label">Contraseña</label>
-                        <div class="col-sm-9 col-md-10">
+                        <div class="col-sm-9 col-md-10 input-group">
                             <input type="password" class="form-control" id="dbpass" name="dbpass" placeholder="Contrseña" required>
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary toggle-password" type="button"><i class="far fa-eye"></i></button>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="card-footer">
                     <input type="hidden" name="action" value="database">
                     <button type="submit" class="btn btn-primary d-block ml-auto mr-0">Comprobar conexión</button>
                 </div>
@@ -43,8 +44,8 @@
         <!--verifyDB-->
         <li class="list-group-item step" id="createAdmin">
             <h2 class="card-subtitle"><i class="far fa-circle text-muted"></i><span>Configuración del administrador</span></h2>
-            <form action="/api/config" method="post" class="border-primary" style="display:none;">
-                <div class="card-body pt-2">
+            <form action="/api/config" method="post" class="border-secondary" style="display:none;">
+                <div class="card-body pt-2 pb-2">
                     <p class="card-text">Continuamos con la creación del administrador</p>
                     <div class="form-group row">
                         <label for="user" class="col-sm-3 col-md-2 col-form-label">Usuario</label>
@@ -70,8 +71,6 @@
                             <input type="password" class="form-control" id="pass2" placeholder="Contraseña" required>
                         </div>
                     </div>
-                </div>
-                <div class="card-footer">
                     <input type="hidden" name="action" value="adminuser">
                     <button type="submit" class="btn btn-primary d-block ml-auto mr-0">Crear administrador</button>
                 </div>

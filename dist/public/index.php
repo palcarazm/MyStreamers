@@ -7,14 +7,14 @@ if(is_file(__DIR__ . '/../config/config.php')){
 
 use Route\Router;
 use Controllers\PublicController;
-use Controllers\ApiController;
+use Apis\ConfigurationApi;
 
 $router = new Router;
 
 /* AÑADIR RUTAS */
 // Configuración
 $router->add('GET','/config', [PublicController::class,'config']);
-$router->add('POST','/api/config', [ApiController::class,'config']);
+$router->add('POST','/api/config', [ConfigurationApi::class,'api']);
 
 
 $router->route();

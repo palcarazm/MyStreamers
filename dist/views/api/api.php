@@ -1,2 +1,3 @@
 <?php
-echo(json_encode($response));
+http_response_code((int) $response['status']);
+print (json_encode($response));

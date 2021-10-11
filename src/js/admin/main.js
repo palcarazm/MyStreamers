@@ -7,6 +7,7 @@
 $(function () {
   switch (currentURL()) {
     case "/config":
+      togglePassword();
       verifyDB();
       break;
 
@@ -15,16 +16,37 @@ $(function () {
   }
 });
 
+// Funciones
+function togglePassword() {
+  $(".toggle-password").on("click", function () {
+    if ($(this).find("i").hasClass("fa-eye")) {
+      $(this).closest(".input-group").find("input").attr("type", "text");
+      $(this).find("i").addClass("fa-eye-slash").removeClass("fa-eye");
+    } else {
+      $(this).closest(".input-group").find("input").attr("type", "password");
+      $(this).find("i").addClass("fa-eye").removeClass("fa-eye-slash");
+    }
+  });
+}
+
 // GLOBALES
 /**
- * Llama a un api desde un formulario
+ * Llama a un api y muestra alertas en función del estado
  * @param {String} uri Dirección de la APi
  * @param {String} method Tipo de solicitud
  * @param {FormData} formdata Datos a enviar
  * @param {int} requiered Valores requeridos
- * @param {function} callback función a ejecutar en caso de éxito
+ * @param {function} success función a ejecutar en caso de éxito
+ * @param {function} error función a ejecutar en caso de error
  */
-function callAPI(uri, method, formdata, requiered, callback) {
+function callAPIverbose(
+  uri,
+  method,
+  formdata,
+  requiered,
+  success = null,
+  error = null
+) {
   let length = 0;
   formdata.forEach((input) => {
     length++;
@@ -58,19 +80,36 @@ function callAPI(uri, method, formdata, requiered, callback) {
     cache: false,
     success: function (data) {
       //console.log(data);
-      if (data.status == "200") {
+      if (success == null) {
         swal({
           type: "success",
-          title: "Información actualizada",
+          title: "Éxito",
           html: data.message,
           timer: 2000,
-        }).then(()=>callback());
+        });
       } else {
+        swal({
+          type: "success",
+          title: "Éxito",
+          html: data.message,
+          timer: 2000,
+        }).then(() => success());
+      }
+    },
+    error: function (data) {
+      //console.log(data);
+      if (error == null) {
         swal({
           type: "error",
           title: "Error",
           html: data.message,
         });
+      } else {
+        swal({
+          type: "error",
+          title: "Error",
+          html: data.message,
+        }).then(() => error());
       }
     },
   });
