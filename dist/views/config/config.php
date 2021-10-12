@@ -42,7 +42,7 @@
             </form>
         </li>
         <!--verifyDB-->
-        <li class="list-group-item step todo" id="createAdmin">
+        <li class="list-group-item step current" id="configAdmin">
             <h2 class="card-subtitle"><i></i><span>Configuración del administrador</span></h2>
             <form action="/api/config" method="post" class="border-secondary step-body">
                 <div class="card-body pt-2 pb-2">
@@ -61,22 +61,28 @@
                     </div>
                     <div class="form-group row">
                         <label for="pass" class="col-sm-3 col-md-2 col-form-label">Contraseña</label>
-                        <div class="col-sm-9 col-md-10">
-                            <input type="text" class="form-control" id="pass" name="pass" placeholder="Contraseña" required>
+                        <div class="col-sm-9 col-md-10 input-group">
+                            <input type="password" class="form-control" id="pass" name="pass" placeholder="Contraseña" required>
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary toggle-password" type="button"><i class="far fa-eye"></i></button>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group row">
                         <label for="pass2" class="col-sm-3 col-md-2 col-form-label">Repetir Contraseña</label>
-                        <div class="col-sm-9 col-md-10">
+                        <div class="col-sm-9 col-md-10 input-group">
                             <input type="password" class="form-control" id="pass2" placeholder="Contraseña" required>
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary toggle-password" type="button"><i class="far fa-eye"></i></button>
+                            </div>
                         </div>
                     </div>
                     <input type="hidden" name="action" value="adminuser">
-                    <button type="submit" class="btn btn-primary d-block ml-auto mr-0">Crear administrador</button>
+                    <button type="submit" class="btn btn-primary d-block ml-auto mr-0" disabled>Crear administrador</button>
                 </div>
             </form>
         </li>
-        <!--createAdmin-->
+        <!--configAdmin-->
         <li class="list-group-item step todo" id="siteConfig">
             <h2 class="card-subtitle"><i></i><span>Configuración del Sitio</span></h2>
             <form action="/api/config" method="post" class="border-secondary step-body">
@@ -106,7 +112,7 @@
                             <input type="password" class="form-control" id="pass2" placeholder="Contraseña" required>
                         </div>
                     </div>
-                    <input type="hidden" name="action" value="adminuser">
+                    <input type="hidden" name="action" value="site">
                     <button type="submit" class="btn btn-primary d-block ml-auto mr-0">Crear administrador</button>
                 </div>
             </form>
