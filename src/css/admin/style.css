@@ -34,13 +34,15 @@
     margin: .5rem 0 0 1.5rem;
     transition: visibility 1s ease-in, opacity .7s ease-in, height 1s ease-in;
 }
-.step.current form{
+.step.current .step-body{
     visibility: visible;
     opacity: 1;
     height: fit-content;
 }
-.step.done form, .step.todo form{
+.step.done .step-body, .step.todo .step-body{
     visibility: hidden;
     opacity: 0;
     height: 0;
+    margin: 0;
+    padding: 0;
 }

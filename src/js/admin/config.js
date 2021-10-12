@@ -14,7 +14,7 @@
           $('#verifyDB.step').removeClass('current').addClass('done');
           $('#verifyDB.step h2').addClass('text-success');
           $('#createAdmin.step ').removeClass('todo').addClass('current');
-          $('#progreso').width("10%");
+          $('#progreso').width("33%");
         }
       );
     });
