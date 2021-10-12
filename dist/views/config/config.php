@@ -78,10 +78,10 @@
         </li>
         <!--createAdmin-->
         <li class="list-group-item step todo" id="siteConfig">
-            <h2 class="card-subtitle"><i></i><span>Configuración del administrador</span></h2>
+            <h2 class="card-subtitle"><i></i><span>Configuración del Sitio</span></h2>
             <form action="/api/config" method="post" class="border-secondary step-body">
                 <div class="card-body pt-2 pb-2">
-                    <p class="card-text">Continuamos con la creación del administrador</p>
+                    <p class="card-text">Continuamos con la configuración básica del sitio</p>
                     <div class="form-group row">
                         <label for="user" class="col-sm-3 col-md-2 col-form-label">Usuario</label>
                         <div class="col-sm-9 col-md-10">

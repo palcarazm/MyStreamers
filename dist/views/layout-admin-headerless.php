@@ -14,8 +14,9 @@
   <link rel="stylesheet" href="/css/sweetalert2.min.css">
   <!-- Admin LTE -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.1.0/css/adminlte.min.css" integrity="sha512-mxrUXSjrxl8vm5GwafxcqTrEwO1/oBNU25l20GODsysHReZo4uhVISzAKzaABH6/tTfAxZrY2FprmeAP5UZY8A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <!-- Admin Style -->
-  <link rel="stylesheet" href="/css/admin-style.min.css">
+  <!-- My Streamers Style -->
+  <link rel="stylesheet" href="/css/main.min.css">
+  <link rel="stylesheet" href="/css/admin.min.css">
 </head>
 
 <body class="hold-transition lockscreen">
@@ -42,8 +43,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.0/js/bootstrap.bundle.min.js" integrity="sha512-wV7Yj1alIZDqZFCUQJy85VN+qvEIly93fIQAN7iqDFCPEucLCeNFz4r35FCo9s6WrpdDQPi80xbljXB8Bjtvcg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <!-- AdminLTE App -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.1.0/js/adminlte.min.js" integrity="sha512-AJUWwfMxFuQLv1iPZOTZX0N/jTCIrLxyZjTRKQostNU71MzZTEPHjajSK20Kj1TwJELpP7gl+ShXw5brpnKwEg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<!-- Main -->
-<script src="/js/admin.min.js"></script>
+  <!-- My Streamers -->
+  <script src="/js/main.min.js"></script>
+  <script src="/js/admin.min.js"></script>
 </body>
 
 </html>
