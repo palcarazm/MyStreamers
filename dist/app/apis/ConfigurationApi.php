@@ -4,6 +4,7 @@ namespace Apis;
 
 use Route\Router;
 use Notihnio\RequestParser\RequestParser;
+use mysqli;
 
 class ConfigurationApi
 {
@@ -47,29 +48,53 @@ class ConfigurationApi
      */
     public static function configDatabase(): array
     {
+        //Filtrar las variables
         $DB_HOST = filter_var(trim($_POST['dbhost']), FILTER_SANITIZE_STRING);
         $DB_USER = filter_var(trim($_POST['dbuser']), FILTER_SANITIZE_STRING);
         $DB_PASS = filter_var(trim($_POST['dbpass']), FILTER_SANITIZE_STRING);
         $DB_NAME = filter_var(trim($_POST['dbname']), FILTER_SANITIZE_STRING);
-        if (verifyDB($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME)) {
+
+        if (verifyDB($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME)) { //Conexión verificada
+            // Crear fichero de configuración
             $data = file_get_contents(__DIR__ . '/../../config/config-template.php');
             $data = preg_replace('/#DB_HOST/', $DB_HOST, $data);
             $data = preg_replace('/#DB_NAME/', $DB_NAME, $data);
             $data = preg_replace('/#DB_USER/', $DB_USER, $data);
             $data = preg_replace('/#DB_PASS/', $DB_PASS, $data);
             file_put_contents(__DIR__ . '/../../config/config.php', $data);
-            $response = array(
+
+            // Crear tablas
+            $fileSQL = file_get_contents(__DIR__ . '/../../config/database-init.min.sql');
+
+            $db = new mysqli($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME);
+            $querynum = 0;
+            if ($db->multi_query($fileSQL)) {
+                do {
+                    if ($db->more_results()) {
+                        $querynum++;
+                    }
+                } while ($db->next_result());
+            }
+            if ($db->errno) {
+                return array(
+                    'status' => '500',
+                    'message' => 'Error en la sentencia #' . ($querynum + 1) . '<br/><br/><span style="color:red;">' . $db->error . '</span>',
+                    'content' => array()
+                );
+            }
+            $db->close();
+
+            return array(
                 'status' => '200',
                 'message' => 'Datos actualizados',
                 'content' => array()
             );
-        } else {
-            $response = array(
+        } else { // Conexión fallida
+            return array(
                 'status' => '500',
                 'message' => 'No se ha podido conectar con la base de datos',
                 'content' => array()
             );
         }
-        return $response;
     }
 }
