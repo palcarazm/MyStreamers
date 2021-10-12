@@ -99,7 +99,7 @@ function currentURL() {
 jQuery.fn.loading = function () {
   return this.css("position", "relative").append(
     $('<div></div>').addClass("overlay loading").append(
-      $('<i></i>').addClass('fas fa-spinner fa-spin')
+      $('<i></i>').addClass('fas fa-spinner fa-spin-ease')
     )
   );
 };
