@@ -4,7 +4,7 @@
         <div class="progress-bar progress-bar-striped" role="progressbar" style="width: 0%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100" id="progreso"></div>
     </div>
     <ul class="list-group list-group-flush">
-        <li class="list-group-item step" id="verifyDB">
+        <li class="list-group-item step current" id="verifyDB">
             <h2 class="card-subtitle"><i class="far fa-circle text-muted"></i><span>Configiuración de la base de datos</span></h2>
             <form action="/api/config" method="post" class="border-secondary">
                 <div class="card-body pt-2 pb-2">
@@ -42,9 +42,9 @@
             </form>
         </li>
         <!--verifyDB-->
-        <li class="list-group-item step" id="createAdmin">
+        <li class="list-group-item step todo" id="createAdmin">
             <h2 class="card-subtitle"><i class="far fa-circle text-muted"></i><span>Configuración del administrador</span></h2>
-            <form action="/api/config" method="post" class="border-secondary" style="display:none;">
+            <form action="/api/config" method="post" class="border-secondary">
                 <div class="card-body pt-2 pb-2">
                     <p class="card-text">Continuamos con la creación del administrador</p>
                     <div class="form-group row">

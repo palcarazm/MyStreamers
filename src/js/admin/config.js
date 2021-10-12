@@ -11,9 +11,9 @@
         new FormData(this),
         $(this).find("input,textarea,select").filter("[required]").length,
         function () {
-          $('#verifyDB form').remove();
+          $('#verifyDB.step').removeClass('current').addClass('done');
           $('#verifyDB.step .card-subtitle i').removeClass('fa-circle text-muted').addClass('fa-check-circle text-success');
-          $('#createAdmin form').show();
+          $('#createAdmin.step ').removeClass('todo').addClass('current');
           $('#progreso').width("10%");
         }
       );

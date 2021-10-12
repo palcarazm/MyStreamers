@@ -16,4 +16,15 @@
 .step form{
     border-left: 1px solid;
     margin: .5rem 0 0 1.5rem;
+    transition: visibility 1s ease-in, opacity .7s ease-in, height 1s ease-in;
+}
+.step.current form{
+    visibility: visible;
+    opacity: 1;
+    height: fit-content;
+}
+.step.done form, .step.todo form{
+    visibility: hidden;
+    opacity: 0;
+    height: 0;
 }
