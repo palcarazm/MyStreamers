@@ -8,7 +8,9 @@
             "email": "pabloalcarazm@gmail.com"
         }
     ],
-    "require": {},
+    "require": {
+        "notihnio/php-request-parser": "1.0.0"
+    },
     "autoload": {
         "classmap": [
             "app/controllers",

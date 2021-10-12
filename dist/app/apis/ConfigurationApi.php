@@ -3,6 +3,7 @@
 namespace Apis;
 
 use Route\Router;
+use Notihnio\RequestParser\RequestParser;
 
 class ConfigurationApi
 {
@@ -14,6 +15,7 @@ class ConfigurationApi
      */
     public static function api(Router $router)
     {
+        RequestParser::parse();
         if (!isset($_POST['action'])) {
             $response = array(
                 'status' => '400',
