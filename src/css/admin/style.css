@@ -10,6 +10,22 @@
     font-size: medium;
     margin-right: .5rem;
 }
+.step .card-subtitle i::before{
+    font-family: "Font Awesome 5 Free";
+    font-weight: 400;
+    display: inline-block;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    margin: 0 auto;
+}
+.step.current .card-subtitle i::before , .step.todo .card-subtitle i::before{
+    content: "\f111";
+}
+.step.done .card-subtitle i::before{
+    content: "\f058";
+}
 .step .card-subtitle span{
     font-size: x-large;
 }
