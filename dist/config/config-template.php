@@ -9,4 +9,5 @@ define('DB_USER','#DB_USER');
 define('DB_PASS','#DB_PASS');
 /* DIRECTORIOS */
 define('APP_FILE',__DIR__ . '/../includes/app.php');
+define('IMG_DIR',__DIR__.'/../pubic/img');
 include APP_FILE;
