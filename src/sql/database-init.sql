@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS roles(
   normas_crear_perms BOOLEAN NOT NULL DEFAULT 0 COMMENT 'Permisos para crear normas',
   normas_publicar_perms BOOLEAN NOT NULL DEFAULT 0 COMMENT 'Permisos para publicar normas',
   config_perms BOOLEAN NOT NULL DEFAULT 0 COMMENT 'Permisos de configuración del sitio',
+  actualizado TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Última actualización',
   PRIMARY KEY (PK_id_rol),
   CONSTRAINT UQ_rol UNIQUE (rol)
 ) COMMENT 'Tabla de roles y permisos';

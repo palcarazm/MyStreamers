@@ -6,13 +6,14 @@ use mysqli;
 
 class ActiveRecord
 {
-    protected static $db;
-    protected static $table = '';
-    protected static $defaultOrder = '';
-    protected static $colDB = [];
-    protected static $errors = [];
-    protected static $PK = 'id';
-    protected static $image = 'image';
+    protected static mysqli $db;
+    protected static String $table = '';
+    protected static String $PK;
+    protected static String $image;
+    protected static String$defaultOrder = '';
+    protected static array $colDB = [];
+    protected static array $errors = [];
+
 
     /**
      * Establecer la conexión con la base de datos
@@ -45,6 +46,7 @@ class ActiveRecord
      */
     public function save(): bool
     {
+        $this->validate();
         $attr = $this->sanitize();
         return is_null($this->id) ? $this->create($attr) : $this->update($attr);
     }
@@ -144,12 +146,30 @@ class ActiveRecord
     /**
      * Valida los datos del registros
      *
-     * @return array arreglo de errores
+     * @return array validación superada (Si/No)
      */
-    public function validate(): array
+    public function validate(): bool
     {
         static::$errors = [];
-        return static::$errors;
+        return empty(static::$errors);
+    }
+    /**
+     * Comprueba si ya hay un registro con el valor indicado en la columna indicada
+     *
+     * @param String $col Columna que comprobar
+     * @param String $type Tipo de valor ( i: integer , d: double , s: string, b: blob)
+     * @return boolean Hay al menos un valor (Si/No)
+     */
+    protected function checkval(String $col, String $type): bool
+    {
+        $query = "SELECT COUNT(*) FROM " . static::$table . " WHERE " . $col . " = ? ;";
+        $stmt = self::$db->prepare($query);
+        $stmt->bind_param($type, $this->$col);
+        $stmt->execute();
+        $stmt->bind_result($num);
+        $stmt->fetch();
+        $stmt->close();
+        return $num > 0;
     }
 
     /**
