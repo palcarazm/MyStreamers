@@ -1,3 +1,17 @@
+/* TABLA DE OPCIONES */
+CREATE TABLE IF NOT EXISTS opciones
+(
+  opcion VARCHAR(125) NOT NULL COMMENT 'Nombre de la opción',
+  valor  LONGTEXT     NOT NULL COMMENT 'Valor de la opción',
+  PRIMARY KEY (opcion)
+) COMMENT 'Tabla con las opciones del sitio';
+/* TABLA DE MÓDULOS*/
+CREATE TABLE IF NOT EXISTS modulos
+(
+  modulo VARCHAR(125) NOT NULL COMMENT 'Nombre del módulo',
+  activo BOOLEAN      NOT NULL COMMENT 'Estado de activación del módulo',
+  PRIMARY KEY (modulo)
+) COMMENT 'Tabla con los estados de los módulos';
 /* TABLA DE ROLES */
 CREATE TABLE IF NOT EXISTS roles(
   PK_id_rol INT(1) NOT NULL AUTO_INCREMENT COMMENT 'ID de rol',
