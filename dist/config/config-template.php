@@ -1,6 +1,7 @@
 <?php
 /* INFORMACIÓN GENERAL */
 define('VERSION','v1.0.0');
+define('IS_INIT',false);
 
 /* INFORMACIÓN DE LA BASE DE DATOS */
 define('DB_HOST','#DB_HOST');
