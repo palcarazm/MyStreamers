@@ -3,6 +3,7 @@
 namespace Apis;
 
 use Route\Router;
+use Model\Usuario;
 use Notihnio\RequestParser\RequestParser;
 use mysqli;
 
@@ -28,6 +29,9 @@ class ConfigurationApi
                 case 'database':
                     $response = ConfigurationApi::configDatabase();
                     break;
+                case 'adminuser':
+                    $response = ConfigurationApi::configAdminuser();
+                    break;
                 default:
                     $response = array(
                         'status' => '501',
@@ -46,7 +50,7 @@ class ConfigurationApi
      *
      * @return array Respuesta de la API
      */
-    public static function configDatabase(): array
+    protected static function configDatabase(): array
     {
         //Filtrar las variables
         $DB_HOST = filter_var(trim($_POST['dbhost']), FILTER_SANITIZE_STRING);
@@ -93,6 +97,56 @@ class ConfigurationApi
             return array(
                 'status' => '500',
                 'message' => 'No se ha podido conectar con la base de datos',
+                'content' => array()
+            );
+        }
+    }
+
+    /**
+     * Configura el administrador principal del sistema
+     *
+     * @return array Respuesta de la API
+     */
+    protected static function configAdminuser(): array
+    {
+        //Filtrar las variables
+        $username = filter_var(trim($_POST['user']), FILTER_SANITIZE_STRING);
+        $email = filter_var(trim($_POST['email']), FILTER_SANITIZE_EMAIL);
+        $pass = filter_var(trim($_POST['pass']), FILTER_SANITIZE_STRING);
+
+        if (filter_var($email, FILTER_VALIDATE_EMAIL) && checkPasswordStrength($pass)) { //validación de datos
+            $user = new Usuario(array(
+                'username' => $username,
+                'email' => $email,
+                'pass' => password_hash($pass, PASSWORD_BCRYPT, array('cost' => 12)),
+                'FK_id_rol' => 1
+            ));
+
+            if ($user->validate()) { // validación de usuario
+                if ($user->save()) { // guargar usuario
+                    return array(
+                        'status' => '200',
+                        'message' => 'Datos actualizados',
+                        'content' => array($user)
+                    );
+                } else { // error al guardar usuario
+                    return array(
+                        'status' => '500',
+                        'message' => getMessage($user->errors()),
+                        'content' => array()
+                    );
+                }
+            } else { // validación de usuario no superada
+                return array(
+                    'status' => '500',
+                    'message' => getMessage($user->errors()),
+                    'content' => array()
+                );
+            }
+        } else { // Validación de datos no superada
+            return array(
+                'status' => '500',
+                'message' => 'No se ha superado la validación de email y contraseña',
                 'content' => array()
             );
         }

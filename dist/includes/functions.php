@@ -68,3 +68,14 @@ function checkPasswordStrength(string $password): bool
         return true;
     }
 }
+
+/**
+ * Genera el mensage de respuesta de la API en base a un arreglo de mensajes
+ *
+ * @param array $messages arreglo de mensajes
+ * @return String mensaje único
+ */
+function getMessage(array $messages): String
+{
+    return join("<br/>", array_values($messages));
+}

@@ -8,9 +8,10 @@ class ActiveRecord
 {
     protected static mysqli $db;
     protected static String $table = '';
-    protected static String $PK;
+    protected static String $PK = '';
+    protected static bool $isAuto_Increment = true;
     protected static String $image;
-    protected static String$defaultOrder = '';
+    protected static String $defaultOrder = '';
     protected static array $colDB = [];
     protected static array $errors = [];
 
@@ -46,9 +47,11 @@ class ActiveRecord
      */
     public function save(): bool
     {
-        $this->validate();
-        $attr = $this->sanitize();
-        return is_null($this->id) ? $this->create($attr) : $this->update($attr);
+        if($this->validate()){
+            $attr = $this->sanitize();
+            return is_null($this->{static::$PK}) ? $this->create($attr) : $this->update($attr);
+        }
+        return false;
     }
 
     /**
@@ -64,9 +67,15 @@ class ActiveRecord
         $query .= " ) VALUES ('";
         $query .= join("' , '", array_values($attr));
         $query .= "')";
-
-        $result = self::$db->query($query);
-        return (bool) $result;
+        if(self::$db->query($query)){
+            if(static::$isAuto_Increment){
+                $this->{static::$PK} = self::$db->insert_id;
+            }
+            return true;
+        }else{
+            static::$errors[] = self::$db -> error;
+            return false;
+        }
     }
 
     /**
@@ -84,10 +93,14 @@ class ActiveRecord
 
         $query = "UPDATE " . static::$table . " SET ";
         $query .= join(" , ", $attr);
-        $query .= " WHERE " . self::$PK . " = '" . self::$db->escape_string($this->self::$PK) . "'";
+        $query .= " WHERE " . static::$PK . " = '" . self::$db->escape_string($this->{static::$PK}) . "'";
 
-        $result = self::$db->query($query);
-        return (bool) $result;
+        if(self::$db->query($query)){
+            return true;
+        }else{
+            static::$errors[] = self::$db -> error;
+            return false;
+        }
     }
 
     /**
@@ -98,9 +111,13 @@ class ActiveRecord
     public function delete(): bool
     {
         $this->deleteImage();
-        $query = "DELETE FROM " . static::$table . " WHERE " . self::$PK . " = '" . self::$db->escape_string($this->self::$PK) . "'";
-        $result = self::$db->query($query);
-        return (bool) $result;
+        $query = "DELETE FROM " . static::$table . " WHERE " . static::$PK . " = '" . self::$db->escape_string($this->{static::$PK}) . "'";
+        if(self::$db->query($query)){
+            return true;
+        }else{
+            static::$errors[] = self::$db -> error;
+            return false;
+        }
     }
 
     /**
@@ -112,7 +129,8 @@ class ActiveRecord
     {
         $attr = [];
         foreach (static::$colDB as $col) {
-            if ($col == self::$PK) continue;
+            if ($col == static::$PK) continue;
+            if(is_null($this->$col)) continue;
             $attr[$col] = $this->$col;
         }
         return $attr;
@@ -181,11 +199,11 @@ class ActiveRecord
     public function setImage(String $image): void
     {
         //Elimina la imagen previa
-        if (!is_null($this->self::$PK)) {
+        if (!is_null($this->{static::$PK})) {
             $this->deleteImage();
         }
         if ($image) {
-            $this->self::$image = $image;
+            $this->{static::$image} = $image;
         }
     }
 
@@ -196,7 +214,7 @@ class ActiveRecord
      */
     public function getImageURL(): String
     {
-        return explode('public', IMG_DIR)[1] . $this->self::$image;
+        return explode('public', IMG_DIR)[1] . $this->{static::$image};
     }
 
     /**
@@ -216,8 +234,8 @@ class ActiveRecord
      */
     protected function deleteImage(): void
     {
-        if (file_exists(IMG_DIR . $this->self::$image)) {
-            unlink(IMG_DIR . $this->self::$image);
+        if (file_exists(IMG_DIR . $this->{static::$image})) {
+            unlink(IMG_DIR . $this->{static::$image});
         }
     }
 

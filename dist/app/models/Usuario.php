@@ -4,10 +4,10 @@ namespace Model;
 
 class Usuario extends ActiveRecord
 {
-    protected static $tabla = 'users';
-    protected static $defaultOrder = 'PK_id_user';
-    protected static $colDB = ['PK_id_user', 'username ', 'email', 'pass', 'actualizado', 'FK_id_rol'];
-    protected static $PK = 'PK_id_user';
+    protected static String $table = 'users';
+    protected static String $defaultOrder = 'PK_id_user';
+    protected static array $colDB = ['PK_id_user', 'username', 'email', 'pass', 'actualizado', 'FK_id_rol'];
+    protected static String $PK = 'PK_id_user';
 
     public $PK_id_user;
     public $username;
@@ -23,7 +23,7 @@ class Usuario extends ActiveRecord
         $this->username = $args['username'] ?? '';
         $this->email = $args['email'] ?? '';
         $this->pass = $args['pass'] ?? '';
-        $this->actualizado = $args['actualizado'] ?? '';
+        $this->actualizado = $args['actualizado'] ?? null;
         $this->FK_id_rol = $args['FK_id_rol'] ?? '';
         //$this->rol = $args[''] ?? '';
     }
