@@ -24,6 +24,23 @@ function getTemplate(String $template, array $options = []): void
 }
 
 /**
+ * Obtiene el listado de temas existentes
+ *
+ * @return array Temas existentes
+ */
+function getThemes():array
+{
+    $themes = [];
+    $themeFolders = array_diff(scandir(THEMES_DIR), array('..', '.'));
+    foreach ($themeFolders as $themeFolder) {
+        if(!is_dir(THEMES_DIR . "/". $themeFolder)) continue;
+        if(!file_exists(THEMES_DIR."/".$themeFolder."/theme.json")) continue;
+        $themes[] = array('folder'=>$themeFolder) + json_decode(file_get_contents(THEMES_DIR."/".$themeFolder."/theme.json"),true);
+    }
+    return $themes;
+}
+
+/**
  * Conectar la Base de datos
  * @return mysqli Base de datos
  */

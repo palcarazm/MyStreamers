@@ -97,17 +97,18 @@
                     <div class="form-group row">
                         <label for="tema" class="col-sm-3 col-md-2 col-form-label">Tema</label>
                         <div class="col-sm-9 col-md-10">
-                            <select name="tema" id="tema" class="custom-select">
+                            <select name="tema" id="tema" class="custom-select" required>
                                 <option value="" disabled selected>--Selecione</option>
-                                <option value="mystreamers">My Streamers</option>
-                                <option value="mystreamers-2">My Streamers 2</option>
-                                <option value="mystreamers-3">My Streamers 3</option>
+                                <?php foreach (getThemes() as $theme) : ?>
+                                    <option value="<?php echo $theme['folder']; ?>"><?php echo $theme['name']; ?></option>
+                                <?php endforeach; ?>
                             </select>
                         </div>
+
                     </div>
                     <div class="form-group row">
                         <label for="descripcion" class="form-label col-12">Descripción del sitio</label>
-                        <textarea name="descripcion" id="descripcion" class="col-12 custom-textarea"></textarea>
+                        <textarea name="descripcion" id="descripcion" class="col-12 custom-textarea" required></textarea>
                     </div>
                     <fieldset class="mb-3">
                         <legend>Módulos</legend>
@@ -139,7 +140,7 @@
                         </div>
                     </fieldset>
                     <input type="hidden" name="action" value="site">
-                    <button type="submit" class="btn btn-primary d-block ml-auto mr-0">Crear administrador</button>
+                    <button type="submit" class="btn btn-primary d-block ml-auto mr-0">Registrar información del sitio</button>
                 </div>
             </form>
         </li>
