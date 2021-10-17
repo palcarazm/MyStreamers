@@ -64,10 +64,10 @@ class ConfigurationApi
         if (verifyDB($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME)) { //Conexión verificada
             // Crear fichero de configuración
             $data = file_get_contents(__DIR__ . '/../../config/config-template.php');
-            $data = preg_replace('/#DB_HOST/', $DB_HOST, $data);
-            $data = preg_replace('/#DB_NAME/', $DB_NAME, $data);
-            $data = preg_replace('/#DB_USER/', $DB_USER, $data);
-            $data = preg_replace('/#DB_PASS/', $DB_PASS, $data);
+            $data = preg_replace('/define\(\'DB_HOST\',\'\S+\'\)/', "define('DB_HOST','{$DB_HOST}')", $data);
+            $data = preg_replace('/define\(\'DB_NAME\',\'\S+\'\)/', "define('DB_NAME','{$DB_NAME}')", $data);
+            $data = preg_replace('/define\(\'DB_USER\',\'\S+\'\)/', "define('DB_USER','{$DB_USER}')", $data);
+            $data = preg_replace('/define\(\'DB_PASS\',\'\S+\'\)/', "define('DB_PASS','{$DB_PASS}')", $data);
             file_put_contents(__DIR__ . '/../../config/config.php', $data);
 
             // Crear tablas
