@@ -143,10 +143,60 @@ function validEmailAdminuserForm() {
       .append(
         $("<div></div>")
           .addClass("invalid-feedback")
-          .text(
-            "El correo electrónico debe ser válido"
-          )
+          .text("El correo electrónico debe ser válido")
       );
     return false;
   }
+}
+
+/**
+ * Configura el sitio
+ */
+function configSite() {
+  $("#siteConfig form").on("submit", function (e) {
+    e.preventDefault();
+    if (
+      $(this)
+        .find("#descripcion")
+        .val()
+        .replace(/<[^>]+>/g, "") == ""
+    ) {
+      $(this)
+        .find("#descripcion")
+        .closest(".form-group")
+        .append(
+          $("<div></div>")
+            .addClass("invalid-feedback d-block")
+            .text("La descripción del sitio es obligatoria")
+        );
+      return;
+    } else {
+      $(this)
+        .find("#descripcion")
+        .closest(".form-group")
+        .find(".invalid-feedback")
+        .remove();
+    }
+    $(this).find('button[type="submit"]').attr("disabled", true);
+    $(this).loadToggle();
+    callAPIverbose(
+      $(this).attr("action"),
+      $(this).attr("method"),
+      new FormData(this),
+      $(this).find("input,textarea,select").filter("[required]").length,
+      function () {
+        $("#siteConfig form").loadToggle();
+        $("#siteConfig.step").removeClass("current").addClass("done");
+        $("#siteConfig.step h2").addClass("text-success");
+        $("#siteConfig.step ").removeClass("todo").addClass("current");
+        $("#progreso").width("67%");
+      },
+      function () {
+        $("#siteConfig form").loadToggle();
+        $("#siteConfig form")
+          .find('button[type="submit"]')
+          .attr("disabled", false);
+      }
+    );
+  });
 }

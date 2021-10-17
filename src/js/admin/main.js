@@ -7,6 +7,7 @@ $(function () {
       verifyDB();
       configAdmin();
       validAdminuserForm();
+      configSite();
       break;
 
     default:

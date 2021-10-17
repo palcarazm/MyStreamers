@@ -97,7 +97,7 @@
                     <div class="form-group row">
                         <label for="tema" class="col-sm-3 col-md-2 col-form-label">Tema</label>
                         <div class="col-sm-9 col-md-10">
-                            <select name="tema" id="tema" class="custom-select" required>
+                            <select name="tema" id="tema" class="custom-select form-control" required>
                                 <option value="" disabled selected>--Selecione</option>
                                 <?php foreach (getThemes() as $theme) : ?>
                                     <option value="<?php echo $theme['folder']; ?>"><?php echo $theme['name']; ?></option>
@@ -108,32 +108,32 @@
                     </div>
                     <div class="form-group row">
                         <label for="descripcion" class="form-label col-12">Descripción del sitio</label>
-                        <textarea name="descripcion" id="descripcion" class="col-12 custom-textarea" required></textarea>
+                        <textarea name="descripcion" id="descripcion" class="col-12 custom-textarea form-control" required></textarea>
                     </div>
                     <fieldset class="mb-3">
                         <legend>Módulos</legend>
                         <div class="form-row">
                             <div class=" col-md-6 col-lg-3">
                                 <div class="custom-control custom-switch">
-                                    <input type="checkbox" class="custom-control-input" id="eventos" name="eventos" checked>
+                                    <input type="checkbox" class="custom-control-input form-control" id="eventos" name="eventos" checked>
                                     <label class="custom-control-label" for="eventos">Eventos</label>
                                 </div>
                             </div>
                             <div class=" col-md-6 col-lg-3">
                                 <div class="custom-control custom-switch">
-                                    <input type="checkbox" class="custom-control-input" id="noticias" name="noticias" checked>
+                                    <input type="checkbox" class="custom-control-input form-control" id="noticias" name="noticias" checked>
                                     <label class="custom-control-label" for="noticias">Noticias</label>
                                 </div>
                             </div>
                             <div class=" col-md-6 col-lg-3">
                                 <div class="custom-control custom-switch">
-                                    <input type="checkbox" class="custom-control-input" id="normas" name="normas" checked>
+                                    <input type="checkbox" class="custom-control-input form-control" id="normas" name="normas" checked>
                                     <label class="custom-control-label" for="normas">Normas</label>
                                 </div>
                             </div>
                             <div class=" col-md-6 col-lg-3">
                                 <div class="custom-control custom-switch">
-                                    <input type="checkbox" class="custom-control-input" id="enlaces" name="enlaces" checked>
+                                    <input type="checkbox" class="custom-control-input form-control" id="enlaces" name="enlaces" checked>
                                     <label class="custom-control-label" for="enlaces">Enlaces personalizados</label>
                                 </div>
                             </div>

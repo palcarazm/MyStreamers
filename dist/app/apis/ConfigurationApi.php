@@ -32,11 +32,14 @@ class ConfigurationApi
                 case 'adminuser':
                     $response = ConfigurationApi::configAdminuser();
                     break;
+                case 'site':
+                    $response = ConfigurationApi::configSite();
+                    break;
                 default:
                     $response = array(
                         'status' => '501',
                         'message' => 'Acción no implementada',
-                        'content' => array()
+                        'content' => $_POST
                     );
                     break;
             }
@@ -147,6 +150,58 @@ class ConfigurationApi
             return array(
                 'status' => '500',
                 'message' => 'No se ha superado la validación de email y contraseña',
+                'content' => array()
+            );
+        }
+    }
+
+    /**
+     * Configura la información del sitio
+     *
+     * @return array Respuesta de la API
+     */
+    protected static function configSite(): array
+    {
+        //Filtrar las variables
+        $titulo = filter_var(trim($_POST['titulo']), FILTER_SANITIZE_STRING);
+        $tema = filter_var(trim($_POST['tema']), FILTER_SANITIZE_STRING);
+        $descripcion = trim($_POST['descripcion']);
+        $eventos = isset($_POST['eventos']) ? 1 : 0;
+        $noticias = isset($_POST['noticias']) ? 1 : 0;
+        $normas = isset($_POST['normas']) ? 1 : 0;
+        $enlaces = isset($_POST['enlaces']) ? 1 : 0;
+
+        if ($titulo != '' && $tema != '' && $descripcion != '') {
+            $db = getDB();
+            $stmt = $db->prepare("REPLACE INTO opciones (opcion , valor) VALUES ('titulo' , ?),('tema' , ?),('descripcion' , ?);");
+            $stmt->bind_param('sss', $titulo, $tema, $descripcion);
+            if ($stmt->execute()) {
+                $stmt->close();
+                $stmt = $db->prepare("REPLACE INTO modulos (modulo , activo) VALUES ('eventos' , ?),('noticias' , ?),('normas' , ?),('enlaces' , ?);");
+                $stmt->bind_param('iiii', $eventos, $noticias, $normas, $enlaces);
+                if ($stmt->execute()) {
+                    $reponse = array(
+                        'status' => '200',
+                        'message' => 'Configuración guardada en la base de datos',
+                        'content' => array()
+                    );
+                    $stmt->close();
+                    $db->close();
+                    return $reponse;
+                }
+            }
+            $reponse = array(
+                'status' => '500',
+                'message' => 'Error al guardar los datos en la base de datos',
+                'content' => array($stmt->error)
+            );
+            $stmt->close();
+            $db->close();
+            return $reponse;
+        } else {
+            return array(
+                'status' => '500',
+                'message' => 'No se ha superado la validación',
                 'content' => array()
             );
         }
