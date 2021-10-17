@@ -42,7 +42,7 @@
             </form>
         </li>
         <!--verifyDB-->
-        <li class="list-group-item step current" id="configAdmin">
+        <li class="list-group-item step todo" id="configAdmin">
             <h2 class="card-subtitle"><i></i><span>Configuración del administrador</span></h2>
             <form action="/api/config" method="post" class="border-secondary step-body">
                 <div class="card-body pt-2 pb-2">
@@ -83,35 +83,61 @@
             </form>
         </li>
         <!--configAdmin-->
-        <li class="list-group-item step todo" id="siteConfig">
-            <h2 class="card-subtitle"><i></i><span>Configuración del Sitio</span></h2>
+        <li class="list-group-item step current" id="siteConfig">
+            <h2 class="card-subtitle"><i></i><span>Configuración del sitio</span></h2>
             <form action="/api/config" method="post" class="border-secondary step-body">
                 <div class="card-body pt-2 pb-2">
                     <p class="card-text">Continuamos con la configuración básica del sitio</p>
                     <div class="form-group row">
-                        <label for="user" class="col-sm-3 col-md-2 col-form-label">Usuario</label>
+                        <label for="titulo" class="col-sm-3 col-md-2 col-form-label">Título</label>
                         <div class="col-sm-9 col-md-10">
-                            <input type="text" class="form-control" id="user" name="user" placeholder="Nombre de usuario" required>
+                            <input type="text" class="form-control" id="titulo" name="titulo" placeholder="Título del sitio" required>
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label for="email" class="col-sm-3 col-md-2 col-form-label">E-Mail</label>
+                        <label for="tema" class="col-sm-3 col-md-2 col-form-label">Tema</label>
                         <div class="col-sm-9 col-md-10">
-                            <input type="email" class="form-control" id="email" name="email" placeholder="Correo Electrónico" required>
+                            <select name="tema" id="tema" class="custom-select">
+                                <option value="" disabled selected>--Selecione</option>
+                                <option value="mystreamers">My Streamers</option>
+                                <option value="mystreamers-2">My Streamers 2</option>
+                                <option value="mystreamers-3">My Streamers 3</option>
+                            </select>
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label for="pass" class="col-sm-3 col-md-2 col-form-label">Contraseña</label>
-                        <div class="col-sm-9 col-md-10">
-                            <input type="text" class="form-control" id="pass" name="pass" placeholder="Contraseña" required>
-                        </div>
+                        <label for="descripcion" class="form-label col-12">Descripción del sitio</label>
+                        <textarea name="descripcion" id="descripcion" class="col-12 custom-textarea"></textarea>
                     </div>
-                    <div class="form-group row">
-                        <label for="pass2" class="col-sm-3 col-md-2 col-form-label">Repetir Contraseña</label>
-                        <div class="col-sm-9 col-md-10">
-                            <input type="password" class="form-control" id="pass2" placeholder="Contraseña" required>
+                    <fieldset class="mb-3">
+                        <legend>Módulos</legend>
+                        <div class="form-row">
+                            <div class=" col-md-6 col-lg-3">
+                                <div class="custom-control custom-switch">
+                                    <input type="checkbox" class="custom-control-input" id="eventos" name="eventos" checked>
+                                    <label class="custom-control-label" for="eventos">Eventos</label>
+                                </div>
+                            </div>
+                            <div class=" col-md-6 col-lg-3">
+                                <div class="custom-control custom-switch">
+                                    <input type="checkbox" class="custom-control-input" id="noticias" name="noticias" checked>
+                                    <label class="custom-control-label" for="noticias">Noticias</label>
+                                </div>
+                            </div>
+                            <div class=" col-md-6 col-lg-3">
+                                <div class="custom-control custom-switch">
+                                    <input type="checkbox" class="custom-control-input" id="normas" name="normas" checked>
+                                    <label class="custom-control-label" for="normas">Normas</label>
+                                </div>
+                            </div>
+                            <div class=" col-md-6 col-lg-3">
+                                <div class="custom-control custom-switch">
+                                    <input type="checkbox" class="custom-control-input" id="enlaces" name="enlaces" checked>
+                                    <label class="custom-control-label" for="enlaces">Enlaces personalizados</label>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    </fieldset>
                     <input type="hidden" name="action" value="site">
                     <button type="submit" class="btn btn-primary d-block ml-auto mr-0">Crear administrador</button>
                 </div>
