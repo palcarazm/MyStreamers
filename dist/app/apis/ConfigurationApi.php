@@ -26,9 +26,6 @@ class ConfigurationApi
             );
         } else {
             switch ($_POST['action']) {
-                case 'database':
-                    $response = ConfigurationApi::configDatabase();
-                    break;
                 case 'adminuser':
                     $response = ConfigurationApi::configAdminuser();
                     break;
@@ -51,10 +48,31 @@ class ConfigurationApi
      * Valida los datos de conexión de la base de datos.
      * Si son correctos lanza la configuración de la misma.
      *
+     * @param Router $router
      * @return array Respuesta de la API
      */
-    protected static function configDatabase(): array
+    public static function postDatabase(Router $router): void
     {
+        // Valida configuración inicial
+        if (IS_CONFIG_DATABASE) {
+            $router->render('api/api', 'layout-api', array('response' => array(
+                'status' => 403,
+                'message' => 'La configuración inicial de la base de datos ya ha sido efectuada y no puede volver a ejecutarse.',
+                'content' => array()
+            )));
+            return;
+        }
+
+        // Valida campos requeridos
+        if (!isset($_POST['dbhost']) || !isset($_POST['dbuser']) || !isset($_POST['dbpass']) || !isset($_POST['dbname'])) {
+            $router->render('api/api', 'layout-api', array('response' => array(
+                'status' => 400,
+                'message' => 'Debe incluirse todos los valores requeridos.',
+                'content' => array()
+            )));
+            return;
+        }
+
         //Filtrar las variables
         $DB_HOST = filter_var(trim($_POST['dbhost']), FILTER_SANITIZE_STRING);
         $DB_USER = filter_var(trim($_POST['dbuser']), FILTER_SANITIZE_STRING);
@@ -62,46 +80,77 @@ class ConfigurationApi
         $DB_NAME = filter_var(trim($_POST['dbname']), FILTER_SANITIZE_STRING);
 
         if (verifyDB($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME)) { //Conexión verificada
-            // Crear fichero de configuración
-            $data = file_get_contents(__DIR__ . '/../../config/config-template.php');
-            $data = preg_replace('/define\(\'DB_HOST\',\'\S+\'\)/', "define('DB_HOST','{$DB_HOST}')", $data);
-            $data = preg_replace('/define\(\'DB_NAME\',\'\S+\'\)/', "define('DB_NAME','{$DB_NAME}')", $data);
-            $data = preg_replace('/define\(\'DB_USER\',\'\S+\'\)/', "define('DB_USER','{$DB_USER}')", $data);
-            $data = preg_replace('/define\(\'DB_PASS\',\'\S+\'\)/', "define('DB_PASS','{$DB_PASS}')", $data);
-            file_put_contents(__DIR__ . '/../../config/config.php', $data);
-
-            // Crear tablas
-            $fileSQL = file_get_contents(__DIR__ . '/../../config/database-init.min.sql');
-
-            $db = new mysqli($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME);
-            $querynum = 0;
-            if ($db->multi_query($fileSQL)) {
-                do {
-                    if ($db->more_results()) {
-                        $querynum++;
-                    }
-                } while ($db->next_result());
-            }
-            if ($db->errno) {
-                return array(
-                    'status' => '500',
-                    'message' => 'Error en la sentencia #' . ($querynum + 1) . '<br/><br/><span style="color:red;">' . $db->error . '</span>',
+            try { // Crear fichero de configuración
+                $data = file_get_contents(__DIR__ . '/../../config/config-template.php');
+                $data = preg_replace('/define\(\'DB_HOST\',\'\S+\'\)/', "define('DB_HOST','{$DB_HOST}')", $data);
+                $data = preg_replace('/define\(\'DB_NAME\',\'\S+\'\)/', "define('DB_NAME','{$DB_NAME}')", $data);
+                $data = preg_replace('/define\(\'DB_USER\',\'\S+\'\)/', "define('DB_USER','{$DB_USER}')", $data);
+                $data = preg_replace('/define\(\'DB_PASS\',\'\S+\'\)/', "define('DB_PASS','{$DB_PASS}')", $data);
+                file_put_contents(__DIR__ . '/../../config/config.php', $data);
+            } catch (\Exception $e) {
+                $router->render('api/api', 'layout-api', array('response' => array(
+                    'status' => 500,
+                    'message' => 'No se ha conseguido guardar los datos de conexión con la base de datos en el fichero de configuración',
                     'content' => array()
-                );
+                )));
+                return;
             }
-            $db->close();
 
-            return array(
-                'status' => '200',
-                'message' => 'Datos actualizados',
+            try { // Crear tablas
+                $fileSQL = file_get_contents(__DIR__ . '/../../config/database-init.min.sql');
+                $db = new mysqli($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME);
+                $querynum = 0;
+                if ($db->multi_query($fileSQL)) {
+                    do {
+                        if ($db->more_results()) {
+                            $querynum++;
+                        }
+                    } while ($db->next_result());
+                }
+                if ($db->errno) {
+                    $router->render('api/api', 'layout-api', array('response' => array(
+                        'status' => 500,
+                        'message' => 'Error en la sentencia #' . ($querynum + 1) . '<br/><br/><span style="color:red;">' . $db->error . '</span>',
+                        'content' => array()
+                    )));
+                    return;
+                }
+                $db->close();
+            } catch (\Exception $e) {
+                $router->render('api/api', 'layout-api', array('response' => array(
+                    'status' => 500,
+                    'message' => 'No se ha conseguido cargar la configuración inicial en la base de datos',
+                    'content' => array()
+                )));
+                return;
+            }
+
+            try { // Alcualiza fichero de configuración
+                $data = file_get_contents(__DIR__ . '/../../config/config.php');
+                $data = preg_replace('/define\(\'IS_CONFIG_DATABASE\',\S+\)/', "define('IS_CONFIG_DATABASE',true)", $data);
+                file_put_contents(__DIR__ . '/../../config/config.php', $data);
+            } catch (\Exception $e) {
+                $router->render('api/api', 'layout-api', array('response' => array(
+                    'status' => 202,
+                    'message' => 'No se ha conseguido bloquear el acceso a la API de configuración de la base de datos. Realice un bloqueo manual',
+                    'content' => array()
+                )));
+                return;
+            }
+
+            $router->render('api/api', 'layout-api', array('response' => array(
+                'status' => 201,
+                'message' => 'Configuración de la base de datos completada',
                 'content' => array()
-            );
+            )));
+            return;
         } else { // Conexión fallida
-            return array(
-                'status' => '500',
-                'message' => 'No se ha podido conectar con la base de datos',
+            $router->render('api/api', 'layout-api', array('response' => array(
+                'status' => 500,
+                'message' => 'No se ha conseguido establecer conexión con la base de datos',
                 'content' => array()
-            );
+            )));
+            return;
         }
     }
 
