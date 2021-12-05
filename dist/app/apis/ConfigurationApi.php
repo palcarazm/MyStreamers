@@ -10,46 +10,10 @@ use mysqli;
 class ConfigurationApi
 {
     /**
-     * Controlador de la página de configuración
-     *
-     * @param Router $router
-     * @return void
-     */
-    public static function api(Router $router)
-    {
-        RequestParser::parse();
-        if (!isset($_POST['action'])) {
-            $response = array(
-                'status' => '400',
-                'message' => 'Se debe especificar la action a realizar',
-                'content' => array()
-            );
-        } else {
-            switch ($_POST['action']) {
-                case 'adminuser':
-                    $response = ConfigurationApi::configAdminuser();
-                    break;
-                case 'site':
-                    $response = ConfigurationApi::configSite();
-                    break;
-                default:
-                    $response = array(
-                        'status' => '501',
-                        'message' => 'Acción no implementada',
-                        'content' => $_POST
-                    );
-                    break;
-            }
-        }
-        $router->render('api/api', 'layout-api', array('response' => $response));
-    }
-
-    /**
      * Valida los datos de conexión de la base de datos.
      * Si son correctos lanza la configuración de la misma.
      *
      * @param Router $router
-     * @return array Respuesta de la API
      */
     public static function postDatabase(Router $router): void
     {
@@ -157,60 +121,127 @@ class ConfigurationApi
     /**
      * Configura el administrador principal del sistema
      *
-     * @return array Respuesta de la API
+     * @param Router $router
      */
-    protected static function configAdminuser(): array
+    public static function postAdmin(Router $router): void
     {
-        //Filtrar las variables
+        // Valida configuración inicial
+        if (IS_CONFIG_ADMIN) {
+            $router->render('api/api', 'layout-api', array('response' => array(
+                'status' => 403,
+                'message' => 'La configuración inicial del administrador ya ha sido efectuada y no puede volver a ejecutarse.',
+                'content' => array()
+            )));
+            return;
+        }
+
+        // Valida campos requeridos
+        if (!isset($_POST['user']) || !isset($_POST['email']) || !isset($_POST['pass'])) {
+            $router->render('api/api', 'layout-api', array('response' => array(
+                'status' => 400,
+                'message' => 'Debe incluirse todos los valores requeridos.',
+                'content' => array()
+            )));
+            return;
+        }
+
+        // Filtrar las variables
         $username = filter_var(trim($_POST['user']), FILTER_SANITIZE_STRING);
         $email = filter_var(trim($_POST['email']), FILTER_SANITIZE_EMAIL);
         $pass = filter_var(trim($_POST['pass']), FILTER_SANITIZE_STRING);
 
-        if (filter_var($email, FILTER_VALIDATE_EMAIL) && checkPasswordStrength($pass)) { //validación de datos
-            $user = new Usuario(array(
-                'username' => $username,
-                'email' => $email,
-                'pass' => password_hash($pass, PASSWORD_BCRYPT, array('cost' => 12)),
-                'FK_id_rol' => 1
-            ));
-
-            if ($user->validate()) { // validación de usuario
-                if ($user->save()) { // guargar usuario
-                    return array(
-                        'status' => '200',
-                        'message' => 'Datos actualizados',
-                        'content' => array($user)
-                    );
-                } else { // error al guardar usuario
-                    return array(
-                        'status' => '500',
-                        'message' => getMessage($user->errors()),
-                        'content' => array()
-                    );
-                }
-            } else { // validación de usuario no superada
-                return array(
-                    'status' => '500',
-                    'message' => getMessage($user->errors()),
-                    'content' => array()
-                );
-            }
-        } else { // Validación de datos no superada
-            return array(
-                'status' => '500',
-                'message' => 'No se ha superado la validación de email y contraseña',
+        if (!checkPasswordStrength($pass)) { // Validación contraseña
+            $router->render('api/api', 'layout-api', array('response' => array(
+                'status' => 500,
+                'message' => 'La contraseña indicada no cumple los estándares de seguridad',
                 'content' => array()
-            );
+            )));
+            return;
+        }
+
+        if (filter_var($email, FILTER_VALIDATE_EMAIL)) { //validación email
+            $router->render('api/api', 'layout-api', array('response' => array(
+                'status' => 400,
+                'message' => 'El e-mail indicado es inválido',
+                'content' => array()
+            )));
+            return;
+        }
+
+        // Cargar modelo de usuario
+        $user = new Usuario(array(
+            'username' => $username,
+            'email' => $email,
+            'pass' => password_hash($pass, PASSWORD_BCRYPT, array('cost' => 12)),
+            'FK_id_rol' => 1
+        ));
+
+        if ($user->validate()) { // validación de usuario
+            if ($user->save()) { // guargar usuario
+                try { // Alcualiza fichero de configuración
+                    $data = file_get_contents(__DIR__ . '/../../config/config.php');
+                    $data = preg_replace('/define\(\'IS_CONFIG_ADMIN\',\S+\)/', "define('IS_CONFIG_ADMIN',true)", $data);
+                    file_put_contents(__DIR__ . '/../../config/config.php', $data);
+                } catch (\Exception $e) {
+                    $router->render('api/api', 'layout-api', array('response' => array(
+                        'status' => 202,
+                        'message' => 'No se ha conseguido bloquear el acceso a la API de configuración del administrador. Realice un bloqueo manual',
+                        'content' => array()
+                    )));
+                    return;
+                }
+
+                $router->render('api/api', 'layout-api', array('response' => array(
+                    'status' => 201,
+                    'message' => 'Configuración del administrador completada',
+                    'content' => array()
+                )));
+                return;
+            } else { // error al guardar usuario
+                $router->render('api/api', 'layout-api', array('response' => array(
+                    'status' => '500',
+                    'message' => 'Se ha producido un error al crear el usuario:<br>' . getMessage($user->errors()),
+                    'content' => array()
+                )));
+                return;
+            }
+        } else { // validación de usuario no superada
+            $router->render('api/api', 'layout-api', array('response' => array(
+                'status' => '500',
+                'message' => 'Se ha producido un error al crear el usuario:<br>' . getMessage($user->errors()),
+                'content' => array()
+            )));
+            return;
         }
     }
 
     /**
      * Configura la información del sitio
      *
-     * @return array Respuesta de la API
+     * @param Router $router
      */
-    protected static function configSite(): array
+    public static function postSite(Router $router): void
     {
+        // Valida configuración inicial
+        if (IS_CONFIG_SITE) {
+            $router->render('api/api', 'layout-api', array('response' => array(
+                'status' => 403,
+                'message' => 'La configuración inicial del sitio ya ha sido efectuada y no puede volver a ejecutarse.',
+                'content' => array()
+            )));
+            return;
+        }
+
+        // Valida campos requeridos
+        if (!isset($_POST['titulo']) || !isset($_POST['tema']) || !isset($_POST['descripcion'])) {
+            $router->render('api/api', 'layout-api', array('response' => array(
+                'status' => 400,
+                'message' => 'Debe incluirse todos los valores requeridos.',
+                'content' => array()
+            )));
+            return;
+        }
+
         //Filtrar las variables
         $titulo = filter_var(trim($_POST['titulo']), FILTER_SANITIZE_STRING);
         $tema = filter_var(trim($_POST['tema']), FILTER_SANITIZE_STRING);
@@ -220,39 +251,81 @@ class ConfigurationApi
         $normas = isset($_POST['normas']) ? 1 : 0;
         $enlaces = isset($_POST['enlaces']) ? 1 : 0;
 
-        if ($titulo != '' && $tema != '' && $descripcion != '') {
+        if (!in_array($tema, array_column(getThemes(), 'folder'))) { // Validar tema
+            $router->render('api/api', 'layout-api', array('response' => array(
+                'status' => 500,
+                'message' => 'El tema seleccionado no se encuentra disponible',
+                'content' => array()
+            )));
+            return;
+        }
+
+        if ($titulo == '' || $descripcion == '') { // Validar datos obligatorios
+            $router->render('api/api', 'layout-api', array('response' => array(
+                'status' => 500,
+                'message' => 'Debe proveerse un título y descripción',
+                'content' => array()
+            )));
+            return;
+        }
+
+        try { // Registrar los datos
             $db = getDB();
             $stmt = $db->prepare("REPLACE INTO opciones (opcion , valor) VALUES ('titulo' , ?),('tema' , ?),('descripcion' , ?);");
             $stmt->bind_param('sss', $titulo, $tema, $descripcion);
-            if ($stmt->execute()) {
+            if (!$stmt->execute()) { // Registro datos principales en error
                 $stmt->close();
-                $stmt = $db->prepare("REPLACE INTO modulos (modulo , activo) VALUES ('eventos' , ?),('noticias' , ?),('normas' , ?),('enlaces' , ?);");
-                $stmt->bind_param('iiii', $eventos, $noticias, $normas, $enlaces);
-                if ($stmt->execute()) {
-                    $reponse = array(
-                        'status' => '200',
-                        'message' => 'Configuración guardada en la base de datos',
-                        'content' => array()
-                    );
-                    $stmt->close();
-                    $db->close();
-                    return $reponse;
-                }
+                $db->close();
+                $router->render('api/api', 'layout-api', array('response' => array(
+                    'status' => 500,
+                    'message' => 'Se ha producido un error al registrar la configuración en la base de datos',
+                    'content' => array()
+                )));
+                return;
             }
-            $reponse = array(
-                'status' => '500',
-                'message' => 'Error al guardar los datos en la base de datos',
-                'content' => array($stmt->error)
-            );
+            $stmt->close();
+
+            $stmt = $db->prepare("REPLACE INTO modulos (modulo , activo) VALUES ('eventos' , ?),('noticias' , ?),('normas' , ?),('enlaces' , ?);");
+            $stmt->bind_param('iiii', $eventos, $noticias, $normas, $enlaces);
+            if (!$stmt->execute()) { // Registro datos de módulos en error
+                $stmt->close();
+                $db->close();
+                $router->render('api/api', 'layout-api', array('response' => array(
+                    'status' => 500,
+                    'message' => 'Se ha producido un error al registrar la configuración en la base de datos',
+                    'content' => array()
+                )));
+                return;
+            }
             $stmt->close();
             $db->close();
-            return $reponse;
-        } else {
-            return array(
-                'status' => '500',
-                'message' => 'No se ha superado la validación',
+        } catch (\Exception $e) {
+            $router->render('api/api', 'layout-api', array('response' => array(
+                'status' => 500,
+                'message' => 'Se ha producido un error al registrar la configuración en la base de datos',
                 'content' => array()
-            );
+            )));
+            return;
         }
+
+        try { // Alcualiza fichero de configuración
+            $data = file_get_contents(__DIR__ . '/../../config/config.php');
+            $data = preg_replace('/define\(\'IS_CONFIG_SITE\',\S+\)/', "define('IS_CONFIG_SITE',true)", $data);
+            file_put_contents(__DIR__ . '/../../config/config.php', $data);
+        } catch (\Exception $e) {
+            $router->render('api/api', 'layout-api', array('response' => array(
+                'status' => 202,
+                'message' => 'No se ha conseguido bloquear el acceso a la API de configuración del sitio. Realice un bloqueo manual',
+                'content' => array()
+            )));
+            return;
+        }
+
+        $router->render('api/api', 'layout-api', array('response' => array(
+            'status' => 201,
+            'message' => 'Configuración del sitio completada',
+            'content' => array()
+        )));
+        return;
     }
 }
