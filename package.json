@@ -19,8 +19,9 @@
   "devDependencies": {
     "cssnano": "^5.0.8",
     "gulp": "^4.0.2",
-    "gulp-autoprefixer": "^8.0.0",
+    "gulp-autoprefixer": "^6.1.0",
     "gulp-concat": "^2.6.1",
+    "gulp-install": "^1.1.0",
     "gulp-notify": "^4.0.0",
     "gulp-postcss": "^9.0.1",
     "gulp-pretty-data": "^0.1.2",

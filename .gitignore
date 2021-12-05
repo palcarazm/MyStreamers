@@ -1,7 +1,7 @@
 node_modules/
 dist/vendor/
 dist/config/config.php
-dist/public/css/admin*
-dist/public/js/admin*
-dist/public/css/main*
-dist/public/js/main*
+dist/public/css/admin**
+dist/public/js/admin**
+dist/public/css/main**
+dist/public/js/main**
