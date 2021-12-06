@@ -17,6 +17,11 @@ class ConfigurationApi
      */
     public static function postDatabase(Router $router): void
     {
+        RequestParser::parse();
+        if(empty($_POST)){
+            $_POST = json_decode(file_get_contents("php://input"), true);
+        }
+
         // Valida configuración inicial
         if (IS_CONFIG_DATABASE) {
             $router->render('api/api', 'layout-api', array('response' => array(
@@ -125,6 +130,11 @@ class ConfigurationApi
      */
     public static function postAdmin(Router $router): void
     {
+        RequestParser::parse();
+        if(empty($_POST)){
+            $_POST = json_decode(file_get_contents("php://input"), true);
+        }
+
         // Valida configuración inicial
         if (IS_CONFIG_ADMIN) {
             $router->render('api/api', 'layout-api', array('response' => array(
@@ -222,6 +232,11 @@ class ConfigurationApi
      */
     public static function postSite(Router $router): void
     {
+        RequestParser::parse();
+        if(empty($_POST)){
+            $_POST = json_decode(file_get_contents("php://input"), true);
+        }
+
         // Valida configuración inicial
         if (IS_CONFIG_SITE) {
             $router->render('api/api', 'layout-api', array('response' => array(

@@ -87,21 +87,21 @@
                 <div class="card-body pt-2 pb-2">
                     <p class="card-text">Continuamos con la configuración del servidor de e-mail</p>
                     <div class="form-group row">
-                        <label for="host" class="col-sm-3 col-md-2 col-form-label">Host SMTP</label>
+                        <label for="hostSMTP" class="col-sm-3 col-md-2 col-form-label">Host SMTP</label>
                         <div class="col-sm-9 col-md-10">
-                            <input type="text" class="form-control" id="host" name="host" placeholder="host" required>
+                            <input type="text" class="form-control" id="hostSMTP" name="hostSMTP" placeholder="host" required>
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label for="port" class="col-sm-3 col-md-2 col-form-label">Puerto</label>
+                        <label for="portSMTP" class="col-sm-3 col-md-2 col-form-label">Puerto</label>
                         <div class="col-sm-9 col-md-10">
-                            <input type="number" min="0" class="form-control" id="port" name="port" placeholder="puerto" required>
+                            <input type="number" min="0" class="form-control" id="portSMTP" name="portSMTP" placeholder="puerto" required>
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label for="user" class="col-sm-3 col-md-2 col-form-label">Usuario</label>
+                        <label for="userEmail" class="col-sm-3 col-md-2 col-form-label">Usuario</label>
                         <div class="col-sm-9 col-md-10">
-                            <input type="text" class="form-control" id="user" name="user" placeholder="Usuario" required>
+                            <input type="text" class="form-control" id="userEmail" name="userEmail" placeholder="Usuario" required>
                         </div>
                     </div>
                     <div class="form-group row">
