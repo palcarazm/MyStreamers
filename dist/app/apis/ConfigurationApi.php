@@ -18,7 +18,7 @@ class ConfigurationApi
     public static function postDatabase(Router $router): void
     {
         RequestParser::parse();
-        if(empty($_POST)){
+        if (empty($_POST)) {
             $_POST = json_decode(file_get_contents("php://input"), true);
         }
 
@@ -48,7 +48,7 @@ class ConfigurationApi
         $DB_PASS = filter_var(trim($_POST['dbpass']), FILTER_SANITIZE_STRING);
         $DB_NAME = filter_var(trim($_POST['dbname']), FILTER_SANITIZE_STRING);
 
-        if (verifyDB($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME)) { //Conexión verificada
+        if (self::verifyDB($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME)) { //Conexión verificada
             try { // Crear fichero de configuración
                 $data = file_get_contents(__DIR__ . '/../../config/config-template.php');
                 $data = preg_replace('/define\(\'DB_HOST\',\'\S+\'\)/', "define('DB_HOST','{$DB_HOST}')", $data);
@@ -131,7 +131,7 @@ class ConfigurationApi
     public static function postAdmin(Router $router): void
     {
         RequestParser::parse();
-        if(empty($_POST)){
+        if (empty($_POST)) {
             $_POST = json_decode(file_get_contents("php://input"), true);
         }
 
@@ -233,7 +233,7 @@ class ConfigurationApi
     public static function postSite(Router $router): void
     {
         RequestParser::parse();
-        if(empty($_POST)){
+        if (empty($_POST)) {
             $_POST = json_decode(file_get_contents("php://input"), true);
         }
 
@@ -342,5 +342,22 @@ class ConfigurationApi
             'content' => array()
         )));
         return;
+    }
+
+    /**
+     * Verificar conexion con la base de datos
+     * @param String $DB_HOST Host de conexion
+     * @param String $DB_USER Usuario de conexion
+     * @param String $DB_PASS Contraseña de conexion
+     * @param String $DB_NAME Base de datos de conexion
+     * @return bool Se establece conexión (SI/NO)
+     */
+    private function verifyDB(String $DB_HOST, String $DB_USER, String $DB_PASS, String $DB_NAME): bool
+    {
+        $db = new mysqli($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME);
+        if ($db->connect_error) {
+            return false;
+        }
+        return true;
     }
 }

@@ -57,23 +57,6 @@ function getDB(): mysqli
 }
 
 /**
- * Verificar conexion con la base de datos
- * @param String $DB_HOST Host de conexion
- * @param String $DB_USER Usuario de conexion
- * @param String $DB_PASS Contraseña de conexion
- * @param String $DB_NAME Base de datos de conexion
- * @return bool Se establece conexión (SI/NO)
- */
-function verifyDB(String $DB_HOST, String $DB_USER, String $DB_PASS, String $DB_NAME): bool
-{
-    $db = new mysqli($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME);
-    if ($db->connect_error) {
-        return false;
-    }
-    return true;
-}
-
-/**
  * Verifica que la contraseña introducida respeta el estandar de seguridad
  * @return bool Respeta el estandar de seguridad (SI/NO)
  */
