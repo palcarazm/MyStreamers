@@ -4,9 +4,10 @@ $(function () {
       togglePassword();
       $('.custom-select').select2();
       $('.custom-textarea').richTextMD();
-      verifyDB();
+      configDB();
       configAdmin();
       validAdminuserForm();
+      configEmail();
       configSite();
       break;
 

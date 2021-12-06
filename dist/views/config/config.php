@@ -4,6 +4,7 @@
         <div class="progress-bar progress-bar-striped" role="progressbar" style="width: 0%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100" id="progreso"></div>
     </div>
     <ul class="list-group list-group-flush">
+        <!-- Inicio configDatabase -->
         <li class="list-group-item step current" id="configDatabase">
             <h2 class="card-subtitle"><i></i><span>Configiuración de la base de datos</span></h2>
             <form action="/api/config/v1/database" method="post" class="border-secondary step-body">
@@ -40,7 +41,8 @@
                 </div>
             </form>
         </li>
-        <!--verifyDB-->
+        <!-- Fin configDatabase -->
+        <!-- Inicio configAdmin -->
         <li class="list-group-item step todo" id="configAdmin">
             <h2 class="card-subtitle"><i></i><span>Configuración del administrador</span></h2>
             <form action="/api/config/v1/admin" method="post" class="border-secondary step-body">
@@ -70,7 +72,7 @@
                     <div class="form-group row">
                         <label for="pass2" class="col-sm-3 col-md-2 col-form-label">Repetir Contraseña</label>
                         <div class="col-sm-9 col-md-10 input-group">
-                            <input type="password" class="form-control" id="pass2" placeholder="Contraseña" required>
+                            <input type="password" class="form-control" id="pass2" name="pass2" placeholder="Contraseña" required>
                             <div class="input-group-append">
                                 <button class="btn btn-outline-secondary toggle-password" type="button"><i class="far fa-eye"></i></button>
                             </div>
@@ -80,8 +82,9 @@
                 </div>
             </form>
         </li>
-        <!--configAdmin-->
-        <li class="list-group-item step current" id="configEmail">
+        <!-- Fin configAdmin -->
+        <!-- Inicio emailConfig -->
+        <li class="list-group-item step todo" id="configEmail">
             <h2 class="card-subtitle"><i></i><span>Configuración del servidor de e-mail</span></h2>
             <form action="/api/config/v1/email" method="post" class="border-secondary step-body">
                 <div class="card-body pt-2 pb-2">
@@ -113,13 +116,26 @@
                             </div>
                         </div>
                     </div>
-                    <input type="hidden" name="adminEmail" value="">
+                    <div class="form-group row">
+                        <label for="fromEmail" class="col-sm-3 col-md-2 col-form-label">E-mail de envío de correos</label>
+                        <div class="col-sm-9 col-md-10">
+                            <input type="text" class="form-control" id="fromEmail" name="fromEmail" placeholder="E-mail que mostrar en el envío de correos" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="fromName" class="col-sm-3 col-md-2 col-form-label">Nombre de envío de correos</label>
+                        <div class="col-sm-9 col-md-10">
+                            <input type="text" class="form-control" id="fromName" name="fromName" placeholder="Nombre que mostrar en el envío  envío de correos" required>
+                        </div>
+                    </div>
+                    <input type="hidden" name="adminEmail" id="adminEmail" value="">
                     <button type="submit" class="btn btn-primary d-block ml-auto mr-0">Verificar servidor de e-mail</button>
                 </div>
             </form>
         </li>
-        <!--emailConfig-->
-        <li class="list-group-item step current" id="configSite">
+        <!-- Fin emailConfig -->
+        <!-- Inicio siteConfig -->
+        <li class="list-group-item step todo" id="configSite">
             <h2 class="card-subtitle"><i></i><span>Configuración del sitio</span></h2>
             <form action="/api/config/v1/site" method="post" class="border-secondary step-body">
                 <div class="card-body pt-2 pb-2">
@@ -179,17 +195,17 @@
                 </div>
             </form>
         </li>
-        <!--siteConfig-->
+        <!-- Fin siteConfig -->
+        <!-- Inicio finalMessage -->
         <li class="list-group-item step todo" id="finalMessage">
             <div class="alert alert-success step-body" role="alert">
                 <h4 class="alert-heading">Bien hecho!</h4>
                 <p>Has finalizado la configuración inicial de My Streamers. Ahora ya tu web y base de datos se encuentran conectadas, has creado el administrador del sistema y configurado los datos básicos de tu sitio.</p>
-                <p><span class="badge badge-warning text-white mr-1"><i class="fas fa-exclamation-circle"></i></span>Por seguridad, vamos a bloquear el acceso a esta sección para que nadie pueda modificar la configuración del sitio sin estar autenticado.</p>
-                <hr>
-                <p class="mb-0"><span class="badge badge-info mr-1"><i class="fas fa-info-circle"></i></span>¿Por qué no te pasas por el <a href="#" class="alert-link text-white">panel de administración</a> para añadir información a tu sitio?</p>
+                <p class="mb-0">¿Por qué no te pasas por el <a href="#" class="alert-link text-white">panel de administración</a> para añadir información a tu sitio?</p>
             </div>
+            <p><span class="badge badge-warning"><i class="fas fa-exclamation-circle  mr-1"></i>Por seguridad, vamos a bloquear el acceso a esta sección para que nadie pueda modificar la configuración del sitio sin estar autenticado.</span></p>
         </li>
-        <!--siteConfig-->
+        <!-- Fin finalMessage -->
     </ul>
 
 </div>
