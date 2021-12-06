@@ -14,7 +14,7 @@ $router = new Router;
 
 /* AÑADIR RUTAS */
 // Configuración
-if(!IS_INIT){$router->add('GET', '/config', [PublicController::class, 'config']);}
+if(!IS_CONFIG_SITE){$router->add('GET', '/config', [PublicController::class, 'config']);}
 $router->add('POST', '/api/config/v1/database', [ConfigurationApi::class, 'postDatabase']);
 $router->add('POST', '/api/config/v1/admin', [ConfigurationApi::class, 'postAdmin']);
 $router->add('POST', '/api/config/v1/email', [ConfigurationApi::class, 'postEmail']);

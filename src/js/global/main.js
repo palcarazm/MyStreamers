@@ -25,7 +25,7 @@ function callAPIverbose(
         html: "Todos los campos son obligatorios",
         timer: 3000,
       });
-      return;
+      return false;
     }
   });
   if (length < requiered) {
@@ -35,7 +35,7 @@ function callAPIverbose(
       html: "Todos los campos son obligatorios",
       timer: 3000,
     });
-    return;
+    return false;
   }
   $.ajax({
     type: method,
@@ -81,6 +81,7 @@ function callAPIverbose(
       }
     },
   });
+  return true;
 }
 /** Devuelve la URL de la página actual
  *
