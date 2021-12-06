@@ -352,7 +352,7 @@ class ConfigurationApi
      * @param String $DB_NAME Base de datos de conexion
      * @return bool Se establece conexión (SI/NO)
      */
-    private function verifyDB(String $DB_HOST, String $DB_USER, String $DB_PASS, String $DB_NAME): bool
+    private static function verifyDB(String $DB_HOST, String $DB_USER, String $DB_PASS, String $DB_NAME): bool
     {
         $db = new mysqli($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME);
         if ($db->connect_error) {
