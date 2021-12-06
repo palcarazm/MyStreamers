@@ -9,6 +9,14 @@ define('DB_NAME','DB_NAME');
 define('DB_USER','DB_USER');
 define('DB_PASS','DB_PASS');
 
+/* INFORMACIÓN DEL SERVIDOR SMTP */
+define('SMTP_HOST','SMTP_HOST');
+define('SMTP_PORT','SMTP_PORT');
+define('SMTP_USER','SMTP_USER');
+define('SMTP_PASS','SMTP_PASS');
+define('SMTP_EMAIL','SMTP_EMAIL');
+define('SMTP_NAME','SMTP_NAME');
+
 /* INFORMACIÓN DE ESTADO DE CONFIGURACION */
 define('IS_CONFIG_DATABASE',false);
 define('IS_CONFIG_ADMIN',false);

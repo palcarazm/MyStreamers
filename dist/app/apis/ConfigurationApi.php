@@ -5,6 +5,9 @@ namespace Apis;
 use Route\Router;
 use Model\Usuario;
 use Notihnio\RequestParser\RequestParser;
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
 use mysqli;
 
 class ConfigurationApi
@@ -169,7 +172,7 @@ class ConfigurationApi
             return;
         }
 
-        if (filter_var($email, FILTER_VALIDATE_EMAIL)) { //validación email
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) { //validación email
             $router->render('api/api', 'layout-api', array('response' => array(
                 'status' => 400,
                 'message' => 'El e-mail indicado es inválido',
@@ -223,6 +226,179 @@ class ConfigurationApi
             )));
             return;
         }
+    }
+
+     /**
+     * Configura el servidor de e-mail
+     *
+     * @param Router $router
+     */
+    public static function postEmail(Router $router): void
+    {
+        RequestParser::parse();
+        if (empty($_POST)) {
+            $_POST = json_decode(file_get_contents("php://input"), true);
+        }
+
+        // Valida configuración inicial
+        if (IS_CONFIG_EMAIL) {
+            $router->render('api/api', 'layout-api', array('response' => array(
+                'status' => 403,
+                'message' => 'La configuración inicial del servidor de correo ya ha sido efectuada y no puede volver a ejecutarse.',
+                'content' => array()
+            )));
+            return;
+        }
+
+        // Valida campos requeridos
+        if (!isset($_POST['hostSMTP']) || !isset($_POST['portSMTP']) || !isset($_POST['userEmail']) || !isset($_POST['passEmail']) || !isset($_POST['adminEmail']) || !isset($_POST['fromEmail']) || !isset($_POST['fromName'])) {
+            $router->render('api/api', 'layout-api', array('response' => array(
+                'status' => 400,
+                'message' => 'Debe incluirse todos los valores requeridos.',
+                'content' => array()
+            )));
+            return;
+        }
+
+        // Filtrar las variables
+        $hostSMTP = filter_var(trim($_POST['hostSMTP']), FILTER_SANITIZE_STRING);
+        $portSMTP = filter_var(trim($_POST['portSMTP']), FILTER_SANITIZE_NUMBER_INT);
+        $userEmail = filter_var(trim($_POST['userEmail']), FILTER_SANITIZE_STRING);
+        $passEmail = filter_var(trim($_POST['passEmail']), FILTER_SANITIZE_STRING);
+        $adminEmail = filter_var(trim($_POST['adminEmail']), FILTER_SANITIZE_EMAIL);
+        $fromEmail = filter_var(trim($_POST['fromEmail']), FILTER_SANITIZE_EMAIL);
+        $fromName = filter_var(trim($_POST['fromName']), FILTER_SANITIZE_STRING);
+
+        if (!filter_var($adminEmail, FILTER_VALIDATE_EMAIL) || !filter_var($fromEmail, FILTER_VALIDATE_EMAIL)) { //validación email
+            $router->render('api/api', 'layout-api', array('response' => array(
+                'status' => 400,
+                'message' => 'El e-mail indicado es inválido',
+                'content' => array()
+            )));
+            return;
+        }
+       
+        try {// Intento de conexión
+           self::verifySMTP($hostSMTP, $portSMTP, $userEmail, $passEmail);
+        } catch (Exception $e) {
+            $router->render('api/api', 'layout-api', array('response' => array(
+                'status' => 500,
+                'message' => 'Se ha producido un error al intentar conectar con el servidor SMTP:<br>' . $e->getMessage(),
+                'content' => array()
+            )));
+            return;
+        }
+
+        try { // Guardar datos en el fichero de configuración
+            $data = file_get_contents(__DIR__ . '/../../config/config.php');
+            $data = preg_replace('/define\(\'SMTP_HOST\',\'\S+\'\)/', "define('SMTP_HOST','{$hostSMTP}')", $data);
+            $data = preg_replace('/define\(\'SMTP_PORT\',\'\S+\'\)/', "define('SMTP_PORT','{$portSMTP}')", $data);
+            $data = preg_replace('/define\(\'SMTP_USER\',\'\S+\'\)/', "define('SMTP_USER','{$userEmail}')", $data);
+            $data = preg_replace('/define\(\'SMTP_PASS\',\'\S+\'\)/', "define('SMTP_PASS','{$passEmail}')", $data);
+            $data = preg_replace('/define\(\'SMTP_EMAIL\',\'\S+\'\)/', "define('SMTP_EMAIL','{$fromEmail}')", $data);
+            $data = preg_replace('/define\(\'SMTP_NAME\',\'\S+\'\)/', "define('SMTP_NAME','{$fromName}')", $data);
+            file_put_contents(__DIR__ . '/../../config/config.php', $data);
+        } catch (\Exception $e) {
+            $router->render('api/api', 'layout-api', array('response' => array(
+                'status' => 500,
+                'message' => 'Se ha producido un error al guardar los datos de configuración',
+                'content' => array()
+            )));
+            return;
+        }
+
+        try { // Envio de mensaje al administrador
+            $mail = new PHPMailer(true);
+            //Server settings
+            $mail->isSMTP();                                            //Send using SMTP
+            $mail->Host       = $hostSMTP;                             //Set the SMTP server to send through
+            $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
+            $mail->Username   = $userEmail;                             //SMTP username
+            $mail->Password   = $passEmail;                             //SMTP password
+            $mail->Port       = $portSMTP;                              //TCP port to connect to
+            $mail->setFrom($fromEmail, $fromName);
+            $mail->CharSet= 'UTF-8';
+        
+            //Recipients
+            $mail->addAddress($adminEmail);
+
+            //Content
+            $mail->isHTML(true);
+            $mail->Subject = '[MyStreamers] Verificación del servidor';
+            $mail->Body    = 'Correo de prueba del <b>servidor SMTP</b>!';
+            $mail->AltBody = 'Correo de prueba del servidor SMTP!';
+        
+            $mail->send();
+        } catch (Exception $e) {
+            $router->render('api/api', 'layout-api', array('response' => array(
+                'status' => 500,
+                'message' => 'Se ha producido un error al enviar el correo de prueba:<br>' . $mail->ErrorInfo,
+                'content' => array()
+            )));
+            return;
+        }
+
+        $router->render('api/api', 'layout-api', array('response' => array(
+            'status' => 201,
+            'message' => 'Configuración del servidor de email registrada',
+            'content' => array()
+        )));
+        return;
+    }
+
+    /**
+     * Actualiza la configuración del servidor de e-mail
+     *
+     * @param Router $router
+     */
+    public static function putEmail(Router $router): void
+    {
+        RequestParser::parse();
+        if (empty($_PUT)) {
+            $_PUT = json_decode(file_get_contents("php://input"), true);
+        }
+
+        if (isset($_GET['confirm'])) { // Metodo de confirmación
+            if ($_GET['confirm']== 'true') {
+                if (IS_CONFIG_EMAIL) {
+                    $router->render('api/api', 'layout-api', array('response' => array(
+                        'status' => 403,
+                        'message' => 'La configuración inicial del servidor de correo ya ha sido efectuada y no puede volver a ejecutarse.',
+                        'content' => array()
+                    )));
+                    return;
+                }
+
+                try { // Alcualiza fichero de configuración
+                    $data = file_get_contents(__DIR__ . '/../../config/config.php');
+                    $data = preg_replace('/define\(\'IS_CONFIG_EMAIL\',\S+\)/', "define('IS_CONFIG_EMAIL',true)", $data);
+                    file_put_contents(__DIR__ . '/../../config/config.php', $data);
+                } catch (\Exception $e) {
+                    $router->render('api/api', 'layout-api', array('response' => array(
+                        'status' => 202,
+                        'message' => 'No se ha conseguido bloquear el acceso a la API de configuración del servidor de email. Realice un bloqueo manual',
+                        'content' => array()
+                    )));
+                    return;
+                }
+    
+                $router->render('api/api', 'layout-api', array('response' => array(
+                    'status' => 201,
+                    'message' => 'Validación del servidor de email registrada',
+                    'content' => array()
+                )));
+                return;
+
+            }
+        }
+
+        // Método no encontrado
+        $router->render('api/api', 'layout-api', array('response' => array(
+            'status' => 405,
+            'message' => 'Método o parámetros no soportados',
+            'content' => array()
+        )));
+        return;
     }
 
     /**
@@ -359,5 +535,48 @@ class ConfigurationApi
             return false;
         }
         return true;
+    }
+
+    /**
+     * Verifica conexión con el servidor SMTP
+     *
+     * @param String $hostSMTP Host del servidor SMTP
+     * @param integer $portSMTP Puerto del servidor SMTP
+     * @param String $userEmail Usuario SMTP
+     * @param String $passEmail Contraseña SMTP
+     * @return void Lanza una exception en caso de error
+     */
+    private static function verifySMTP(String $hostSMTP, int $portSMTP, String $userEmail, String $passEmail): void
+    {
+        $smtp = new SMTP();
+        //Connect to an SMTP server
+        if (!$smtp->connect($hostSMTP, $portSMTP)) {
+            throw new Exception('Fallo en la conexión con el servidor');
+        }
+        //Say hello
+        if (!$smtp->hello(gethostname())) {
+            throw new Exception('El servidor no responde: ' . $smtp->getError()['error']);
+        }
+        //Get the list of ESMTP services the server offers
+        $e = $smtp->getServerExtList();
+        //If server can do TLS encryption, use it
+        if (is_array($e) && array_key_exists('STARTTLS', $e)) {
+            $tlsok = $smtp->startTLS();
+            if (!$tlsok) {
+                throw new Exception('Allo al iniciar la encriptación: ' . $smtp->getError()['error']);
+            }
+            //Repeat EHLO after STARTTLS
+            if (!$smtp->hello(gethostname())) {
+                throw new Exception('El servidor no responde: ' . $smtp->getError()['error']);
+            }
+            //Get new capabilities list, which will usually now include AUTH if it didn't before
+            $e = $smtp->getServerExtList();
+        }
+        //If server supports authentication, do it (even if no encryption)
+        if (is_array($e) && array_key_exists('AUTH', $e)) {
+            if (!$smtp->authenticate($userEmail, $passEmail)) {
+                throw new Exception('Fallo en la autenticación de usuario: ' . $smtp->getError()['error']);
+            }
+        }
     }
 }
