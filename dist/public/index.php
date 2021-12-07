@@ -21,6 +21,9 @@ $router->add('POST', '/api/config/v1/email', [ConfigurationApi::class, 'postEmai
 $router->add('PUT', '/api/config/v1/email', [ConfigurationApi::class, 'putEmail']);
 $router->add('POST', '/api/config/v1/site', [ConfigurationApi::class, 'postSite']);
 
+// Publicas
+$router->add('GET','/',[PublicController::class, 'index']);
+
 /* ENROUTAR */
 if (is_file(__DIR__ . '/../config/config.php')) {
     ActiveRecord::connect(getDB());
