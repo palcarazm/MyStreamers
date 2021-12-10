@@ -312,11 +312,11 @@ class ActiveRecord
      * Crea un objeto con los datos indicados
      *
      * @param mixed $record
-     * @return static
+     * @return object
      */
-    protected static function createObject(mixed $record): static
+    protected static function createObject(mixed $record)
     {
-        $obj = new static;
+        $obj = new self;
         foreach ($record as $key => $value) {
             if (property_exists($obj, $key)) {
                 $obj->$key = $value;
