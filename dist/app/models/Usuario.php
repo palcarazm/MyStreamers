@@ -5,17 +5,19 @@ namespace Model;
 class Usuario extends ActiveRecord
 {
     protected static String $table = 'users';
+    protected static String $date ='actualizado';
+    protected static array $joins = array('roles'=>'id_rol');
     protected static String $defaultOrder = 'PK_id_user';
     protected static array $colDB = ['PK_id_user', 'username', 'email', 'pass', 'actualizado', 'FK_id_rol'];
     protected static String $PK = 'PK_id_user';
 
-    public $PK_id_user;
+    protected $PK_id_user;
     public $username;
     public $email;
     public $pass;
-    public $actualizado;
+    protected $actualizado;
     public $FK_id_rol;
-    //public $rol;
+    public $rol;
 
     public function __construct($args = [])
     {
@@ -23,9 +25,8 @@ class Usuario extends ActiveRecord
         $this->username = $args['username'] ?? '';
         $this->email = $args['email'] ?? '';
         $this->pass = $args['pass'] ?? '';
-        $this->actualizado = $args['actualizado'] ?? null;
         $this->FK_id_rol = $args['FK_id_rol'] ?? '';
-        //$this->rol = $args[''] ?? '';
+        $this->actualizado = $args['actualizado'] ?? null;
     }
 
     /**
@@ -55,5 +56,27 @@ class Usuario extends ActiveRecord
         }
 
         return empty(self::$errors);
+    }
+
+    /**
+     * Crea un objeto con los datos indicados
+     *
+     * @param mixed $record
+     * @param array $fields
+     * @return object
+     */
+    protected static function createObject(mixed $record , array $fields)
+    {
+        $obj = new static;
+        $rol_values =[];
+        foreach ($record as $key => $value) {
+            if (property_exists($obj, $key) && $fields[$key] == static::$table) {
+                $obj->$key = $value;
+            }elseif( $fields[$key] == 'roles'){
+                $rol_values[$key] = $value;
+            }
+        }
+        $obj->rol = new Rol($rol_values);
+        return $obj;
     }
 }

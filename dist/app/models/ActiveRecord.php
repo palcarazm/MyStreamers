@@ -9,6 +9,8 @@ class ActiveRecord
     protected static mysqli $db;
     protected static String $table = '';
     protected static String $PK = '';
+    protected static String $date ='';
+    protected static array $joins = [];
     protected static bool $isAuto_Increment = true;
     protected static String $image;
     protected static String $defaultOrder = '';
@@ -47,8 +49,9 @@ class ActiveRecord
      */
     public function save(): bool
     {
-        if($this->validate()){
+        if ($this->validate()) {
             $attr = $this->sanitize();
+            if(static::$date != ''){$this->{static::$date} = date('Y-m-d HH:ii:ss'); }
             return is_null($this->{static::$PK}) ? $this->create($attr) : $this->update($attr);
         }
         return false;
@@ -67,13 +70,13 @@ class ActiveRecord
         $query .= " ) VALUES ('";
         $query .= join("' , '", array_values($attr));
         $query .= "')";
-        if(self::$db->query($query)){
-            if(static::$isAuto_Increment){
+        if (self::$db->query($query)) {
+            if (static::$isAuto_Increment) {
                 $this->{static::$PK} = self::$db->insert_id;
             }
             return true;
-        }else{
-            static::$errors[] = self::$db -> error;
+        } else {
+            static::$errors[] = self::$db->error;
             return false;
         }
     }
@@ -95,10 +98,10 @@ class ActiveRecord
         $query .= join(" , ", $attr);
         $query .= " WHERE " . static::$PK . " = '" . self::$db->escape_string($this->{static::$PK}) . "'";
 
-        if(self::$db->query($query)){
+        if (self::$db->query($query)) {
             return true;
-        }else{
-            static::$errors[] = self::$db -> error;
+        } else {
+            static::$errors[] = self::$db->error;
             return false;
         }
     }
@@ -112,10 +115,10 @@ class ActiveRecord
     {
         $this->deleteImage();
         $query = "DELETE FROM " . static::$table . " WHERE " . static::$PK . " = '" . self::$db->escape_string($this->{static::$PK}) . "'";
-        if(self::$db->query($query)){
+        if (self::$db->query($query)) {
             return true;
-        }else{
-            static::$errors[] = self::$db -> error;
+        } else {
+            static::$errors[] = self::$db->error;
             return false;
         }
     }
@@ -130,7 +133,7 @@ class ActiveRecord
         $attr = [];
         foreach (static::$colDB as $col) {
             if ($col == static::$PK) continue;
-            if(is_null($this->$col)) continue;
+            if (is_null($this->$col)) continue;
             $attr[$col] = $this->$col;
         }
         return $attr;
@@ -260,7 +263,13 @@ class ActiveRecord
      */
     public static function all(): array
     {
-        $query = "SELECT * FROM " . static::$table . " ORDER BY " . static::$defaultOrder;
+        $query = "SELECT * FROM " . static::$table;
+        if (!empty(static::$joins)) {
+            foreach (static::$joins as $table => $FK) {
+                $query .= " INNER JOIN " . $table . " ON FK_" . $FK . " = PK_"  . $FK;
+            }
+        }
+        $query .= " ORDER BY " . static::$defaultOrder;
         return self::query($query);
     }
 
@@ -270,7 +279,13 @@ class ActiveRecord
      */
     public static function allLimit(int $limit): array
     {
-        $query = "SELECT * FROM " . static::$table . " ORDER BY " . static::$defaultOrder . " LIMIT " . $limit;
+        $query = "SELECT * FROM " . static::$table;
+        if (!empty(static::$joins)) {
+            foreach (static::$joins as $table => $FK) {
+                $query .= " INNER JOIN " . $table . " ON FK_" . $FK . " = PK_"  . $FK;
+            }
+        }
+        $query .= " ORDER BY " . static::$defaultOrder . " LIMIT " . $limit;
         return self::query($query);
     }
 
@@ -281,7 +296,13 @@ class ActiveRecord
      */
     public static function find(int $id): self|null
     {
-        $query = "SELECT * FROM " . static::$table . " WHERE id = ${id}";
+        $query = "SELECT * FROM " . static::$table;
+        if (!empty(static::$joins)) {
+            foreach (static::$joins as $table => $FK) {
+                $query .= " INNER JOIN " . $table . " ON FK_" . $FK . " = PK_"  . $FK;
+            }
+        }
+        $query .= " WHERE " . static::$PK . " = ${id}";
         $resultado = self::query($query);
         return array_shift($resultado);
     }
@@ -299,8 +320,13 @@ class ActiveRecord
 
         // Crear arreglo
         $array = [];
+        $fields = [];
+        foreach ($rs->fetch_fields() as $field) {
+            $fields[$field->name] = $field->table;
+        }
+
         while ($item = $rs->fetch_assoc()) {
-            $array[] = static::createObject($item);
+            $array[] = static::createObject($item, $fields);
         }
         // Liberar memoria
         $rs->free();
@@ -312,13 +338,14 @@ class ActiveRecord
      * Crea un objeto con los datos indicados
      *
      * @param mixed $record
+     * @param array $fields
      * @return object
      */
-    protected static function createObject(mixed $record)
+    protected static function createObject(mixed $record, array $fields)
     {
-        $obj = new self;
+        $obj = new static;
         foreach ($record as $key => $value) {
-            if (property_exists($obj, $key)) {
+            if (property_exists($obj, $key) && $fields[$key] == static::$table) {
                 $obj->$key = $value;
             }
         }

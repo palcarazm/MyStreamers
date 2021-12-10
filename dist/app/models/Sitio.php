@@ -61,7 +61,7 @@ class Sitio extends ActiveRecord
      * @param mixed $record
      * @return array
      */
-    protected static function createObject(mixed $record)
+    protected static function createObject(mixed $record, array $fields =[])
     {
         return $record;
     }
