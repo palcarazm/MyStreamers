@@ -2,7 +2,9 @@
 
 namespace Route;
 
+use Exception;
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\SignatureInvalidException;
 
@@ -28,7 +30,7 @@ class Token
     {
         return JWT::encode(array(
             'iat' => time(),              // inicio del token
-            'exp' => time() + (60 * 1),       // validez (1 min)
+            'exp' => time() + (60 * 60),       // validez (1 h)
             'data' => [
                 'scopes' => $scopes
             ]
@@ -45,7 +47,8 @@ class Token
     public static function validate(string $scope, string $token):Token
     {
         try {
-            $data = JWT::decode($token, SECRET, array('HS256'));
+            $token = JWT::decode($token, new Key(SECRET, 'HS256'));
+            $data = $token->data;
         } catch (ExpiredException $e) {
             return new Token(array(
                 'status' => 401,
@@ -56,24 +59,29 @@ class Token
                 'status' => 401,
                 'message' => 'Token invalido'
             ));
+        } catch (Exception $e){
+            return new Token(array(
+                'status' => 500,
+                'message' => $e
+            ));
         }
-        if(!isset($data['scopes'])){
+        if(!isset($data->scopes)){
             return new Token(array(
                 'status' => 403,
                 'message' => 'No tiene permisos para este servicio'
             ));
         }
-        if (!in_array($scope, $data['scopes'])) {
+        if (!in_array($scope, $data->scopes)) {
             return new Token(array(
                 'status' => 403,
                 'message' => 'No tiene permisos para este servicio',
-                'scopes' => $data['scopes']
+                'scopes' => $data->scopes
             ));
         }
         return new Token(array(
             'status' => 200,
             'message' => 'Accesso autorizado',
-            'scopes' => $data['scopes']
+            'scopes' => $data->scopes
         ));
     }
 

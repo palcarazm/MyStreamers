@@ -3,6 +3,7 @@
 namespace Apis;
 
 use Route\Router;
+use Route\Token;
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\PHPMailer;
 use Notihnio\RequestParser\RequestParser;
@@ -20,16 +21,25 @@ class ComunicationApi
     public static function postEmail(Router $router): void
     {
         RequestParser::parse();
+        $_HEADER = getallheaders();
         if (empty($_POST)) {
             $_POST = json_decode(file_get_contents("php://input"), true);
         }
-        loadSession();
-
+        
         // Credito para envio de email
-        if(!isset($_SESSION['COM']) || $_SESSION['COM']<1){
+        if(!isset($_HEADER['Authorization'])){
             $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 401,
+                'status' => 403,
                 'message' => 'No dispone de autorización para emplear este servicio.',
+                'content' => array()
+            )));
+            return;
+        }
+        $token = Token::validate('COM',$_HEADER['Authorization']);
+        if($token->getStatus()!=200){
+            $router->render('api/api', 'layout-api', array('response' => array(
+                'status' => $token->getStatus(),
+                'message' => $token->getMessage(),
                 'content' => array()
             )));
             return;

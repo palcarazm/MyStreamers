@@ -54,6 +54,7 @@ class ConfigurationApi
         if (self::verifyDB($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME)) { //Conexión verificada
             try { // Crear fichero de configuración
                 $data = file_get_contents(__DIR__ . '/../../config/config-template.php');
+                $data = preg_replace('/define\(\'SECRET\',\'\S+\'\)/', "define('SECRET','".strtoupper(bin2hex(random_bytes(20)))."')", $data);
                 $data = preg_replace('/define\(\'DB_HOST\',\'\S+\'\)/', "define('DB_HOST','{$DB_HOST}')", $data);
                 $data = preg_replace('/define\(\'DB_NAME\',\'\S+\'\)/', "define('DB_NAME','{$DB_NAME}')", $data);
                 $data = preg_replace('/define\(\'DB_USER\',\'\S+\'\)/', "define('DB_USER','{$DB_USER}')", $data);
