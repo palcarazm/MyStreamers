@@ -25,5 +25,6 @@ define('IS_CONFIG_SITE',false);
 /* DIRECTORIOS */
 define('APP_FILE',__DIR__ . '/../includes/app.php');
 define('THEMES_DIR',__DIR__ . '/../public/themes');
+define('TEMPLATES_DIR',__DIR__ . '/../includes/templates');
 define('IMG_DIR',__DIR__.'/../public/img');
 include APP_FILE;
