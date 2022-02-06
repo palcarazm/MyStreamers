@@ -8,6 +8,7 @@ if (is_file(__DIR__ . '/../config/config.php')) {
 use Route\Router;
 use Controllers\PublicController;
 use Apis\ConfigurationApi;
+use Apis\ComunicationApi;
 use Model\ActiveRecord;
 
 $router = new Router;
@@ -21,6 +22,8 @@ $router->add('POST', '/api/config/v1/email', [ConfigurationApi::class, 'postEmai
 $router->add('PUT', '/api/config/v1/email', [ConfigurationApi::class, 'putEmail']);
 $router->add('POST', '/api/config/v1/site', [ConfigurationApi::class, 'postSite']);
 
+// Comunicación
+$router->add('POST','/api/com/v1/email',[ComunicationApi::class,'postEmail']);
 // Publicas
 $router->add('GET','/',[PublicController::class, 'index']);
 
