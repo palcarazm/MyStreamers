@@ -79,4 +79,23 @@ class Usuario extends ActiveRecord
         $obj->rol = new Rol($rol_values);
         return $obj;
     }
+
+    /**
+     * Buscar usuario por nombre o email
+     *
+     * @param String $usuario nombre o email
+     * @return void
+     */
+    public static function findUser(String $usuario)
+    {
+        $query = "SELECT * FROM " . static::$table;
+        if (!empty(static::$joins)) {
+            foreach (static::$joins as $table => $FK) {
+                $query .= " INNER JOIN " . $table . " ON FK_" . $FK . " = PK_"  . $FK;
+            }
+        }
+        $query .= " WHERE username = '${usuario}' OR email = '${usuario}'";
+        $resultado = self::query($query);
+        return array_shift($resultado);
+    }
 }
