@@ -79,3 +79,15 @@ function getMessage(array $messages): String
 {
     return join("<br/>", array_values($messages));
 }
+
+/**
+ * Carga la session
+ *
+ * @return void
+ */
+function loadSession(): void
+{
+    if (session_status() == PHP_SESSION_NONE) {
+        session_start();
+    }
+}
