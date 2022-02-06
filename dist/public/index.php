@@ -9,6 +9,7 @@ use Route\Router;
 use Controllers\PublicController;
 use Apis\ConfigurationApi;
 use Apis\ComunicationApi;
+use Apis\AuthentificationApi;
 use Model\ActiveRecord;
 
 $router = new Router;
@@ -24,6 +25,10 @@ $router->add('POST', '/api/config/v1/site', [ConfigurationApi::class, 'postSite'
 
 // Comunicación
 $router->add('POST','/api/com/v1/email',[ComunicationApi::class,'postEmail']);
+
+// Autentificación
+$router->add('POST','/api/auth/v1/otp',[AuthentificationApi::class,'postOTP']);
+
 // Publicas
 $router->add('GET','/',[PublicController::class, 'index']);
 
