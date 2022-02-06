@@ -24,7 +24,6 @@ class Rol extends ActiveRecord
 
     public function __construct($args = [])
     {
-        debug($args);
         $this->PK_id_rol = $args['PK_id_rol'] ?? null;
         $this->rol = $args['rol'] ?? '';
         $this->usuarios_perms = $args['usuarios_perms'] ?? '';
