@@ -10,7 +10,9 @@
     ],
     "require": {
         "notihnio/php-request-parser": "1.0.0",
-        "phpmailer/phpmailer": "^6.5"
+        "phpmailer/phpmailer": "^6.5",
+        "guzzlehttp/guzzle": "^7.4",
+        "firebase/php-jwt": "^6.0"
     },
     "autoload": {
         "classmap": [
