@@ -90,7 +90,7 @@ VALUES
     email VARCHAR(320) NOT NULL COMMENT 'Email de usuario',
     pass CHAR(60) NOT NULL COMMENT 'Contraseña encriptada',
     FK_id_rol INT(1) NOT NULL COMMENT 'ID de rol',
-    otp CHAR(60) NOT NULL COMMENT 'OTP encriptada',
+    otp CHAR(60) NULL COMMENT 'OTP encriptada',
     otp_valid TIMESTAMP NULL COMMENT 'Caducidad del OTP',
     actualizado TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Última actualización',
     PRIMARY KEY (PK_id_user),
