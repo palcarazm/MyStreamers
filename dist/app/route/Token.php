@@ -13,6 +13,7 @@ class Token
     protected $status;
     protected $message;
     protected $scopes;
+    const SUCCESS_CODE = 200;
 
     public function __construct($args = [])
     {
@@ -79,7 +80,7 @@ class Token
             ));
         }
         return new Token(array(
-            'status' => 200,
+            'status' => self::SUCCESS_CODE,
             'message' => 'Accesso autorizado',
             'scopes' => $data->scopes
         ));

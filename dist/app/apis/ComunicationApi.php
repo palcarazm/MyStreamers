@@ -11,6 +11,7 @@ use Notihnio\RequestParser\RequestParser;
 class ComunicationApi
 {
     protected static string $EMAIL_TEMPLATES_DIR = TEMPLATES_DIR . '/COM/email';
+    const SCOPE ="COM";
 
     /**
      * API de envio de email conforme a la plantilla específicada
@@ -35,8 +36,8 @@ class ComunicationApi
             )));
             return;
         }
-        $token = Token::validate('COM',$_HEADER['Authorization']);
-        if($token->getStatus()!=200){
+        $token = Token::validate(self::SCOPE,$_HEADER['Authorization']);
+        if($token->getStatus()!=Token::SUCCESS_CODE){
             $router->render('api/api', 'layout-api', array('response' => array(
                 'status' => $token->getStatus(),
                 'message' => $token->getMessage(),
