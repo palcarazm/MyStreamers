@@ -109,6 +109,7 @@ class Usuario extends ActiveRecord
      * Crea un OTP para el usuario
      *
      * @return string Código OTP
+     * @throws Exception OTP no guardado en base de datos
      */
     public function createOTP():string
     {
@@ -121,5 +122,26 @@ class Usuario extends ActiveRecord
             throw new Exception('Imposible guardar en la base de datos');
         }
         
+    }
+
+    /**
+     * Elimina el OTP para el usurio
+     *
+     * @return boolean Completado con éxito (Si/No)
+     */
+    public function deleteOTP():bool
+    {
+        $this->otp = null;
+        $this->otp_valid = null;
+        $query = "UPDATE " . static::$table . " SET ";
+        $query .= "otp = NULL , otp_valid = NULL";
+        $query .= " WHERE " . static::$PK . " = '" . self::$db->escape_string($this->{static::$PK}) . "'";
+
+        if (self::$db->query($query)) {
+            return true;
+        } else {
+            static::$errors[] = self::$db->error;
+            return false;
+        }
     }
 }

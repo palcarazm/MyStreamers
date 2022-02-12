@@ -96,4 +96,49 @@ class AuthentificationApi
             )
         )));
     }
+
+    public static function deleteOTP(Router $router): void
+    {
+        RequestParser::parse();
+        if (empty($_DELETE)) {
+            $_DELETE = json_decode(file_get_contents("php://input"), true);
+        }
+
+        // Valida campos requeridos
+        if (!isset($_DELETE['usuario'])) {
+            $router->render('api/api', 'layout-api', array('response' => array(
+                'status' => 400,
+                'message' => 'Debe incluirse todos los valores requeridos.',
+                'content' => array()
+            )));
+            return;
+        }
+
+        // Buscar usuario filtrando varaible
+        $usuario = Usuario::findUser(filter_var(trim($_DELETE['usuario']), FILTER_SANITIZE_STRING));
+        if (is_null($usuario)) {
+            $router->render('api/api', 'layout-api', array('response' => array(
+                'status' => 500,
+                'message' => 'Usuario no encontrado.',
+                'content' => array()
+            )));
+            return;
+        }
+        // Elimina OTP
+        if(!$usuario->deleteOTP()){
+            $router->render('api/api', 'layout-api', array('response' => array(
+                'status' => 500,
+                'message' => 'n error con la base de datos no permite completar la invalidación del OTP.',
+                'content' => array()
+            )));
+            return;
+        }
+
+        // Respuesta
+        $router->render('api/api', 'layout-api', array('response' => array(
+            'status' => 200,
+            'message' => 'OTP invalidado.',
+            'content' => array()
+        )));
+    }
 }

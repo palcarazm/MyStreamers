@@ -28,6 +28,7 @@ $router->add('POST','/api/com/v1/email',[ComunicationApi::class,'postEmail']);
 
 // Autentificación
 $router->add('POST','/api/auth/v1/otp',[AuthentificationApi::class,'postOTP']);
+$router->add('DELETE','/api/auth/v1/otp',[AuthentificationApi::class,'deleteOTP']);
 
 // Publicas
 $router->add('GET','/',[PublicController::class, 'index']);
