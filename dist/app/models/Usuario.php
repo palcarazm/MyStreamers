@@ -2,13 +2,15 @@
 
 namespace Model;
 
+use Exception;
+
 class Usuario extends ActiveRecord
 {
     protected static String $table = 'users';
     protected static String $date ='actualizado';
     protected static array $joins = array('roles'=>'id_rol');
     protected static String $defaultOrder = 'PK_id_user';
-    protected static array $colDB = ['PK_id_user', 'username', 'email', 'pass', 'actualizado', 'FK_id_rol'];
+    protected static array $colDB = ['PK_id_user', 'username', 'email', 'pass', 'actualizado', 'FK_id_rol', 'otp', 'otp_valid'];
     protected static String $PK = 'PK_id_user';
 
     protected $PK_id_user;
@@ -18,6 +20,8 @@ class Usuario extends ActiveRecord
     protected $actualizado;
     public $FK_id_rol;
     public $rol;
+    protected $otp;
+    protected $otp_valid;
 
     public function __construct($args = [])
     {
@@ -27,6 +31,8 @@ class Usuario extends ActiveRecord
         $this->pass = $args['pass'] ?? '';
         $this->FK_id_rol = $args['FK_id_rol'] ?? '';
         $this->actualizado = $args['actualizado'] ?? null;
+        $this->otp = $args['otp'] ?? null;
+        $this->otp_valid = $args['otp_valid'] ?? null;
     }
 
     /**
@@ -40,14 +46,14 @@ class Usuario extends ActiveRecord
         if (!$this->username) {
             self::$errors[]   = 'El nombre de usuario es obligatorio';
         }else{
-            if($this->checkval('username' , 's')){
-                self::$errors[]   = 'Este nombre de usuario dya se encuentra registrado';
+            if($this->checkval('username' , 's') && is_null($this->PK_id_user)){
+                self::$errors[]   = 'Este nombre de usuario ya se encuentra registrado';
             }
         }
         if (!$this->email) {
             self::$errors[]   = 'El correo electrónico es obligatorio';
         }else{
-            if($this->checkval('email' , 's')){
+            if($this->checkval('email' , 's')  && is_null($this->PK_id_user)){
                 self::$errors[]   = 'Este correo electrónico ya se encuentra registrado';
             }
         }
@@ -84,9 +90,9 @@ class Usuario extends ActiveRecord
      * Buscar usuario por nombre o email
      *
      * @param String $usuario nombre o email
-     * @return void
+     * @return Usuario|null
      */
-    public static function findUser(String $usuario)
+    public static function findUser(String $usuario):Usuario|null
     {
         $query = "SELECT * FROM " . static::$table;
         if (!empty(static::$joins)) {
@@ -97,5 +103,23 @@ class Usuario extends ActiveRecord
         $query .= " WHERE username = '${usuario}' OR email = '${usuario}'";
         $resultado = self::query($query);
         return array_shift($resultado);
+    }
+
+    /**
+     * Crea un OTP para el usuario
+     *
+     * @return string Código OTP
+     */
+    public function createOTP():string
+    {
+        $OTP = strtoupper(bin2hex(random_bytes(8)));
+        $this->otp = password_hash($OTP, PASSWORD_BCRYPT, array('cost' => 12));
+        $this->otp_valid = date('Y-m-d H:i:s',strtotime("+2 day"));
+        if($this->save()){
+            return $OTP;
+        }else{
+            throw new Exception('Imposible guardar en la base de datos');
+        }
+        
     }
 }
