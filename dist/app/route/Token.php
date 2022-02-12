@@ -14,6 +14,7 @@ class Token
     protected $message;
     protected $scopes;
     const SUCCESS_CODE = 200;
+    const SECURITY = 'Bearer';
 
     public function __construct($args = [])
     {
@@ -39,26 +40,52 @@ class Token
     }
 
     /**
+     * Devuelve la cadena del token
+     *
+     * @return string|null Cadena del token
+     */
+    public static function get():string|null
+    {   
+        $_HEADER = getallheaders();
+        if(!isset($_HEADER['Authorization'])){
+            return null;
+        }else{
+            $security = explode(" ",$_HEADER['Authorization']);
+            if($security[0] == self::SECURITY){
+                return $security[1];
+            }else{
+                return null;
+            }
+        }
+    }
+
+    /**
      * Valida el token
      *
      * @param string $scope
-     * @param string $token
      * @return Token
      */
-    public static function validate(string $scope, string $token):Token
+    public static function validate(string $scope):Token
     {
+        $token = self::get();
+        if (is_null($token)){
+            return new Token(array(
+                'status' => 403,
+                'message' => 'No dispone de autorización para emplear este servicio.'
+            ));
+        }
         try {
             $token = JWT::decode($token, new Key(SECRET, 'HS256'));
             $data = $token->data;
         } catch (ExpiredException $e) {
             return new Token(array(
                 'status' => 401,
-                'message' => 'Token ha expirado'
+                'message' => 'Token ha expirado.'
             ));
         } catch (SignatureInvalidException $e){
             return new Token(array(
                 'status' => 401,
-                'message' => 'Token invalido'
+                'message' => 'Token invalido.'
             ));
         } catch (Exception $e){
             return new Token(array(
@@ -69,19 +96,19 @@ class Token
         if(!isset($data->scopes)){
             return new Token(array(
                 'status' => 403,
-                'message' => 'No tiene permisos para este servicio'
+                'message' => 'No dispone de autorización para emplear este servicio.'
             ));
         }
         if (!in_array($scope, $data->scopes)) {
             return new Token(array(
                 'status' => 403,
-                'message' => 'No tiene permisos para este servicio',
+                'message' => 'No dispone de autorización para emplear este servicio.',
                 'scopes' => $data->scopes
             ));
         }
         return new Token(array(
             'status' => self::SUCCESS_CODE,
-            'message' => 'Accesso autorizado',
+            'message' => 'Accesso autorizado.',
             'scopes' => $data->scopes
         ));
     }

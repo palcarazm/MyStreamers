@@ -22,21 +22,12 @@ class ComunicationApi
     public static function postEmail(Router $router): void
     {
         RequestParser::parse();
-        $_HEADER = getallheaders();
         if (empty($_POST)) {
             $_POST = json_decode(file_get_contents("php://input"), true);
         }
         
         // Credito para envio de email
-        if(!isset($_HEADER['Authorization'])){
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 403,
-                'message' => 'No dispone de autorización para emplear este servicio.',
-                'content' => array()
-            )));
-            return;
-        }
-        $token = Token::validate(self::SCOPE,$_HEADER['Authorization']);
+        $token = Token::validate(self::SCOPE);
         if($token->getStatus()!=Token::SUCCESS_CODE){
             $router->render('api/api', 'layout-api', array('response' => array(
                 'status' => $token->getStatus(),
