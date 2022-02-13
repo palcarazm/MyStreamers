@@ -97,6 +97,12 @@ class AuthentificationApi
         )));
     }
 
+    /**
+     * API de invalidación de OTP
+     *
+     * @param Router $router
+     * @return void
+     */
     public static function deleteOTP(Router $router): void
     {
         RequestParser::parse();
@@ -128,7 +134,7 @@ class AuthentificationApi
         if(!$usuario->deleteOTP()){
             $router->render('api/api', 'layout-api', array('response' => array(
                 'status' => 500,
-                'message' => 'n error con la base de datos no permite completar la invalidación del OTP.',
+                'message' => 'Error con la base de datos no permite completar la invalidación del OTP.',
                 'content' => array()
             )));
             return;
