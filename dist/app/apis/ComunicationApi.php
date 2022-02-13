@@ -48,7 +48,7 @@ class ComunicationApi
         }
         // Filtrar las variables
         $email     = filter_var(trim($_POST['email']), FILTER_SANITIZE_EMAIL);
-        $plantilla = filter_var(trim($_POST['plantilla']), FILTER_SANITIZE_STRING);
+        $plantilla = htmlspecialchars(trim($_POST['plantilla']));
 
         // Valida la plantilla
         $html   = self::$EMAIL_TEMPLATES_DIR . '/' . $plantilla . '_body.html';

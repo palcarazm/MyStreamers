@@ -46,10 +46,10 @@ class ConfigurationApi
         }
 
         //Filtrar las variables
-        $DB_HOST = filter_var(trim($_POST['dbhost']), FILTER_SANITIZE_STRING);
-        $DB_USER = filter_var(trim($_POST['dbuser']), FILTER_SANITIZE_STRING);
-        $DB_PASS = filter_var(trim($_POST['dbpass']), FILTER_SANITIZE_STRING);
-        $DB_NAME = filter_var(trim($_POST['dbname']), FILTER_SANITIZE_STRING);
+        $DB_HOST = htmlspecialchars(trim($_POST['dbhost']));
+        $DB_USER = htmlspecialchars(trim($_POST['dbuser']));
+        $DB_PASS = htmlspecialchars(trim($_POST['dbpass']));
+        $DB_NAME = htmlspecialchars(trim($_POST['dbname']));
 
         if (self::verifyDB($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME)) { //Conexión verificada
             try { // Crear fichero de configuración
@@ -160,9 +160,9 @@ class ConfigurationApi
         }
 
         // Filtrar las variables
-        $username = filter_var(trim($_POST['user']), FILTER_SANITIZE_STRING);
+        $username = htmlspecialchars(trim($_POST['user']));
         $email = filter_var(trim($_POST['email']), FILTER_SANITIZE_EMAIL);
-        $pass = filter_var(trim($_POST['pass']), FILTER_SANITIZE_STRING);
+        $pass = htmlspecialchars(trim($_POST['pass']));
 
         if (!checkPasswordStrength($pass)) { // Validación contraseña
             $router->render('api/api', 'layout-api', array('response' => array(
@@ -262,13 +262,13 @@ class ConfigurationApi
         }
 
         // Filtrar las variables
-        $hostSMTP = filter_var(trim($_POST['hostSMTP']), FILTER_SANITIZE_STRING);
+        $hostSMTP = htmlspecialchars(trim($_POST['hostSMTP']));
         $portSMTP = filter_var(trim($_POST['portSMTP']), FILTER_SANITIZE_NUMBER_INT);
-        $userEmail = filter_var(trim($_POST['userEmail']), FILTER_SANITIZE_STRING);
-        $passEmail = filter_var(trim($_POST['passEmail']), FILTER_SANITIZE_STRING);
+        $userEmail = htmlspecialchars(trim($_POST['userEmail']));
+        $passEmail = htmlspecialchars(trim($_POST['passEmail']));
         $adminEmail = filter_var(trim($_POST['adminEmail']), FILTER_SANITIZE_EMAIL);
         $fromEmail = filter_var(trim($_POST['fromEmail']), FILTER_SANITIZE_EMAIL);
-        $fromName = filter_var(trim($_POST['fromName']), FILTER_SANITIZE_STRING);
+        $fromName = htmlspecialchars(trim($_POST['fromName']));
 
         if (!filter_var($adminEmail, FILTER_VALIDATE_EMAIL) || !filter_var($fromEmail, FILTER_VALIDATE_EMAIL)) { //validación email
             $router->render('api/api', 'layout-api', array('response' => array(
@@ -435,8 +435,8 @@ class ConfigurationApi
         }
 
         //Filtrar las variables
-        $titulo = filter_var(trim($_POST['titulo']), FILTER_SANITIZE_STRING);
-        $tema = filter_var(trim($_POST['tema']), FILTER_SANITIZE_STRING);
+        $titulo = htmlspecialchars(trim($_POST['titulo']));
+        $tema = htmlspecialchars(trim($_POST['tema']));
         $descripcion = trim($_POST['descripcion']);
         $eventos = isset($_POST['eventos']) ? 1 : 0;
         $noticias = isset($_POST['noticias']) ? 1 : 0;

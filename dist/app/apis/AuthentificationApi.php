@@ -36,7 +36,7 @@ class AuthentificationApi
         }
 
         // Buscar usuario filtrando varaible
-        $usuario = Usuario::findUser(filter_var(trim($_POST['usuario']), FILTER_SANITIZE_STRING));
+        $usuario = Usuario::findUser(htmlspecialchars(trim($_POST['usuario'])));
         if (is_null($usuario)) {
             $router->render('api/api', 'layout-api', array('response' => array(
                 'status' => 500,
@@ -122,7 +122,7 @@ class AuthentificationApi
         }
 
         // Buscar usuario filtrando varaible
-        $usuario = Usuario::findUser(filter_var(trim($_DELETE['usuario']), FILTER_SANITIZE_STRING));
+        $usuario = Usuario::findUser(htmlspecialchars(trim($_DELETE['usuario'])));
         if (is_null($usuario)) {
             $router->render('api/api', 'layout-api', array('response' => array(
                 'status' => 500,
@@ -173,7 +173,7 @@ class AuthentificationApi
         }
 
         // Buscar usuario filtrando varaible
-        $usuario = Usuario::findUser(filter_var(trim($_PATCH['usuario']), FILTER_SANITIZE_STRING));
+        $usuario = Usuario::findUser(htmlspecialchars(trim($_PATCH['usuario'])));
         if (is_null($usuario)) {
             $router->render('api/api', 'layout-api', array('response' => array(
                 'status' => 500,
@@ -240,7 +240,7 @@ class AuthentificationApi
         }
 
         // Buscar usuario filtrando variable
-        $usuario = Usuario::findUser(filter_var(trim($_POST['usuario']), FILTER_SANITIZE_STRING));
+        $usuario = Usuario::findUser(htmlspecialchars(trim($_POST['usuario'])));
         if (is_null($usuario)) {
             $router->render('api/api', 'layout-api', array('response' => array(
                 'status' => 500,
