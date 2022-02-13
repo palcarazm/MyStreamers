@@ -147,4 +147,71 @@ class AuthentificationApi
             'content' => array()
         )));
     }
+
+    /**
+     * API de validación de OTP
+     *
+     * @param Router $router
+     * @return void
+     */
+    public static function patchOTP(Router $router): void
+    {
+        RequestParser::parse();
+        if (empty($_PATCH)) {
+            $_PATCH = json_decode(file_get_contents("php://input"), true);
+        }
+
+        // Valida campos requeridos
+        if (!isset($_PATCH['usuario']) || !isset($_PATCH['otp']) || !isset($_PATCH['clave'])) {
+            $router->render('api/api', 'layout-api', array('response' => array(
+                'status' => 400,
+                'message' => 'Debe incluirse todos los valores requeridos.',
+                'content' => array()
+            )));
+            return;
+        }
+
+        // Buscar usuario filtrando varaible
+        $usuario = Usuario::findUser(filter_var(trim($_PATCH['usuario']), FILTER_SANITIZE_STRING));
+        if (is_null($usuario)) {
+            $router->render('api/api', 'layout-api', array('response' => array(
+                'status' => 500,
+                'message' => 'Usuario no encontrado.',
+                'content' => array()
+            )));
+            return;
+        }
+
+        // Valida el OTP
+        if(!$usuario->validateOTP($_PATCH['otp'])){
+            $router->render('api/api', 'layout-api', array('response' => array(
+                'status' => 500,
+                'message' => getMessage($usuario->errors()),
+                'content' => array()
+            )));
+            return;
+        }
+        // Cambia la contraseña
+        if(!$usuario->setPass($_PATCH['clave'])){
+            $router->render('api/api', 'layout-api', array('response' => array(
+                'status' => 500,
+                'message' => 'Error al actualizar la contraseña. '. getMessage($usuario->errors()),
+                'content' => array()
+            )));
+            return;
+        }
+
+        // Elimina el OTP
+        $otp_message = '';
+        if(!$usuario->deleteOTP()){
+            $otp_message = ' El OTP no ha posido ser eliminado por seguridad intenten eliminarlo.';
+        }
+
+        // Respuesta
+        $router->render('api/api', 'layout-api', array('response' => array(
+            'status' => 200,
+            'message' => 'Contraseña actualizada.'.$otp_message,
+            'content' => array()
+        )));
+    }
 }

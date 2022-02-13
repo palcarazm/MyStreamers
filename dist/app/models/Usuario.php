@@ -2,6 +2,7 @@
 
 namespace Model;
 
+use DateTime;
 use Exception;
 
 class Usuario extends ActiveRecord
@@ -65,6 +66,22 @@ class Usuario extends ActiveRecord
     }
 
     /**
+     * Cambia la contraseña del usuario
+     *
+     * @param String $pass Contraseña sin cifrar
+     * @return boolean Completado con éxito (Si/No)
+     */
+    public function setPass(String $pass):bool
+    {
+        if(!checkPasswordStrength($pass)){
+            self::$errors[] = 'La contraseña no cumple los requisitos de seguridad.'; 
+            return false;
+        }
+        $this->pass = password_hash($pass, PASSWORD_BCRYPT, array('cost' => 12));
+        return $this->save();
+    }
+
+    /**
      * Crea un objeto con los datos indicados
      *
      * @param mixed $record
@@ -125,7 +142,7 @@ class Usuario extends ActiveRecord
     }
 
     /**
-     * Elimina el OTP para el usurio
+     * Elimina el OTP para el usuario
      *
      * @return boolean Completado con éxito (Si/No)
      */
@@ -143,5 +160,24 @@ class Usuario extends ActiveRecord
             static::$errors[] = self::$db->error;
             return false;
         }
+    }
+
+    /**
+     * Valida el OTP para el usuario
+     *
+     * @param String $otp OTP sin encriptar
+     * @return boolean Completado con éxito (Si/No)
+     */
+    public function validateOTP(String $otp):bool
+    {       
+        if (is_null($this->otp)) {
+            static::$errors[] = 'No se encuentra código OTP para el usuario indicado';
+            return false;
+        }
+        if ( !(new DateTime($this->otp_valid))->diff(new DateTime("now"))->invert || !password_verify($otp,$this->otp)) {
+            static::$errors[] = 'Código OTP incorrecto o expirado';
+            return false;
+        }
+        return true;
     }
 }
