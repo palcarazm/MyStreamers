@@ -214,4 +214,28 @@ class AuthentificationApi
             'content' => array()
         )));
     }
+
+    /**
+     * Elimina la sesión de autentificación de usuario
+     *
+     * @param Router $router
+     * @return void
+     */
+    public static function deleteAuth(Router $router): void
+    {
+        RequestParser::parse();
+        if (empty($_DELETE)) {
+            $_DELETE = json_decode(file_get_contents("php://input"), true);
+        }
+
+        loadSession();
+        if(isset($_SESSION['auth'])){unset($_SESSION['auth']);}
+
+        // Respuesta
+        $router->render('api/api', 'layout-api', array('response' => array(
+            'status' => 200,
+            'message' => 'Sesión cerrada.',
+            'content' => array()
+        )));
+    }
 }
