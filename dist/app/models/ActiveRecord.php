@@ -50,8 +50,8 @@ class ActiveRecord
     public function save(): bool
     {
         if ($this->validate()) {
+            if(static::$date != ''){$this->{static::$date} = date('Y-m-d H:i:s');}
             $attr = $this->sanitize();
-            if(static::$date != ''){$this->{static::$date} = date('Y-m-d HH:ii:ss'); }
             return is_null($this->{static::$PK}) ? $this->create($attr) : $this->update($attr);
         }
         return false;
