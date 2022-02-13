@@ -2,6 +2,7 @@
 
 namespace Apis;
 
+use DateTime;
 use Route\Router;
 use Model\Usuario;
 use GuzzleHttp\Client;
@@ -211,6 +212,65 @@ class AuthentificationApi
         $router->render('api/api', 'layout-api', array('response' => array(
             'status' => 200,
             'message' => 'Contraseña actualizada.'.$otp_message,
+            'content' => array()
+        )));
+    }
+
+    /**
+     * API de Apertura de sesión
+     *
+     * @param Router $router
+     * @return void
+     */
+    public static function postAuth(Router $router): void
+    {
+        RequestParser::parse();
+        if (empty($_POST)) {
+            $_POST = json_decode(file_get_contents("php://input"), true);
+        }
+
+        // Valida campos requeridos
+        if (!isset($_POST['usuario']) || !isset($_POST['clave'])) {
+            $router->render('api/api', 'layout-api', array('response' => array(
+                'status' => 400,
+                'message' => 'Debe incluirse todos los valores requeridos.',
+                'content' => array()
+            )));
+            return;
+        }
+
+        // Buscar usuario filtrando variable
+        $usuario = Usuario::findUser(filter_var(trim($_POST['usuario']), FILTER_SANITIZE_STRING));
+        if (is_null($usuario)) {
+            $router->render('api/api', 'layout-api', array('response' => array(
+                'status' => 500,
+                'message' => 'Usuario no encontrado.',
+                'content' => array()
+            )));
+            return;
+        }
+
+        // Validar clave
+        if(!$usuario->validatePass($_POST['clave'])){
+            $router->render('api/api', 'layout-api', array('response' => array(
+                'status' => 500,
+                'message' => 'Clave incorrecta.',
+                'content' => array()
+            )));
+            return;
+        }
+        
+        // Iniciar la sesion
+        loadSession();
+        $_SESSION['auth'] = array(
+            'usuario' => $usuario,
+            'fecha' => new DateTime("now")
+        );
+
+        // Respuesta
+        $router->render('api/api', 'layout-api', array('response' => array(
+            'status' => 200,
+            'message' => 'Usuario identificado.',
             'content' => array()
         )));
     }

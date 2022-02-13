@@ -82,6 +82,17 @@ class Usuario extends ActiveRecord
     }
 
     /**
+     * Valida la contraseña de usuario
+     *
+     * @param String $pass
+     * @return boolean Contraseña correcta (Si/No)
+     */
+    public function validatePass(String $pass):bool
+    {
+        return password_verify($pass,$this->pass);
+    }
+
+    /**
      * Crea un objeto con los datos indicados
      *
      * @param mixed $record
