@@ -193,3 +193,47 @@ function validateEmail(email) {
   const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(String(email).toLowerCase());
 }
+
+/**
+ * Valida las contraseñas del Formulario de establecimiento, restablecimeinto o modificación
+ * @returns bool Validación superada (Si/No)
+ */
+ function validatePass(password , passwordRepeat) {
+  password.parent().find(".invalid-feedback").remove();
+  passwordRepeat.parent().find(".invalid-feedback").remove();
+  if (passwordRepeat.val() != password.val()) {
+    password
+      .parent()
+      .append(
+        $("<div></div>")
+          .addClass("invalid-feedback")
+          .text("Las contraseñas no coinciden")
+      );
+    passwordRepeat
+      .parent()
+      .append(
+        $("<div></div>")
+          .addClass("invalid-feedback")
+          .text("Las contraseñas no coinciden")
+      );
+    passwordRepeat.addClass("is-invalid").removeClass("is-valid");
+    password.addClass("is-invalid").removeClass("is-valid");
+    return false;
+  } else if (!checkPasswordStrength(String(password.val()).trim())) {
+    password.addClass("is-invalid").removeClass("is-valid");
+    password
+      .parent()
+      .append(
+        $("<div></div>")
+          .addClass("invalid-feedback")
+          .text(
+            "La contraseña debe contener al menos una minúscula, una mayúscula, un número, un carácter especial y ser de almenos 8 carácteres"
+          )
+      );
+    return false;
+  } else {
+    passwordRepeat.removeClass("is-invalid").addClass("is-valid");
+    password.removeClass("is-invalid").addClass("is-valid");
+    return true;
+  }
+}

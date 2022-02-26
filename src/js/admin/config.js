@@ -224,7 +224,7 @@ function validAdminuserForm() {
   $(
     "#configAdmin form #pass2 , #configAdmin form #pass , #configAdmin form #email"
   ).on("input keyup keypress blur change", function () {
-    const validPass = validPassAdminuserForm();
+    const validPass = validatePass($("#configAdmin form #pass") , $("#configAdmin form #pass2"));
     const validEmail = validEmailAdminuserForm();
     if (validPass && validEmail) {
       $(this)
@@ -238,52 +238,6 @@ function validAdminuserForm() {
         .attr("disabled", "disabled");
     }
   });
-}
-
-/**
- * Valida las contraseñas del Formulario de configuración de administrador
- * @returns bool Validación superada (Si/No)
- */
-function validPassAdminuserForm() {
-  const password = $("#configAdmin form #pass");
-  const passwordRepeat = $("#configAdmin form #pass2");
-  password.parent().find(".invalid-feedback").remove();
-  passwordRepeat.parent().find(".invalid-feedback").remove();
-  if (passwordRepeat.val() != password.val()) {
-    password
-      .parent()
-      .append(
-        $("<div></div>")
-          .addClass("invalid-feedback")
-          .text("Las contraseñas no coinciden")
-      );
-    passwordRepeat
-      .parent()
-      .append(
-        $("<div></div>")
-          .addClass("invalid-feedback")
-          .text("Las contraseñas no coinciden")
-      );
-    passwordRepeat.addClass("is-invalid").removeClass("is-valid");
-    password.addClass("is-invalid").removeClass("is-valid");
-    return false;
-  } else if (!checkPasswordStrength(String(password.val()).trim())) {
-    password.addClass("is-invalid").removeClass("is-valid");
-    password
-      .parent()
-      .append(
-        $("<div></div>")
-          .addClass("invalid-feedback")
-          .text(
-            "La contraseña debe contener al menos una minúscula, una mayúscula, un número, un carácter especial y ser de almenos 8 carácteres"
-          )
-      );
-    return false;
-  } else {
-    passwordRepeat.removeClass("is-invalid").addClass("is-valid");
-    password.removeClass("is-invalid").addClass("is-valid");
-    return true;
-  }
 }
 
 /**
