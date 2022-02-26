@@ -12,7 +12,7 @@ class PublicController{
      */
     public static function config(Router $router)
     {
-        $router->render('config/config','layout-admin-headerless');
+        $router->render('config/config','layout-admin-headerless',array('title'=>'Configuración'));
     }
 
     /**
