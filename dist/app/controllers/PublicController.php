@@ -50,4 +50,18 @@ class PublicController{
     {
         $router->render('auth/create-otp','layout-admin-headerless',array('title'=>'Restablecer Contraseña'));
     }
+
+    /**
+     * Controlador de la página de invalidación del OTP
+     *
+     * @param Router $router
+     * @return void
+     */
+    public static function invalidateOTP(Router $router)
+    {
+        $router->render('auth/invalidate-otp','layout-admin-headerless',array(
+            'title'=>'Invalidar OTP',
+            'usuario'=> $_GET['user'] ?? ''
+        ));
+    }
 }

@@ -17,6 +17,9 @@ $(function () {
     case "/create-otp":
       createOTP();
       break;
+    case "/invalidate-otp":
+      invalidateOTP();
+      break;
 
     default:
       break;
