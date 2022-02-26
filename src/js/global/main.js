@@ -62,7 +62,7 @@ function callAPI(
           swal({
             type: "success",
             title: "Éxito",
-            html: data.responseJSON.message,
+            html: data.message,
             timer: 2000,
           });
         }
@@ -71,7 +71,7 @@ function callAPI(
           swal({
             type: "success",
             title: "Éxito",
-            html: data.responseJSON.message,
+            html: data.message,
             timer: 2000,
           }).then(() => success());
         } else {
