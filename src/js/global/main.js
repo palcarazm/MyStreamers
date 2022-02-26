@@ -19,7 +19,8 @@ function callAPI(
   error = null
 ) {
   let length = 0;
-  formdata.forEach((input) => {
+  var object = {};
+  formdata.forEach((value,input) => {
     length++;
     if (input == null || input == "") {
       if (verbose > 0) {
@@ -32,6 +33,7 @@ function callAPI(
       }
       return false;
     }
+    object[input] = value;
   });
   if (length < requiered) {
     if (verbose > 0) {
@@ -46,7 +48,7 @@ function callAPI(
   }
   $.ajax({
     type: method,
-    data: formdata,
+    data: JSON.stringify(object),
     url: uri,
     dataType: "json",
     contentType: false,
