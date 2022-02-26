@@ -14,6 +14,9 @@ $(function () {
       togglePassword();
       login();
       break;
+    case "/create-otp":
+      createOTP();
+      break;
 
     default:
       break;

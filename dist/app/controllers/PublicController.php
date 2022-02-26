@@ -39,4 +39,15 @@ class PublicController{
             'destino' => $_GET['dest'] ?? '/admin'
         ));
     }
+
+    /**
+     * Controlador de la página de creación de OTP
+     *
+     * @param Router $router
+     * @return void
+     */
+    public static function createOTP(Router $router)
+    {
+        $router->render('auth/create-otp','layout-admin-headerless',array('title'=>'Restablecer Contraseña'));
+    }
 }
