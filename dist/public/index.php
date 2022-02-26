@@ -27,6 +27,7 @@ $router->add('POST', '/api/config/v1/site', [ConfigurationApi::class, 'postSite'
 $router->add('POST','/api/com/v1/email',[ComunicationApi::class,'postEmail']);
 
 // Autentificación
+$router->add('GET','/login',[PublicController::class, 'login']);
 $router->add('POST','/api/auth/v1/otp',[AuthentificationApi::class,'postOTP']);
 $router->add('DELETE','/api/auth/v1/otp',[AuthentificationApi::class,'deleteOTP']);
 $router->add('PATCH','/api/auth/v1/otp',[AuthentificationApi::class,'patchOTP']);

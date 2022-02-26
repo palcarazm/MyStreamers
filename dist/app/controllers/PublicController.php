@@ -25,4 +25,18 @@ class PublicController{
     {
         $router->render('public/index','layout-public',array('title'=>'Inicio'));
     }
+
+    /**
+     * Controlador de la página de login
+     *
+     * @param Router $router
+     * @return void
+     */
+    public static function login(Router $router)
+    {
+        $router->render('auth/login','layout-admin-headerless',array(
+            'title'=>'Login',
+            'destino' => $_GET['dest'] ?? '/admin'
+        ));
+    }
 }

@@ -10,6 +10,10 @@ $(function () {
       configEmail();
       configSite();
       break;
+    case "/login":
+      togglePassword();
+      login();
+      break;
 
     default:
       break;
