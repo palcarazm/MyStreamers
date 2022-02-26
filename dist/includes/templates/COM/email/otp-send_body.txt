@@ -2,9 +2,9 @@ Hola ${user},
 
 Has solicitado restablecer tu contraseña de ${sitio}. Para ello de hará falta el siguiente código : ${otp}
 
-Accede a http://${host}/new-password?otp=${otp}/ para establecer una nueva contraseña
+Accede a http://${host}/new-password?otp=${otp} para establecer una nueva contraseña
 
-Si no has solicitado tu el cambio de contraseña te recomendamos invalidar este código en http://${host}/invalidate-otp?user=${user}/
+Si no has solicitado tu el cambio de contraseña te recomendamos invalidar este código en http://${host}/invalidate-otp?user=${user}
 
 --
 Este mensaje ha sido generado automáticamentemente. Por favor no responda.
