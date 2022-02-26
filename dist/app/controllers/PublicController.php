@@ -64,4 +64,18 @@ class PublicController{
             'usuario'=> $_GET['user'] ?? ''
         ));
     }
+
+    /**
+     * Controlador de la página de restablecimiento de contraseña
+     *
+     * @param Router $router
+     * @return void
+     */
+    public static function newPassword(Router $router)
+    {
+        $router->render('auth/new-password','layout-admin-headerless',array(
+            'title'=>'Restablecimiento de contraseña ',
+            'otp'=> $_GET['otp'] ?? ''
+        ));
+    }
 }

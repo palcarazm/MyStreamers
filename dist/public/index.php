@@ -30,6 +30,7 @@ $router->add('POST','/api/com/v1/email',[ComunicationApi::class,'postEmail']);
 $router->add('GET','/login',[PublicController::class, 'login']);
 $router->add('GET','/create-otp',[PublicController::class, 'createOTP']);
 $router->add('GET','/invalidate-otp',[PublicController::class, 'invalidateOTP']);
+$router->add('GET','/new-password',[PublicController::class, 'newPassword']);
 $router->add('POST','/api/auth/v1/otp',[AuthentificationApi::class,'postOTP']);
 $router->add('DELETE','/api/auth/v1/otp',[AuthentificationApi::class,'deleteOTP']);
 $router->add('PATCH','/api/auth/v1/otp',[AuthentificationApi::class,'patchOTP']);

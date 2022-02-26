@@ -20,7 +20,11 @@ $(function () {
     case "/invalidate-otp":
       invalidateOTP();
       break;
-
+    case "/new-password":
+      togglePassword();
+      validateNewPasswordForm();
+      newPassword();
+      break;
     default:
       break;
   }
