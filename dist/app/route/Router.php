@@ -47,7 +47,15 @@ class Router
             }
             call_user_func($fn, $this);
         } else { // Redirección a página 404
-            $this->render('404','');
+            if(preg_match('/^\/api/',$currentURL)){
+                $this->render('api/api', 'layout-api', array('response' => array(
+                    'status' => 404,
+                    'message' => 'API no encontrada',
+                    'content' => array()
+                )));
+            }else{
+                $this->render('public/404','layout-public',array('title'=>'Página no encontrada'));
+            }
         }
     }
 
