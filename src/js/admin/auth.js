@@ -1,3 +1,6 @@
+/** Authentificación de usuarios
+ * 
+ */
 function login() {
   $("#login-form").on("submit", function (e) {
     e.preventDefault();
@@ -27,6 +30,9 @@ function login() {
   });
 }
 
+/** Creación de OTP
+ * 
+ */
 function createOTP() {
   $("#create-otp form").on("submit", function (e) {
     e.preventDefault();
@@ -57,6 +63,9 @@ function createOTP() {
   });
 }
 
+/** Invalidation de OTP
+ * 
+ */
 function invalidateOTP() {
   $("#invalidate-otp-form").on("submit", function (e) {
     e.preventDefault();
@@ -86,6 +95,9 @@ function invalidateOTP() {
   });
 }
 
+/** Validation del formulario de restablecimeinto de contraseña
+ * 
+ */
 function validateNewPasswordForm() {
   $(
     "#new-password-form #clave , #new-password-form #clave2"
@@ -104,6 +116,9 @@ function validateNewPasswordForm() {
   });
 }
 
+/** Restablecimiento de contraseña
+ * 
+ */
 function newPassword() {
   $("#new-password-form").on("submit", function (e) {
     e.preventDefault();

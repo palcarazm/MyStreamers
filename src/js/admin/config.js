@@ -34,6 +34,7 @@ function configDB() {
     }
   });
 }
+
 /** Configurar administrador
  *
  */

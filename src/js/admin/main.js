@@ -1,3 +1,6 @@
+/**
+ * Cargador de funciones en función de la página cargada
+ */
 $(function () {
   switch (currentURL()) {
     case "/config":
@@ -30,7 +33,6 @@ $(function () {
   }
 });
 
-// Funciones
 /**
  * Muestra y oculta la contraseña al apretar un boton
  */
@@ -45,6 +47,7 @@ function togglePassword() {
     }
   });
 }
+
 /**
  * Configura el text area para introducción de texto enriquecido
  */
@@ -178,6 +181,7 @@ jQuery.fn.richTextMD = function () {
     useTabForNext: false
   });
 };
+
 /**
  * Compurueba la seguridad de la contraseña
  * @param {String} password 
@@ -188,6 +192,7 @@ function checkPasswordStrength(password) {
     "(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})"
   ).test(password);
 }
+
 /**
  * Valida que el texto inproducido es un email
  * @param {String} email 
