@@ -31,7 +31,28 @@ $(function () {
     default:
       break;
   }
+  setupAdminMenu();
 });
+
+/**
+ * Configura el menu de administración
+ */
+ function setupAdminMenu() {
+   $('ul.nav-sidebar a[href="' + currentURL() + '"]')
+     .addClass("active")
+     .parents("ul.nav-sidebar li.nav-item")
+     .each(function () {
+       //$(this).addClass("active");
+       if ($(this).children(".nav-treeview").length > 0) {
+         $(this).addClass("menu-is-opening menu-open");
+         $(this)
+           .children(".nav-treeview")
+           .each(function () {
+             $(this).show();
+           });
+       }
+     });
+ }
 
 /**
  * Muestra y oculta la contraseña al apretar un boton
