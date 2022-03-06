@@ -7,6 +7,7 @@
  * @param {int} verbose Tipo de llamada 0--> No verbose, 1 --> solo validacion, 2 --> Validacion y error, 3 --> Verbose
  * @param {function} success función a ejecutar en caso de éxito
  * @param {function} error función a ejecutar en caso de error
+ * @param {string} authorization cadena de autorización para incorporar al header
  * @returns
  */
 function callAPI(
@@ -16,7 +17,8 @@ function callAPI(
   requiered,
   verbose = 1,
   success = null,
-  error = null
+  error = null,
+  authorization = null
 ) {
   let length = 0;
   var object = {};
@@ -99,6 +101,11 @@ function callAPI(
         } else {
           error();
         }
+      }
+    },
+    beforeSend: function (xhr) {
+      if (authorization != null) {
+        xhr.setRequestHeader('Authorization', authorization);
       }
     },
   });
