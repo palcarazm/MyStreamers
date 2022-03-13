@@ -2,16 +2,18 @@
 
 namespace Apis;
 
+use mysqli;
+use Route\Token;
 use Route\Router;
 use Model\Usuario;
-use Notihnio\RequestParser\RequestParser;
-use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
-use mysqli;
+use PHPMailer\PHPMailer\PHPMailer;
+use Notihnio\RequestParser\RequestParser;
 
 class ConfigurationApi
 {
+    const SCOPE = "CONFIG";
     /**
      * Valida los datos de conexión de la base de datos.
      * Si son correctos lanza la configuración de la misma.
@@ -54,7 +56,7 @@ class ConfigurationApi
         if (self::verifyDB($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME)) { //Conexión verificada
             try { // Crear fichero de configuración
                 $data = file_get_contents(__DIR__ . '/../../config/config-template.php');
-                $data = preg_replace('/define\(\'SECRET\',\'\S+\'\)/', "define('SECRET','".strtoupper(bin2hex(random_bytes(20)))."')", $data);
+                $data = preg_replace('/define\(\'SECRET\',\'\S+\'\)/', "define('SECRET','" . strtoupper(bin2hex(random_bytes(20))) . "')", $data);
                 $data = preg_replace('/define\(\'DB_HOST\',\'\S+\'\)/', "define('DB_HOST','{$DB_HOST}')", $data);
                 $data = preg_replace('/define\(\'DB_NAME\',\'\S+\'\)/', "define('DB_NAME','{$DB_NAME}')", $data);
                 $data = preg_replace('/define\(\'DB_USER\',\'\S+\'\)/', "define('DB_USER','{$DB_USER}')", $data);
@@ -229,7 +231,7 @@ class ConfigurationApi
         }
     }
 
-     /**
+    /**
      * Configura el servidor de e-mail
      *
      * @param Router $router
@@ -278,9 +280,9 @@ class ConfigurationApi
             )));
             return;
         }
-       
-        try {// Intento de conexión
-           self::verifySMTP($hostSMTP, $portSMTP, $userEmail, $passEmail);
+
+        try { // Intento de conexión
+            self::verifySMTP($hostSMTP, $portSMTP, $userEmail, $passEmail);
         } catch (Exception $e) {
             $router->render('api/api', 'layout-api', array('response' => array(
                 'status' => 500,
@@ -318,8 +320,8 @@ class ConfigurationApi
             $mail->Password   = $passEmail;                             //SMTP password
             $mail->Port       = $portSMTP;                              //TCP port to connect to
             $mail->setFrom($fromEmail, $fromName);
-            $mail->CharSet= 'UTF-8';
-        
+            $mail->CharSet = 'UTF-8';
+
             //Recipients
             $mail->addAddress($adminEmail);
 
@@ -328,7 +330,7 @@ class ConfigurationApi
             $mail->Subject = '[MyStreamers] Verificación del servidor';
             $mail->Body    = 'Correo de prueba del <b>servidor SMTP</b>!';
             $mail->AltBody = 'Correo de prueba del servidor SMTP!';
-        
+
             $mail->send();
         } catch (Exception $e) {
             $router->render('api/api', 'layout-api', array('response' => array(
@@ -360,7 +362,7 @@ class ConfigurationApi
         }
 
         if (isset($_GET['confirm'])) { // Metodo de confirmación
-            if ($_GET['confirm']== 'true') {
+            if ($_GET['confirm'] == 'true') {
                 if (IS_CONFIG_EMAIL) {
                     $router->render('api/api', 'layout-api', array('response' => array(
                         'status' => 403,
@@ -382,14 +384,13 @@ class ConfigurationApi
                     )));
                     return;
                 }
-    
+
                 $router->render('api/api', 'layout-api', array('response' => array(
                     'status' => 201,
                     'message' => 'Validación del servidor de email registrada',
                     'content' => array()
                 )));
                 return;
-
             }
         }
 
@@ -402,6 +403,31 @@ class ConfigurationApi
         return;
     }
 
+    /**
+     * Actualiza la información del sitio
+     *
+     * @param Router $router
+     */
+    public static function putSite(Router $router): void
+    {
+        RequestParser::parse();
+        if (empty($_PUT)) {
+            $_PUT = json_decode(file_get_contents("php://input"), true);
+        }
+
+        // Validación de Token
+        $token = Token::validate(self::SCOPE);
+        if($token->getStatus()!=Token::SUCCESS_CODE){
+            $router->render('api/api', 'layout-api', array('response' => array(
+                'status' => $token->getStatus(),
+                'message' => $token->getMessage(),
+                'content' => array()
+            )));
+            return;
+        }
+        
+        self::configSite($_PUT,$router);
+    }
     /**
      * Configura la información del sitio
      *
@@ -424,8 +450,19 @@ class ConfigurationApi
             return;
         }
 
+        self::configSite($_POST,$router);
+    }
+
+    /**
+     * Configura la información del sitio
+     * @param array $body argumentos de configuración
+     * @param Router $router
+     */
+    private static function configSite(array $body, Router $router): void
+    {
+
         // Valida campos requeridos
-        if (!isset($_POST['titulo']) || !isset($_POST['tema']) || !isset($_POST['descripcion'])) {
+        if (!isset($body['titulo']) || !isset($body['tema']) || !isset($body['descripcion'])) {
             $router->render('api/api', 'layout-api', array('response' => array(
                 'status' => 400,
                 'message' => 'Debe incluirse todos los valores requeridos.',
@@ -435,13 +472,13 @@ class ConfigurationApi
         }
 
         //Filtrar las variables
-        $titulo = htmlspecialchars(trim($_POST['titulo']));
-        $tema = htmlspecialchars(trim($_POST['tema']));
-        $descripcion = trim($_POST['descripcion']);
-        $eventos = isset($_POST['eventos']) ? 1 : 0;
-        $noticias = isset($_POST['noticias']) ? 1 : 0;
-        $normas = isset($_POST['normas']) ? 1 : 0;
-        $enlaces = isset($_POST['enlaces']) ? 1 : 0;
+        $titulo = htmlspecialchars(trim($body['titulo']));
+        $tema = htmlspecialchars(trim($body['tema']));
+        $descripcion = trim($body['descripcion']);
+        $eventos = isset($body['eventos']) ? 1 : 0;
+        $noticias = isset($body['noticias']) ? 1 : 0;
+        $normas = isset($body['normas']) ? 1 : 0;
+        $enlaces = isset($body['enlaces']) ? 1 : 0;
 
         if (!in_array($tema, array_column(getThemes(), 'folder'))) { // Validar tema
             $router->render('api/api', 'layout-api', array('response' => array(

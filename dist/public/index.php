@@ -7,10 +7,12 @@ if (is_file(__DIR__ . '/../config/config.php')) {
 
 use Route\Router;
 use Controllers\PublicController;
+use Controllers\AdminController;
 use Apis\ConfigurationApi;
 use Apis\ComunicationApi;
 use Apis\AuthentificationApi;
 use Model\ActiveRecord;
+use Model\Rol;
 
 $router = new Router;
 
@@ -22,6 +24,7 @@ $router->add('POST', '/api/config/v1/admin', [ConfigurationApi::class, 'postAdmi
 $router->add('POST', '/api/config/v1/email', [ConfigurationApi::class, 'postEmail']);
 $router->add('PUT', '/api/config/v1/email', [ConfigurationApi::class, 'putEmail']);
 $router->add('POST', '/api/config/v1/site', [ConfigurationApi::class, 'postSite']);
+$router->add('PUT', '/api/config/v1/site', [ConfigurationApi::class, 'putSite']);
 
 // Comunicación
 $router->add('POST','/api/com/v1/email',[ComunicationApi::class,'postEmail']);
@@ -36,6 +39,10 @@ $router->add('DELETE','/api/auth/v1/otp',[AuthentificationApi::class,'deleteOTP'
 $router->add('PATCH','/api/auth/v1/otp',[AuthentificationApi::class,'patchOTP']);
 $router->add('POST','/api/auth/v1/auth',[AuthentificationApi::class,'postAuth']);
 $router->add('DELETE','/api/auth/v1/auth',[AuthentificationApi::class,'deleteAuth']);
+
+// Administración
+/// Configuración
+$router->add('GET','/admin/config/sitio',[AdminController::class,'configSitio'],Rol::PERMS_CONFIG);
 
 // Publicas
 $router->add('GET','/',[PublicController::class, 'index']);

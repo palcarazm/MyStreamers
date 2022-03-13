@@ -219,6 +219,59 @@ function configSite() {
 }
 
 /**
+ * Actualiza la configuración del sitio
+ */
+ function updateSite() {
+  $("#updateSite-form").on("submit", function (e) {
+    e.preventDefault();
+    if (
+      $(this)
+        .find("#descripcion")
+        .val()
+        .replace(/<[^>]+>/g, "") == ""
+    ) {
+      $(this)
+        .find("#descripcion")
+        .closest(".form-group")
+        .append(
+          $("<div></div>")
+            .addClass("invalid-feedback d-block")
+            .text("La descripción del sitio es obligatoria")
+        );
+      return;
+    } else {
+      $(this)
+        .find("#descripcion")
+        .closest(".form-group")
+        .find(".invalid-feedback")
+        .remove();
+    }
+    $(this).find('button[type="submit"]').attr("disabled", true);
+    $(this).loadToggle();
+    callAPI(
+      $(this).attr("action"),
+      $(this).attr("method"),
+      new FormData(this),
+      $(this).find("input,textarea,select").filter("[required]").length,
+      3,
+      function () {
+        $("#updateSite-form").loadToggle();
+        $("#updateSite-form")
+          .find('button[type="submit"]')
+          .attr("disabled", false);
+      },
+      function () {
+        $("#updateSite-form").loadToggle();
+        $("#updateSite-form")
+          .find('button[type="submit"]')
+          .attr("disabled", false);
+      },
+      $('#token').val()
+    )
+  });
+}
+
+/**
  * Valida el formulario de configuración de administrador
  */
 function validAdminuserForm() {

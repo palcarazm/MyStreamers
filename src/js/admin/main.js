@@ -28,6 +28,11 @@ $(function () {
       validateNewPasswordForm();
       newPassword();
       break;
+    case "/admin/config/sitio":
+      $('.custom-select').select2();
+      $('.custom-textarea').richTextMD();
+      updateSite();
+      break;
     default:
       break;
   }
