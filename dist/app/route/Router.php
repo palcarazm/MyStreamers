@@ -12,14 +12,14 @@ class Router
      * @param String $method Método de solicitud
      * @param String $uri URI solicitada 
      * @param array|String $fn Función a invocar
-     * @param boolean $isPublic Accesible sin autentificación (Y/N)
+     * @param string $perms permisos requeridos por defecto ninguno
      * @return void
      */
-    public function add(String $method, String $uri, array|String $fn, bool $isPublic = true): void
+    public function add(String $method, String $uri, array|String $fn, string $perms = null): void
     {
         $this->routes[$method][$uri] = [
             'function' => $fn,
-            'isPublic' => $isPublic
+            'perms' => $perms
         ];
     }
 
@@ -39,11 +39,26 @@ class Router
         $auth = isset($_SESSION['auth']) ? $_SESSION['auth'] : false; // Comprueba si el usuario está autenticado
 
         $fn = $this->routes[$method][$currentURL]['function'] ?? null;
-        $isPublic = $this->routes[$method][$currentURL]['isPublic'] ?? null;
+        $perms = $this->routes[$method][$currentURL]['perms'];
+        $isPublic = is_null($perms);
 
         if ($fn) { // Página existe
-            if (!$isPublic && !$auth) { // Requiere autenticación y no se aporta
-                header('Location:/login');
+            if(!$isPublic){ //No es publica
+                if (!$auth) { // No está authentificado
+                    header('Location:/login?dest=' . $currentURL);
+                }
+                if(!$auth['usuario']->can($perms)){
+                    if(preg_match('/^\/api/',$currentURL)){
+                        $this->render('api/api', 'layout-api', array('response' => array(
+                            'status' => 403,
+                            'message' => 'Acceso no autorizdo',
+                            'content' => array()
+                        )));
+                    }else{
+                        $this->render('public/403','layout-public',array('title'=>'Acceso no autorizado'));
+                    }
+                    return;
+                }
             }
             call_user_func($fn, $this);
         } else { // Redirección a página 404

@@ -191,4 +191,15 @@ class Usuario extends ActiveRecord
         }
         return true;
     }
+
+     /**
+     * Verifica si dispone de los permisos requieridos
+     *
+     * @param string $perms Permisos a verificar
+     * @return boolean Dispone de permisos (Y/N) devuelve null si permiso desconocido
+     */
+    public function can(string $perms):bool|null
+    {
+        return $this->rol->can($perms);
+    }
 }
