@@ -23,6 +23,26 @@ class Sitio extends ActiveRecord
     {
         echo self::getTitulo();
     }
+
+    /**
+     * Devuelve el tema del sitio
+     *
+     * @return string
+     */
+    public static function getTema():string
+    {
+        return self::query("SELECT valor FROM opciones WHERE opcion = 'tema'")[0]['valor'];
+    }
+
+    /**
+     * Imprime el tema del sitio
+     *
+     * @return void
+     */
+    public static function printTema():void
+    {
+        echo self::getTema();
+    }
     
     /**
      * Devuelve la descripción del sitio
