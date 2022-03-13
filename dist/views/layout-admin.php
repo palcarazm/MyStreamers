@@ -137,7 +137,7 @@
 
       <!-- Sidebar Menu -->
       <nav class="mt-2">
-        <?php include TEMPLATES_DIR . '/menu/admin.html' ?>
+        <?php include TEMPLATES_DIR . '/menu/admin.php' ?>
       </nav>
       <!-- /.sidebar-menu -->
     </div>
