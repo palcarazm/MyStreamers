@@ -23,8 +23,7 @@ class AdminController{
             'eventos' => Sitio::isEnabled("eventos"),
             'noticias' => Sitio::isEnabled("noticias"),
             'normas' => Sitio::isEnabled("normas"),
-            'enlaces' => Sitio::isEnabled("enlaces"),
-            'token' => Token::SECURITY . ' ' . Token::create(array(ConfigurationApi::SCOPE))
+            'enlaces' => Sitio::isEnabled("enlaces")
         ));
     }
 }

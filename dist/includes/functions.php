@@ -1,5 +1,7 @@
 <?php
 
+use Model\Usuario;
+
 /**
  * Debugear
  * @param mixed $var Variable a debugear
@@ -89,5 +91,30 @@ function loadSession(): void
 {
     if (session_status() == PHP_SESSION_NONE) {
         session_start();
+    }
+}
+
+/**
+ * Comprueba si hay un usuario autenticado
+ *
+ * @return boolean
+ */
+function isAuth(): bool
+{
+    loadSession();
+    return isset($_SESSION['auth']);
+}
+
+/**
+ * Devuelve el usuario autenticado
+ *
+ * @return Usuario|null
+ */
+function getAuthUser():Usuario|null
+{
+    if(!isAuth()){
+        return null;
+    }else{
+        return $_SESSION['auth']['usuario'];
     }
 }

@@ -2,8 +2,8 @@
 
 use Model\Rol;
 
-loadSession();
-$usuario = $_SESSION['auth']['usuario'];
+$usuario = getAuthUser();
+if (!is_null($usuario)):
 ?>
 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
     <?php if($usuario->can(Rol::PERMS_CONFIG)):?>    
@@ -26,3 +26,4 @@ $usuario = $_SESSION['auth']['usuario'];
         </li>
     <?php endif;?>
 </ul>
+<?php endif;?>

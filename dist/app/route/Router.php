@@ -32,26 +32,20 @@ class Router
     {
         $currentURL = explode('?', $_SERVER['REQUEST_URI'] ?? '/', 2)[0]; // Ruta solicitada
         $method = $_SERVER['REQUEST_METHOD']; //Método de solicitud
-
-        if (!isset($_SESSION)) {
-            session_start();
-        }
-        $auth = isset($_SESSION['auth']) ? $_SESSION['auth'] : false; // Comprueba si el usuario está autenticado
-
         $fn = $this->routes[$method][$currentURL]['function'] ?? null;
         $perms = $this->routes[$method][$currentURL]['perms'];
         $isPublic = is_null($perms);
 
         if ($fn) { // Página existe
             if(!$isPublic){ //No es publica
-                if (!$auth) { // No está authentificado
+                if (!isAuth()) { // No está authentificado
                     header('Location:/login?dest=' . $currentURL);
                 }
-                if(!$auth['usuario']->can($perms)){
+                if(!getAuthUser()->can($perms)){
                     if(preg_match('/^\/api/',$currentURL)){
                         $this->render('api/api', 'layout-api', array('response' => array(
                             'status' => 403,
-                            'message' => 'Acceso no autorizdo',
+                            'message' => 'Acceso no autorizado',
                             'content' => array()
                         )));
                     }else{

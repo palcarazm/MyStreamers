@@ -82,7 +82,6 @@
             </div>
             <!-- /.card-body -->
             <div class="card-footer">
-                <input type="hidden" id="token" value="<?php echo $token; ?>">
                 <button type="submit" class="btn btn-primary d-block ml-auto mr-0">Registrar información del sitio</button>
             </div>
             <!-- /.card-footer-->

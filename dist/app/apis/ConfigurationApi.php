@@ -6,6 +6,7 @@ use mysqli;
 use Route\Token;
 use Route\Router;
 use Model\Usuario;
+use Model\Rol;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\PHPMailer;
@@ -13,7 +14,7 @@ use Notihnio\RequestParser\RequestParser;
 
 class ConfigurationApi
 {
-    const SCOPE = "CONFIG";
+    const SCOPE = Rol::PERMS_CONFIG;
     /**
      * Valida los datos de conexión de la base de datos.
      * Si son correctos lanza la configuración de la misma.
@@ -415,15 +416,26 @@ class ConfigurationApi
             $_PUT = json_decode(file_get_contents("php://input"), true);
         }
 
-        // Validación de Token
-        $token = Token::validate(self::SCOPE);
-        if($token->getStatus()!=Token::SUCCESS_CODE){
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => $token->getStatus(),
-                'message' => $token->getMessage(),
-                'content' => array()
-            )));
-            return;
+        $authUser = getAuthUser();
+        if(!is_null($authUser)){// Validación por sesión
+            if(!$authUser->can(self::SCOPE)){
+                $router->render('api/api', 'layout-api', array('response' => array(
+                    'status' => 403,
+                    'message' => 'Acceso no autorizado',
+                    'content' => array()
+                )));
+                return;
+            }
+        }else{// Validación de Token
+            $token = Token::validate(self::SCOPE);
+            if($token->getStatus()!=Token::SUCCESS_CODE){
+                $router->render('api/api', 'layout-api', array('response' => array(
+                    'status' => $token->getStatus(),
+                    'message' => $token->getMessage(),
+                    'content' => array()
+                )));
+                return;
+            }
         }
         
         self::configSite($_PUT,$router);
