@@ -102,7 +102,15 @@ function loadSession(): void
 function isAuth(): bool
 {
     loadSession();
-    return isset($_SESSION['auth']);
+    if(isset($_SESSION['auth'])){
+        if($_SESSION['auth']['exp'] < time()){
+            return true;
+        }
+        else{
+            unset($_SESSION['auth']);
+        }
+    }
+    return false;
 }
 
 /**
