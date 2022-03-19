@@ -264,7 +264,8 @@ class AuthentificationApi
         loadSession();
         $_SESSION['auth'] = array(
             'usuario' => $usuario,
-            'fecha' => new DateTime("now")
+            'iat' => time(),                        // inicio de la session
+            'exp' => time() + (24 * 60 * 60),       // validez (24 h)
         );
 
         // Respuesta
