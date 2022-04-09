@@ -227,14 +227,14 @@ class AuthentificationApi
         }
 
         // Buscar usuario filtrando variable
-        $usuario = Usuario::findUser(htmlspecialchars(trim($_POST['usuario'])));
+        $usuario = Usuario::findUser(htmlspecialchars(trim($api->in['usuario'])));
         if (is_null($usuario)) {
             $api->send(500, 'Usuario no encontrado.', new stdClass());
             return;
         }
 
         // Validar clave
-        if (!$usuario->validatePass($_POST['clave'])) {
+        if (!$usuario->validatePass($api->in['clave'])) {
             $api->send(500, 'Clave incorrecta.', new stdClass());
             return;
         }
