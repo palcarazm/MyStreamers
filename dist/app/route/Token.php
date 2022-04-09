@@ -3,6 +3,7 @@
 namespace Route;
 
 use Exception;
+use Model\Api;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Firebase\JWT\ExpiredException;
@@ -71,7 +72,7 @@ class Token
         if (is_null($token)){
             return new Token(array(
                 'status' => 403,
-                'message' => 'No dispone de autorización para emplear este servicio.'
+                'message' => Api::RES_403_Unauthenticaded
             ));
         }
         try {
@@ -96,13 +97,13 @@ class Token
         if(!isset($data->scopes)){
             return new Token(array(
                 'status' => 403,
-                'message' => 'No dispone de autorización para emplear este servicio.'
+                'message' => Api::RES_403_Unauthorized
             ));
         }
         if (!in_array($scope, $data->scopes)) {
             return new Token(array(
                 'status' => 403,
-                'message' => 'No dispone de autorización para emplear este servicio.',
+                'message' => Api::RES_403_Unauthorized,
                 'scopes' => $data->scopes
             ));
         }
