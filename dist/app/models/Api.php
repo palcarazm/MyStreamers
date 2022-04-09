@@ -23,7 +23,7 @@ class Api
      * Constructor de la API
      *
      * @param Router $router Router del sitio
-     * @param string $method Metodo de llamada (GET POST DELETE PATCH)
+     * @param string $method Metodo de llamada (GET POST PUT DELETE PATCH)
      * @param array $schema Especificación de entrada ([ {name* required* type* max min filter schema} ])
      * @param array $authMethods Métodos de autentificación soportados (SESSION TOKEN)
      */
@@ -50,6 +50,9 @@ class Api
                 break;
             case 'POST':
                 $this->in = empty($_POST) ? json_decode(file_get_contents("php://input"), true) : $_POST;
+                break;
+            case 'PUT':
+                $this->in = empty($_PUT) ? json_decode(file_get_contents("php://input"), true) : $_PUT;
                 break;
             case 'DELETE':
                 $this->in = empty($_DETETE) ? json_decode(file_get_contents("php://input"), true) : $_DETETE;
