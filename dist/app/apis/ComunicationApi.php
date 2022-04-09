@@ -2,16 +2,16 @@
 
 namespace Apis;
 
+use stdClass;
+use Model\Api;
 use Route\Router;
-use Route\Token;
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\PHPMailer;
-use Notihnio\RequestParser\RequestParser;
 
 class ComunicationApi
 {
     protected static string $EMAIL_TEMPLATES_DIR = TEMPLATES_DIR . '/COM/email';
-    const SCOPE ="COM";
+    const SCOPE = "COM";
 
     /**
      * API de envio de email conforme a la plantilla específicada
@@ -21,45 +21,52 @@ class ComunicationApi
      */
     public static function postEmail(Router $router): void
     {
-        RequestParser::parse();
-        if (empty($_POST)) {
-            $_POST = json_decode(file_get_contents("php://input"), true);
-        }
-        
-        // Credito para envio de email
-        $token = Token::validate(self::SCOPE);
-        if($token->getStatus()!=Token::SUCCESS_CODE){
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => $token->getStatus(),
-                'message' => $token->getMessage(),
-                'content' => array()
-            )));
+        $api = new Api(
+            $router,
+            'POST',
+            array(
+                array(
+                    'name' => 'email',
+                    'required' => true,
+                    'type' => 'string',
+                    'max' =>  320,
+                    'filter' => FILTER_VALIDATE_EMAIL
+                ),
+                array(
+                    'name' => 'plantilla',
+                    'required' => true,
+                    'type' => 'string'
+                ),
+                array(
+                    'name' => 'variables',
+                    'required' => true,
+                    'type' => 'object',
+                    'schema' => array()
+                )
+            ),
+            array('TOKEN')
+        );
+
+        // Valida la autentificación
+        if (!$api->auth(self::SCOPE)) {
             return;
         }
 
         // Valida campos requeridos
-        if (!isset($_POST['email']) || !isset($_POST['plantilla']) || !isset($_POST['variables']) || !filter_var($_POST['email'],FILTER_VALIDATE_EMAIL)) {
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 400,
-                'message' => 'Debe incluirse todos los valores requeridos.',
-                'content' => array()
-            )));
+        if (!$api->validate()) {
             return;
         }
+
         // Filtrar las variables
-        $email     = filter_var(trim($_POST['email']), FILTER_SANITIZE_EMAIL);
-        $plantilla = htmlspecialchars(trim($_POST['plantilla']));
+        $email     = filter_var(trim($api->in['email']), FILTER_SANITIZE_EMAIL);
+        $plantilla = htmlspecialchars(trim($api->in['plantilla']));
 
         // Valida la plantilla
         $html   = self::$EMAIL_TEMPLATES_DIR . '/' . $plantilla . '_body.html';
         $text   = self::$EMAIL_TEMPLATES_DIR . '/' . $plantilla . '_body.txt';
         $header = self::$EMAIL_TEMPLATES_DIR . '/' . $plantilla . '_header.txt';
         if (!is_file($html) || !is_file($text) || !is_file($header)) {
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 500,
-                'message' => 'Plantilla de comunicación desconocida.',
-                'content' => array()
-            )));
+            $api->send(500, 'Plantilla de comunicación desconocida.', new stdClass());
             return;
         }
 
@@ -69,19 +76,15 @@ class ComunicationApi
         $header = file_get_contents($header);
 
         // Remplazar variables
-        foreach($_POST['variables'] as $variable => $valor){
-            $html   = preg_replace('/\$\{'.$variable.'\}/', $valor, $html);
-            $text   = preg_replace('/\$\{'.$variable.'\}/', $valor, $text);
-            $header = preg_replace('/\$\{'.$variable.'\}/', $valor, $header);
+        foreach ($api->in['variables'] as $variable => $valor) {
+            $html   = preg_replace('/\$\{' . $variable . '\}/', $valor, $html);
+            $text   = preg_replace('/\$\{' . $variable . '\}/', $valor, $text);
+            $header = preg_replace('/\$\{' . $variable . '\}/', $valor, $header);
         }
 
         // Valida todas las variables sustituidas
-        if (preg_match('/\$\{\S+\}/',$html) || preg_match('/\$\{\S+\}/',$text) || preg_match('/\$\{\S+\}/',$header)) {
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 400,
-                'message' => 'Deben de indicarse todas las variables de la plantilla.',
-                'content' => array()
-            )));
+        if (preg_match('/\$\{\S+\}/', $html) || preg_match('/\$\{\S+\}/', $text) || preg_match('/\$\{\S+\}/', $header)) {
+            $api->send(400, 'Deben de indicarse todas las variables de la plantilla.', new stdClass());
             return;
         }
 
@@ -97,7 +100,7 @@ class ComunicationApi
             $mail->Port       = SMTP_PORT;                              //TCP port to connect to
             $mail->setFrom(SMTP_EMAIL, SMTP_NAME);
             $mail->CharSet    = 'UTF-8';
-        
+
             //Recipients
             $mail->addAddress($email);
 
@@ -106,22 +109,13 @@ class ComunicationApi
             $mail->Subject = $header;
             $mail->Body    = $html;
             $mail->AltBody = $text;
-        
+
             $mail->send();
         } catch (Exception $e) {
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 500,
-                'message' => 'Error al enviar el e-mail.',
-                'content' => array()
-            )));
+            $api->send(500, 'Error al enviar el e-mail.', new stdClass());
             return;
         }
 
-        $router->render('api/api', 'layout-api', array('response' => array(
-            'status' => 200,
-            'message' => 'Notificación enviada por e-mail.',
-            'content' => array()
-        )));
-
+        $api->send(200, 'Notificación enviada por e-mail.', new stdClass());
     }
 }

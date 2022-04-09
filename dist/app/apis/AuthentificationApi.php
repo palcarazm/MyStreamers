@@ -2,13 +2,13 @@
 
 namespace Apis;
 
-use DateTime;
+use stdClass;
+use Model\Api;
+use Model\Sitio;
+use Route\Token;
 use Route\Router;
 use Model\Usuario;
 use GuzzleHttp\Client;
-use Model\Sitio;
-use Notihnio\RequestParser\RequestParser;
-use Route\Token;
 
 class AuthentificationApi
 {
@@ -20,40 +20,35 @@ class AuthentificationApi
      */
     public static function postOTP(Router $router): void
     {
-        RequestParser::parse();
-        if (empty($_POST)) {
-            $_POST = json_decode(file_get_contents("php://input"), true);
-        }
+        $api = new Api(
+            $router,
+            'POST',
+            array(
+                array(
+                    'name' => 'usuario',
+                    'required' => true,
+                    'type' => 'string',
+                    'min' =>  1
+                )
+            )
+        );
 
         // Valida campos requeridos
-        if (!isset($_POST['usuario'])) {
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 400,
-                'message' => 'Debe incluirse todos los valores requeridos.',
-                'content' => array()
-            )));
+        if (!$api->validate()) {
             return;
         }
 
         // Buscar usuario filtrando varaible
-        $usuario = Usuario::findUser(htmlspecialchars(trim($_POST['usuario'])));
+        $usuario = Usuario::findUser(htmlspecialchars(trim($api->in['usuario'])));
         if (is_null($usuario)) {
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 500,
-                'message' => 'Usuario no encontrado.',
-                'content' => array()
-            )));
+            $api->send(500, 'Usuario no encontrado.', new stdClass());
             return;
         }
         // Crear OTP
         try {
             $OTP = $usuario->createOTP();
         } catch (\Exception $e) {
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 500,
-                'message' => 'Error en la creación de OTP.',
-                'content' => array()
-            )));
+            $api->send(400, 'Error en la creación de OTP.', new stdClass());
             return;
         }
 
@@ -81,21 +76,13 @@ class AuthentificationApi
             ]
         );
         if ($res->getStatusCode() != 200) {
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 500,
-                'message' => 'Error en el envío del OTP.',
-                'content' => array()
-            )));
+            $api->send(500, 'Error en el envío del OTP.', new stdClass());
             return;
         }
 
-        $router->render('api/api', 'layout-api', array('response' => array(
-            'status' => 201,
-            'message' => 'Notificación enviada por e-mail.',
-            'content' => array(
-                'email' => $usuario->email
-            )
-        )));
+        $api->send(201, 'Notificación enviada por e-mail.', array(
+            'email' => $usuario->email
+        ));
     }
 
     /**
@@ -106,47 +93,38 @@ class AuthentificationApi
      */
     public static function deleteOTP(Router $router): void
     {
-        RequestParser::parse();
-        if (empty($_DELETE)) {
-            $_DELETE = json_decode(file_get_contents("php://input"), true);
-        }
+        $api = new Api(
+            $router,
+            'DELETE',
+            array(
+                array(
+                    'name' => 'usuario',
+                    'required' => true,
+                    'type' => 'string',
+                    'min' =>  1
+                )
+            )
+        );
 
         // Valida campos requeridos
-        if (!isset($_DELETE['usuario'])) {
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 400,
-                'message' => 'Debe incluirse todos los valores requeridos.',
-                'content' => array()
-            )));
+        if (!$api->validate()) {
             return;
         }
 
         // Buscar usuario filtrando varaible
-        $usuario = Usuario::findUser(htmlspecialchars(trim($_DELETE['usuario'])));
+        $usuario = Usuario::findUser(htmlspecialchars(trim($api->in['usuario'])));
         if (is_null($usuario)) {
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 500,
-                'message' => 'Usuario no encontrado.',
-                'content' => array()
-            )));
+            $api->send(500, 'Usuario no encontrado.', new stdClass());
             return;
         }
         // Elimina OTP
-        if(!$usuario->deleteOTP()){
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 500,
-                'message' => 'Error con la base de datos no permite completar la invalidación del OTP.',
-                'content' => array()
-            )));
+        if (!$usuario->deleteOTP()) {
+            $api->send(500, 'Error con la base de datos no permite completar la invalidación del OTP.', new stdClass());
             return;
         }
 
         // Respuesta
-        $router->render('api/api', 'layout-api', array('response' => array(
-            'status' => 200,
-            'message' => 'OTP invalidado.',
-            'content' => array()
-        )));
+        $api->send(200, 'OTP invalidado.', new stdClass());
     }
 
     /**
@@ -157,63 +135,63 @@ class AuthentificationApi
      */
     public static function patchOTP(Router $router): void
     {
-        RequestParser::parse();
-        if (empty($_PATCH)) {
-            $_PATCH = json_decode(file_get_contents("php://input"), true);
-        }
+        $api = new Api(
+            $router,
+            'PATCH',
+            array(
+                array(
+                    'name' => 'usuario',
+                    'required' => true,
+                    'type' => 'string',
+                    'min' =>  1
+                ),
+                array(
+                    'name' => 'otp',
+                    'required' => true,
+                    'type' => 'string',
+                    'min' =>  16,
+                    'max' => 16,
+                ),
+                array(
+                    'name' => 'clave',
+                    'required' => true,
+                    'type' => 'string',
+                    'min' =>  8
+                )
+            )
+        );
 
         // Valida campos requeridos
-        if (!isset($_PATCH['usuario']) || !isset($_PATCH['otp']) || !isset($_PATCH['clave'])) {
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 400,
-                'message' => 'Debe incluirse todos los valores requeridos.',
-                'content' => array()
-            )));
+        if (!$api->validate()) {
             return;
         }
 
         // Buscar usuario filtrando varaible
-        $usuario = Usuario::findUser(htmlspecialchars(trim($_PATCH['usuario'])));
+        $usuario = Usuario::findUser(htmlspecialchars(trim($api->in['usuario'])));
         if (is_null($usuario)) {
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 500,
-                'message' => 'Usuario no encontrado.',
-                'content' => array()
-            )));
+            $api->send(500, 'Usuario no encontrado.', new stdClass());
             return;
         }
 
         // Valida el OTP
-        if(!$usuario->validateOTP($_PATCH['otp'])){
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 500,
-                'message' => getMessage($usuario->errors()),
-                'content' => array()
-            )));
+        if (!$usuario->validateOTP($api->in['otp'])) {
+            $api->send(500, getMessage($usuario->errors()), new stdClass());
             return;
         }
         // Cambia la contraseña
-        if(!$usuario->setPass($_PATCH['clave'])){
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 500,
-                'message' => 'Error al actualizar la contraseña. '. getMessage($usuario->errors()),
-                'content' => array()
-            )));
+        if (!$usuario->setPass($api->in['clave'])) {
+            $api->send(500, 'Error al actualizar la contraseña. ' . getMessage($usuario->errors()), new stdClass());
             return;
         }
 
         // Elimina el OTP
         $otp_message = '';
-        if(!$usuario->deleteOTP()){
-            $otp_message = ' El OTP no ha posido ser eliminado por seguridad intenten eliminarlo.';
+        if (!$usuario->deleteOTP()) {
+            $otp_message = ' El OTP no ha posido ser eliminado por seguridad intente eliminarlo.';
         }
 
         // Respuesta
-        $router->render('api/api', 'layout-api', array('response' => array(
-            'status' => 200,
-            'message' => 'Contraseña actualizada.'.$otp_message,
-            'content' => array()
-        )));
+        $api->send(200, 'Contraseña actualizada.' . $otp_message, new stdClass());
     }
 
     /**
@@ -224,42 +202,43 @@ class AuthentificationApi
      */
     public static function postAuth(Router $router): void
     {
-        RequestParser::parse();
-        if (empty($_POST)) {
-            $_POST = json_decode(file_get_contents("php://input"), true);
-        }
+        $api = new Api(
+            $router,
+            'POST',
+            array(
+                array(
+                    'name' => 'usuario',
+                    'required' => true,
+                    'type' => 'string',
+                    'min' =>  1
+                ),
+                array(
+                    'name' => 'clave',
+                    'required' => true,
+                    'type' => 'string',
+                    'min' =>  8
+                )
+            )
+        );
 
         // Valida campos requeridos
-        if (!isset($_POST['usuario']) || !isset($_POST['clave'])) {
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 400,
-                'message' => 'Debe incluirse todos los valores requeridos.',
-                'content' => array()
-            )));
+        if (!$api->validate()) {
             return;
         }
 
         // Buscar usuario filtrando variable
         $usuario = Usuario::findUser(htmlspecialchars(trim($_POST['usuario'])));
         if (is_null($usuario)) {
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 500,
-                'message' => 'Usuario no encontrado.',
-                'content' => array()
-            )));
+            $api->send(500, 'Usuario no encontrado.', new stdClass());
             return;
         }
 
         // Validar clave
-        if(!$usuario->validatePass($_POST['clave'])){
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 500,
-                'message' => 'Clave incorrecta.',
-                'content' => array()
-            )));
+        if (!$usuario->validatePass($_POST['clave'])) {
+            $api->send(500, 'Clave incorrecta.', new stdClass());
             return;
         }
-        
+
         // Iniciar la sesion
         loadSession();
         $_SESSION['auth'] = array(
@@ -269,11 +248,7 @@ class AuthentificationApi
         );
 
         // Respuesta
-        $router->render('api/api', 'layout-api', array('response' => array(
-            'status' => 200,
-            'message' => 'Usuario identificado.',
-            'content' => array()
-        )));
+        $api->send(200, 'Usuario identificado.', new stdClass());
     }
 
     /**
@@ -284,19 +259,18 @@ class AuthentificationApi
      */
     public static function deleteAuth(Router $router): void
     {
-        RequestParser::parse();
-        if (empty($_DELETE)) {
-            $_DELETE = json_decode(file_get_contents("php://input"), true);
-        }
+        $api = new Api(
+            $router,
+            'DELETE',
+            array()
+        );
 
         loadSession();
-        if(isset($_SESSION['auth'])){unset($_SESSION['auth']);}
+        if (isset($_SESSION['auth'])) {
+            unset($_SESSION['auth']);
+        }
 
         // Respuesta
-        $router->render('api/api', 'layout-api', array('response' => array(
-            'status' => 200,
-            'message' => 'Sesión cerrada.',
-            'content' => array()
-        )));
+        $api->send(200, 'Sesión cerrada.', new stdClass());
     }
 }

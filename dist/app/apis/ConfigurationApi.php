@@ -3,14 +3,14 @@
 namespace Apis;
 
 use mysqli;
-use Route\Token;
+use stdClass;
+use Model\Api;
+use Model\Rol;
 use Route\Router;
 use Model\Usuario;
-use Model\Rol;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\PHPMailer;
-use Notihnio\RequestParser\RequestParser;
 
 class ConfigurationApi
 {
@@ -23,36 +23,45 @@ class ConfigurationApi
      */
     public static function postDatabase(Router $router): void
     {
-        RequestParser::parse();
-        if (empty($_POST)) {
-            $_POST = json_decode(file_get_contents("php://input"), true);
-        }
+        $api = new Api($router, 'POST', array(
+            array(
+                'name' => 'dbhost',
+                'required' => true,
+                'type' => 'string'
+            ),
+            array(
+                'name' => 'dbname',
+                'required' => true,
+                'type' => 'string'
+            ),
+            array(
+                'name' => 'dbuser',
+                'required' => true,
+                'type' => 'string'
+            ),
+            array(
+                'name' => 'dbpass',
+                'required' => true,
+                'type' => 'string'
+            )
+        ));
 
         // Valida configuración inicial
         if (IS_CONFIG_DATABASE) {
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 403,
-                'message' => 'La configuración inicial de la base de datos ya ha sido efectuada y no puede volver a ejecutarse.',
-                'content' => array()
-            )));
+            $api->send(403, 'La configuración inicial de la base de datos ya ha sido efectuada y no puede volver a ejecutarse.', new stdClass());
             return;
         }
 
         // Valida campos requeridos
-        if (!isset($_POST['dbhost']) || !isset($_POST['dbuser']) || !isset($_POST['dbpass']) || !isset($_POST['dbname'])) {
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 400,
-                'message' => 'Debe incluirse todos los valores requeridos.',
-                'content' => array()
-            )));
+        if (!$api->validate()) {
             return;
         }
 
         //Filtrar las variables
-        $DB_HOST = htmlspecialchars(trim($_POST['dbhost']));
-        $DB_USER = htmlspecialchars(trim($_POST['dbuser']));
-        $DB_PASS = htmlspecialchars(trim($_POST['dbpass']));
-        $DB_NAME = htmlspecialchars(trim($_POST['dbname']));
+        $DB_HOST = htmlspecialchars(trim($api->in['dbhost']));
+        $DB_USER = htmlspecialchars(trim($api->in['dbuser']));
+        $DB_PASS = htmlspecialchars(trim($api->in['dbpass']));
+        $DB_NAME = htmlspecialchars(trim($api->in['dbname']));
 
         if (self::verifyDB($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME)) { //Conexión verificada
             try { // Crear fichero de configuración
@@ -64,11 +73,7 @@ class ConfigurationApi
                 $data = preg_replace('/define\(\'DB_PASS\',\'\S+\'\)/', "define('DB_PASS','{$DB_PASS}')", $data);
                 file_put_contents(__DIR__ . '/../../config/config.php', $data);
             } catch (\Exception $e) {
-                $router->render('api/api', 'layout-api', array('response' => array(
-                    'status' => 500,
-                    'message' => 'No se ha conseguido guardar los datos de conexión con la base de datos en el fichero de configuración',
-                    'content' => array()
-                )));
+                $api->send(500, 'No se ha conseguido guardar los datos de conexión con la base de datos en el fichero de configuración', new stdClass());
                 return;
             }
 
@@ -84,20 +89,12 @@ class ConfigurationApi
                     } while ($db->next_result());
                 }
                 if ($db->errno) {
-                    $router->render('api/api', 'layout-api', array('response' => array(
-                        'status' => 500,
-                        'message' => 'Error en la sentencia #' . ($querynum + 1) . '<br/><br/><span style="color:red;">' . $db->error . '</span>',
-                        'content' => array()
-                    )));
+                    $api->send(500, 'Error en la sentencia #' . ($querynum + 1) . '<br/><br/><span style="color:red;">' . $db->error . '</span>', new stdClass());
                     return;
                 }
                 $db->close();
             } catch (\Exception $e) {
-                $router->render('api/api', 'layout-api', array('response' => array(
-                    'status' => 500,
-                    'message' => 'No se ha conseguido cargar la configuración inicial en la base de datos',
-                    'content' => array()
-                )));
+                $api->send(500, 'No se ha conseguido cargar la configuración inicial en la base de datos', new stdClass());
                 return;
             }
 
@@ -106,26 +103,14 @@ class ConfigurationApi
                 $data = preg_replace('/define\(\'IS_CONFIG_DATABASE\',\S+\)/', "define('IS_CONFIG_DATABASE',true)", $data);
                 file_put_contents(__DIR__ . '/../../config/config.php', $data);
             } catch (\Exception $e) {
-                $router->render('api/api', 'layout-api', array('response' => array(
-                    'status' => 202,
-                    'message' => 'No se ha conseguido bloquear el acceso a la API de configuración de la base de datos. Realice un bloqueo manual',
-                    'content' => array()
-                )));
+                $api->send(202, 'No se ha conseguido bloquear el acceso a la API de configuración de la base de datos. Realice un bloqueo manual', new stdClass());
                 return;
             }
 
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 201,
-                'message' => 'Configuración de la base de datos completada',
-                'content' => array()
-            )));
+            $api->send(201, 'Configuración de la base de datos completada', new stdClass());
             return;
         } else { // Conexión fallida
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 500,
-                'message' => 'No se ha conseguido establecer conexión con la base de datos',
-                'content' => array()
-            )));
+            $api->send(500, 'No se ha conseguido establecer conexión con la base de datos', new stdClass());
             return;
         }
     }
@@ -137,51 +122,53 @@ class ConfigurationApi
      */
     public static function postAdmin(Router $router): void
     {
-        RequestParser::parse();
-        if (empty($_POST)) {
-            $_POST = json_decode(file_get_contents("php://input"), true);
-        }
+        $api = new Api($router, 'POST', array(
+            array(
+                'name' => 'user',
+                'required' => true,
+                'type' => 'string',
+                'min' => 1,
+                'max' => 50
+            ),
+            array(
+                'name' => 'email',
+                'required' => true,
+                'type' => 'string',
+                'min' => 1,
+                'max' => 320,
+                'filter' => FILTER_VALIDATE_EMAIL
+            ),
+            array(
+                'name' => 'pass',
+                'required' => true,
+                'type' => 'string',
+                'min' => 8
+            )
+        ));
 
         // Valida configuración inicial
         if (IS_CONFIG_ADMIN) {
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 403,
-                'message' => 'La configuración inicial del administrador ya ha sido efectuada y no puede volver a ejecutarse.',
-                'content' => array()
-            )));
+            $api->send(403, 'La configuración inicial del administrador ya ha sido efectuada y no puede volver a ejecutarse.', new stdClass());
             return;
         }
 
         // Valida campos requeridos
-        if (!isset($_POST['user']) || !isset($_POST['email']) || !isset($_POST['pass'])) {
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 400,
-                'message' => 'Debe incluirse todos los valores requeridos.',
-                'content' => array()
-            )));
+        if (!$api->validate()) {
             return;
         }
 
         // Filtrar las variables
-        $username = htmlspecialchars(trim($_POST['user']));
-        $email = filter_var(trim($_POST['email']), FILTER_SANITIZE_EMAIL);
-        $pass = htmlspecialchars(trim($_POST['pass']));
+        $username = htmlspecialchars(trim($api->in['user']));
+        $email = filter_var(trim($api->in['email']), FILTER_SANITIZE_EMAIL);
+        $pass = htmlspecialchars(trim($api->in['pass']));
 
         if (!checkPasswordStrength($pass)) { // Validación contraseña
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 500,
-                'message' => 'La contraseña indicada no cumple los estándares de seguridad',
-                'content' => array()
-            )));
+            $api->send(500, 'La contraseña indicada no cumple los estándares de seguridad', new stdClass());
             return;
         }
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) { //validación email
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 400,
-                'message' => 'El e-mail indicado es inválido',
-                'content' => array()
-            )));
+            $api->send(400, 'El e-mail indicado es inválido', new stdClass());
             return;
         }
 
@@ -200,34 +187,18 @@ class ConfigurationApi
                     $data = preg_replace('/define\(\'IS_CONFIG_ADMIN\',\S+\)/', "define('IS_CONFIG_ADMIN',true)", $data);
                     file_put_contents(__DIR__ . '/../../config/config.php', $data);
                 } catch (\Exception $e) {
-                    $router->render('api/api', 'layout-api', array('response' => array(
-                        'status' => 202,
-                        'message' => 'No se ha conseguido bloquear el acceso a la API de configuración del administrador. Realice un bloqueo manual',
-                        'content' => array()
-                    )));
+                    $api->send(202, 'No se ha conseguido bloquear el acceso a la API de configuración del administrador. Realice un bloqueo manual', new stdClass());
                     return;
                 }
 
-                $router->render('api/api', 'layout-api', array('response' => array(
-                    'status' => 201,
-                    'message' => 'Configuración del administrador completada',
-                    'content' => array()
-                )));
+                $api->send(201, 'Configuración del administrador completada', new stdClass());
                 return;
             } else { // error al guardar usuario
-                $router->render('api/api', 'layout-api', array('response' => array(
-                    'status' => '500',
-                    'message' => 'Se ha producido un error al crear el usuario:<br>' . getMessage($user->errors()),
-                    'content' => array()
-                )));
+                $api->send(500, 'Se ha producido un error al crear el usuario:<br>' . getMessage($user->errors()), new stdClass());
                 return;
             }
         } else { // validación de usuario no superada
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => '500',
-                'message' => 'Se ha producido un error al crear el usuario:<br>' . getMessage($user->errors()),
-                'content' => array()
-            )));
+            $api->send(500, 'Se ha producido un error al crear el usuario:<br>' . getMessage($user->errors()), new stdClass());
             return;
         }
     }
@@ -239,57 +210,79 @@ class ConfigurationApi
      */
     public static function postEmail(Router $router): void
     {
-        RequestParser::parse();
-        if (empty($_POST)) {
-            $_POST = json_decode(file_get_contents("php://input"), true);
-        }
+        $api = new Api($router, 'POST', array(
+            array(
+                'name' => 'hostSMTP',
+                'required' => true,
+                'type' => 'string',
+                'min' => 1
+            ),
+            array(
+                'name' => 'portSMTP',
+                'required' => true,
+                'type' => 'string',
+                'min' => 1
+            ),
+            array(
+                'name' => 'userEmail',
+                'required' => true,
+                'type' => 'string',
+                'min' => 1
+            ),
+            array(
+                'name' => 'passEmail',
+                'required' => true,
+                'type' => 'string',
+                'min' => 1
+            ),
+            array(
+                'name' => 'adminEmail',
+                'required' => true,
+                'type' => 'string',
+                'min' => 1,
+                'max' => 320,
+                'filter' => FILTER_VALIDATE_EMAIL
+            ),
+            array(
+                'name' => 'fromEmail',
+                'required' => true,
+                'type' => 'string',
+                'min' => 1,
+                'max' => 320,
+                'filter' => FILTER_VALIDATE_EMAIL
+            ),
+            array(
+                'name' => 'fromName',
+                'required' => true,
+                'type' => 'string',
+                'min' => 1
+            )
+        ));
 
         // Valida configuración inicial
         if (IS_CONFIG_EMAIL) {
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 403,
-                'message' => 'La configuración inicial del servidor de correo ya ha sido efectuada y no puede volver a ejecutarse.',
-                'content' => array()
-            )));
+            $api->send(403, 'La configuración inicial del servidor de correo ya ha sido efectuada y no puede volver a ejecutarse.', new stdClass());
             return;
         }
 
         // Valida campos requeridos
-        if (!isset($_POST['hostSMTP']) || !isset($_POST['portSMTP']) || !isset($_POST['userEmail']) || !isset($_POST['passEmail']) || !isset($_POST['adminEmail']) || !isset($_POST['fromEmail']) || !isset($_POST['fromName'])) {
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 400,
-                'message' => 'Debe incluirse todos los valores requeridos.',
-                'content' => array()
-            )));
+        if (!$api->validate()) {
             return;
         }
 
         // Filtrar las variables
-        $hostSMTP = htmlspecialchars(trim($_POST['hostSMTP']));
-        $portSMTP = filter_var(trim($_POST['portSMTP']), FILTER_SANITIZE_NUMBER_INT);
-        $userEmail = htmlspecialchars(trim($_POST['userEmail']));
-        $passEmail = htmlspecialchars(trim($_POST['passEmail']));
-        $adminEmail = filter_var(trim($_POST['adminEmail']), FILTER_SANITIZE_EMAIL);
-        $fromEmail = filter_var(trim($_POST['fromEmail']), FILTER_SANITIZE_EMAIL);
-        $fromName = htmlspecialchars(trim($_POST['fromName']));
-
-        if (!filter_var($adminEmail, FILTER_VALIDATE_EMAIL) || !filter_var($fromEmail, FILTER_VALIDATE_EMAIL)) { //validación email
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 400,
-                'message' => 'El e-mail indicado es inválido',
-                'content' => array()
-            )));
-            return;
-        }
+        $hostSMTP = htmlspecialchars(trim($api->in['hostSMTP']));
+        $portSMTP = filter_var(trim($api->in['portSMTP']), FILTER_SANITIZE_NUMBER_INT);
+        $userEmail = htmlspecialchars(trim($api->in['userEmail']));
+        $passEmail = htmlspecialchars(trim($api->in['passEmail']));
+        $adminEmail = filter_var(trim($api->in['adminEmail']), FILTER_SANITIZE_EMAIL);
+        $fromEmail = filter_var(trim($api->in['fromEmail']), FILTER_SANITIZE_EMAIL);
+        $fromName = htmlspecialchars(trim($api->in['fromName']));
 
         try { // Intento de conexión
             self::verifySMTP($hostSMTP, $portSMTP, $userEmail, $passEmail);
         } catch (Exception $e) {
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 500,
-                'message' => 'Se ha producido un error al intentar conectar con el servidor SMTP:<br>' . $e->getMessage(),
-                'content' => array()
-            )));
+            $api->send(500, 'Se ha producido un error al intentar conectar con el servidor SMTP:<br>' . $e->getMessage(), new stdClass());
             return;
         }
 
@@ -303,11 +296,7 @@ class ConfigurationApi
             $data = preg_replace('/define\(\'SMTP_NAME\',\'\S+\'\)/', "define('SMTP_NAME','{$fromName}')", $data);
             file_put_contents(__DIR__ . '/../../config/config.php', $data);
         } catch (\Exception $e) {
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 500,
-                'message' => 'Se ha producido un error al guardar los datos de configuración',
-                'content' => array()
-            )));
+            $api->send(500, 'Se ha producido un error al guardar los datos de configuración', new stdClass());
             return;
         }
 
@@ -334,19 +323,11 @@ class ConfigurationApi
 
             $mail->send();
         } catch (Exception $e) {
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 500,
-                'message' => 'Se ha producido un error al enviar el correo de prueba:<br>' . $mail->ErrorInfo,
-                'content' => array()
-            )));
+            $api->send(500, 'Se ha producido un error al enviar el correo de prueba:<br>' . $mail->ErrorInfo, new stdClass());
             return;
         }
 
-        $router->render('api/api', 'layout-api', array('response' => array(
-            'status' => 201,
-            'message' => 'Configuración del servidor de email registrada',
-            'content' => array()
-        )));
+        $api->send(201, 'Configuración del servidor de email registrada', new stdClass());
         return;
     }
 
@@ -357,19 +338,12 @@ class ConfigurationApi
      */
     public static function putEmail(Router $router): void
     {
-        RequestParser::parse();
-        if (empty($_PUT)) {
-            $_PUT = json_decode(file_get_contents("php://input"), true);
-        }
+        $api = new Api($router, 'PUT', array());
 
         if (isset($_GET['confirm'])) { // Metodo de confirmación
             if ($_GET['confirm'] == 'true') {
                 if (IS_CONFIG_EMAIL) {
-                    $router->render('api/api', 'layout-api', array('response' => array(
-                        'status' => 403,
-                        'message' => 'La configuración inicial del servidor de correo ya ha sido efectuada y no puede volver a ejecutarse.',
-                        'content' => array()
-                    )));
+                    $api->send(403, 'La configuración inicial del servidor de correo ya ha sido efectuada y no puede volver a ejecutarse.', new stdClass());
                     return;
                 }
 
@@ -378,29 +352,17 @@ class ConfigurationApi
                     $data = preg_replace('/define\(\'IS_CONFIG_EMAIL\',\S+\)/', "define('IS_CONFIG_EMAIL',true)", $data);
                     file_put_contents(__DIR__ . '/../../config/config.php', $data);
                 } catch (\Exception $e) {
-                    $router->render('api/api', 'layout-api', array('response' => array(
-                        'status' => 202,
-                        'message' => 'No se ha conseguido bloquear el acceso a la API de configuración del servidor de email. Realice un bloqueo manual',
-                        'content' => array()
-                    )));
+                    $api->send(202, 'No se ha conseguido bloquear el acceso a la API de configuración del servidor de email. Realice un bloqueo manual', new stdClass());
                     return;
                 }
 
-                $router->render('api/api', 'layout-api', array('response' => array(
-                    'status' => 201,
-                    'message' => 'Validación del servidor de email registrada',
-                    'content' => array()
-                )));
+                $api->send(201, 'Validación del servidor de email registrada', new stdClass());
                 return;
             }
         }
 
         // Método no encontrado
-        $router->render('api/api', 'layout-api', array('response' => array(
-            'status' => 405,
-            'message' => 'Método o parámetros no soportados',
-            'content' => array()
-        )));
+        $api->send(405, 'Método o parámetros no soportados', new stdClass());
         return;
     }
 
@@ -411,34 +373,56 @@ class ConfigurationApi
      */
     public static function putSite(Router $router): void
     {
-        RequestParser::parse();
-        if (empty($_PUT)) {
-            $_PUT = json_decode(file_get_contents("php://input"), true);
+        $api = new Api($router, 'PUT', array(
+            array(
+                'name' => 'titulo',
+                'required' => true,
+                'type' => 'string',
+                'min' => 1,
+                'max' => 2 ^ 32 - 1
+            ),
+            array(
+                'name' => 'tema',
+                'required' => true,
+                'type' => 'string',
+                'min' => 1,
+                'max' => 2 ^ 32 - 1
+            ),
+            array(
+                'name' => 'descripcion',
+                'required' => true,
+                'type' => 'string',
+                'min' => 1,
+                'max' => 2 ^ 32 - 1
+            ),
+            array(
+                'name' => 'eventos',
+                'required' => false,
+                'type' => 'boolean'
+            ),
+            array(
+                'name' => 'noticias',
+                'required' => false,
+                'type' => 'boolean'
+            ),
+            array(
+                'name' => 'normas',
+                'required' => false,
+                'type' => 'boolean'
+            ),
+            array(
+                'name' => 'enlaces',
+                'required' => false,
+                'type' => 'boolean'
+            )
+        ), array('SESSION', 'TOKEN'));
+
+        // Valida la autentificación
+        if (!$api->auth(self::SCOPE)) {
+            return;
         }
 
-        $authUser = getAuthUser();
-        if(!is_null($authUser)){// Validación por sesión
-            if(!$authUser->can(self::SCOPE)){
-                $router->render('api/api', 'layout-api', array('response' => array(
-                    'status' => 403,
-                    'message' => 'Acceso no autorizado',
-                    'content' => array()
-                )));
-                return;
-            }
-        }else{// Validación de Token
-            $token = Token::validate(self::SCOPE);
-            if($token->getStatus()!=Token::SUCCESS_CODE){
-                $router->render('api/api', 'layout-api', array('response' => array(
-                    'status' => $token->getStatus(),
-                    'message' => $token->getMessage(),
-                    'content' => array()
-                )));
-                return;
-            }
-        }
-        
-        self::configSite($_PUT,$router);
+        self::configSite($api);
     }
     /**
      * Configura la información del sitio
@@ -447,22 +431,57 @@ class ConfigurationApi
      */
     public static function postSite(Router $router): void
     {
-        RequestParser::parse();
-        if (empty($_POST)) {
-            $_POST = json_decode(file_get_contents("php://input"), true);
-        }
+        $api = new Api($router, 'POST', array(
+            array(
+                'name' => 'titulo',
+                'required' => true,
+                'type' => 'string',
+                'min' => 1,
+                'max' => 2 ^ 32 - 1
+            ),
+            array(
+                'name' => 'tema',
+                'required' => true,
+                'type' => 'string',
+                'min' => 1,
+                'max' => 2 ^ 32 - 1
+            ),
+            array(
+                'name' => 'descripcion',
+                'required' => true,
+                'type' => 'string',
+                'min' => 1,
+                'max' => 2 ^ 32 - 1
+            ),
+            array(
+                'name' => 'eventos',
+                'required' => false,
+                'type' => 'boolean'
+            ),
+            array(
+                'name' => 'noticias',
+                'required' => false,
+                'type' => 'boolean'
+            ),
+            array(
+                'name' => 'normas',
+                'required' => false,
+                'type' => 'boolean'
+            ),
+            array(
+                'name' => 'enlaces',
+                'required' => false,
+                'type' => 'boolean'
+            )
+        ));
 
         // Valida configuración inicial
         if (IS_CONFIG_SITE) {
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 403,
-                'message' => 'La configuración inicial del sitio ya ha sido efectuada y no puede volver a ejecutarse.',
-                'content' => array()
-            )));
+            $api->send(403, 'La configuración inicial del sitio ya ha sido efectuada y no puede volver a ejecutarse.', new stdClass());
             return;
         }
 
-        self::configSite($_POST,$router);
+        self::configSite($api);
     }
 
     /**
@@ -470,43 +489,25 @@ class ConfigurationApi
      * @param array $body argumentos de configuración
      * @param Router $router
      */
-    private static function configSite(array $body, Router $router): void
+    private static function configSite(Api $api): void
     {
 
         // Valida campos requeridos
-        if (!isset($body['titulo']) || !isset($body['tema']) || !isset($body['descripcion'])) {
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 400,
-                'message' => 'Debe incluirse todos los valores requeridos.',
-                'content' => array()
-            )));
+        if (!$api->validate()) {
             return;
         }
 
         //Filtrar las variables
-        $titulo = htmlspecialchars(trim($body['titulo']));
-        $tema = htmlspecialchars(trim($body['tema']));
-        $descripcion = trim($body['descripcion']);
-        $eventos = isset($body['eventos']) ? 1 : 0;
-        $noticias = isset($body['noticias']) ? 1 : 0;
-        $normas = isset($body['normas']) ? 1 : 0;
-        $enlaces = isset($body['enlaces']) ? 1 : 0;
+        $titulo = htmlspecialchars(trim($api->in['titulo']));
+        $tema = htmlspecialchars(trim($api->in['tema']));
+        $descripcion = trim($api->in['descripcion']);
+        $eventos = isset($api->in['eventos']) ? 1 : 0;
+        $noticias = isset($api->in['noticias']) ? 1 : 0;
+        $normas = isset($api->in['normas']) ? 1 : 0;
+        $enlaces = isset($api->in['enlaces']) ? 1 : 0;
 
         if (!in_array($tema, array_column(getThemes(), 'folder'))) { // Validar tema
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 500,
-                'message' => 'El tema seleccionado no se encuentra disponible',
-                'content' => array()
-            )));
-            return;
-        }
-
-        if ($titulo == '' || $descripcion == '') { // Validar datos obligatorios
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 500,
-                'message' => 'Debe proveerse un título y descripción',
-                'content' => array()
-            )));
+            $api->send(500, 'El tema seleccionado no se encuentra disponible', new stdClass());
             return;
         }
 
@@ -517,11 +518,7 @@ class ConfigurationApi
             if (!$stmt->execute()) { // Registro datos principales en error
                 $stmt->close();
                 $db->close();
-                $router->render('api/api', 'layout-api', array('response' => array(
-                    'status' => 500,
-                    'message' => 'Se ha producido un error al registrar la configuración en la base de datos',
-                    'content' => array()
-                )));
+                $api->send(500, 'Se ha producido un error al registrar la configuración en la base de datos', new stdClass());
                 return;
             }
             $stmt->close();
@@ -531,21 +528,13 @@ class ConfigurationApi
             if (!$stmt->execute()) { // Registro datos de módulos en error
                 $stmt->close();
                 $db->close();
-                $router->render('api/api', 'layout-api', array('response' => array(
-                    'status' => 500,
-                    'message' => 'Se ha producido un error al registrar la configuración en la base de datos',
-                    'content' => array()
-                )));
+                $api->send(500, 'Se ha producido un error al registrar la configuración en la base de datos', new stdClass());
                 return;
             }
             $stmt->close();
             $db->close();
         } catch (\Exception $e) {
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 500,
-                'message' => 'Se ha producido un error al registrar la configuración en la base de datos',
-                'content' => array()
-            )));
+            $api->send(500, 'Se ha producido un error al registrar la configuración en la base de datos', new stdClass());
             return;
         }
 
@@ -554,19 +543,11 @@ class ConfigurationApi
             $data = preg_replace('/define\(\'IS_CONFIG_SITE\',\S+\)/', "define('IS_CONFIG_SITE',true)", $data);
             file_put_contents(__DIR__ . '/../../config/config.php', $data);
         } catch (\Exception $e) {
-            $router->render('api/api', 'layout-api', array('response' => array(
-                'status' => 202,
-                'message' => 'No se ha conseguido bloquear el acceso a la API de configuración del sitio. Realice un bloqueo manual',
-                'content' => array()
-            )));
+            $api->send(202, 'No se ha conseguido bloquear el acceso a la API de configuración del sitio. Realice un bloqueo manual', new stdClass());
             return;
         }
 
-        $router->render('api/api', 'layout-api', array('response' => array(
-            'status' => 201,
-            'message' => 'Configuración del sitio completada',
-            'content' => array()
-        )));
+        $api->send(201, 'Configuración del sitio completada', new stdClass());
         return;
     }
 
