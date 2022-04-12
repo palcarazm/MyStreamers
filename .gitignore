@@ -1,6 +1,7 @@
 node_modules/
 dist/vendor/
 dist/config/config.php
+dist/config/database-init.min.sql
 dist/public/css/admin**
 dist/public/js/admin**
 dist/public/css/main**

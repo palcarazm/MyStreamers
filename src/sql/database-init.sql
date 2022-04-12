@@ -85,16 +85,15 @@ VALUES
   );
   /* TABLA DE USUARIOS */
   CREATE TABLE IF NOT EXISTS users(
-    PK_id_user INT(11) NOT NULL AUTO_INCREMENT COMMENT 'ID de usuario',
-    username VARCHAR(50) NOT NULL COMMENT 'Nombre de usuario',
-    email VARCHAR(320) NOT NULL COMMENT 'Email de usuario',
-    pass CHAR(60) NOT NULL COMMENT 'Contraseña encriptada',
-    FK_id_rol INT(1) NOT NULL COMMENT 'ID de rol',
-    otp CHAR(60) NULL COMMENT 'OTP encriptada',
-    otp_valid TIMESTAMP NULL COMMENT 'Caducidad del OTP',
-    actualizado TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Última actualización',
-    PRIMARY KEY (PK_id_user),
-    CONSTRAINT UQ_username UNIQUE (username),
-    CONSTRAINT UQ_email UNIQUE (email),
-    CONSTRAINT FK_roles_TO_users FOREIGN KEY (FK_id_rol) REFERENCES roles (PK_id_rol)
-  ) COMMENT 'Tabla de usuarios';
+  PK_id_user  INT(11)      NOT NULL AUTO_INCREMENT COMMENT 'ID de usuario',
+  username    VARCHAR(50)  NOT NULL COMMENT 'Nombre de usuario',
+  email       VARCHAR(320) NOT NULL COMMENT 'Email de usuario',
+  pass        CHAR(60)     NOT NULL COMMENT 'Contraseña encriptada',
+  FK_id_rol   INT(1)       NOT NULL COMMENT 'ID de rol',
+  actualizado TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Última actualización',
+  otp         VARCHAR(60)  NULL     COMMENT 'OTP encriptada',
+  otp_valid   TIMESTAMP    NULL     COMMENT 'Caducidad del OTP',
+  imagen      VARCHAR(40)  NULL     COMMENT 'Ruta a la imagen de perfil',
+  bloqueado   BOOLEAN      NOT NULL DEFAULT FALSE COMMENT 'Indicador de bloqueado',
+  PRIMARY KEY (PK_id_user)
+) COMMENT 'Tabla de usuarios';
