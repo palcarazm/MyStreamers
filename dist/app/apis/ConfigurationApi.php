@@ -439,21 +439,21 @@ class ConfigurationApi
                 'required' => true,
                 'type' => 'string',
                 'min' => 1,
-                'max' => 2 ^ 32 - 1
+                'max' => 2 ** 32 - 1
             ),
             array(
                 'name' => 'tema',
                 'required' => true,
                 'type' => 'string',
                 'min' => 1,
-                'max' => 2 ^ 32 - 1
+                'max' => 2 ** 32 - 1
             ),
             array(
                 'name' => 'descripcion',
                 'required' => true,
                 'type' => 'string',
                 'min' => 1,
-                'max' => 2 ^ 32 - 1
+                'max' => 2 ** 32 - 1
             ),
             array(
                 'name' => 'eventos',

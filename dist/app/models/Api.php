@@ -51,23 +51,25 @@ class Api
         $this->query = $_GET;
         switch ($this->method) {
             case 'GET':
+                $in = array();
                 break;
             case 'POST':
-                $this->in = empty($_POST) ? json_decode(file_get_contents("php://input"), true) : $_POST;
+                $in = empty($_POST) ? json_decode(file_get_contents("php://input"), true) : $_POST;
                 break;
             case 'PUT':
-                $this->in = empty($_PUT) ? json_decode(file_get_contents("php://input"), true) : $_PUT;
+                $in = empty($_PUT) ? json_decode(file_get_contents("php://input"), true) : $_PUT;
                 break;
             case 'DELETE':
-                $this->in = empty($_DETETE) ? json_decode(file_get_contents("php://input"), true) : $_DETETE;
+                $in = empty($_DETETE) ? json_decode(file_get_contents("php://input"), true) : $_DETETE;
                 break;
             case 'PATCH':
-                $this->in = empty($_PATCH) ? json_decode(file_get_contents("php://input"), true) : $_PATCH;
+                $in = empty($_PATCH) ? json_decode(file_get_contents("php://input"), true) : $_PATCH;
                 break;
             default:
                 throw new Exception("Metodo no soportado por el dominio", 1);
                 break;
         }
+        $this->in = is_null($in)? array() : $in;
     }
 
     public function auth(string $scope): bool
@@ -193,7 +195,7 @@ class Api
                     }
                     break;
                 case 'boolean':
-                    if (!filter_var($params[$spec['name']], FILTER_VALIDATE_BOOLEAN,)) {
+                    if (is_null(filter_var($params[$spec['name']], FILTER_VALIDATE_BOOLEAN,FILTER_NULL_ON_FAILURE))) {
                         return false;
                     }
                     break;
