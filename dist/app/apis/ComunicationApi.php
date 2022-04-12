@@ -44,6 +44,7 @@ class ComunicationApi
                     'schema' => array()
                 )
             ),
+            array(),
             array('TOKEN')
         );
 

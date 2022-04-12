@@ -415,7 +415,9 @@ class ConfigurationApi
                 'required' => false,
                 'type' => 'boolean'
             )
-        ), array('SESSION', 'TOKEN'));
+        ),
+        array(),
+        array('SESSION', 'TOKEN'));
 
         // Valida la autentificación
         if (!$api->auth(self::SCOPE)) {

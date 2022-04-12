@@ -152,6 +152,7 @@ class AuthentificationApi
                     'min' =>  16,
                     'max' => 16,
                 ),
+                array(),
                 array(
                     'name' => 'clave',
                     'required' => true,

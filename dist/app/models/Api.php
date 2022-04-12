@@ -16,22 +16,26 @@ class Api
     protected Router $router;
     protected String $method;
     protected array $authMethods;
-    protected array $schema;
+    protected array $bodySchema;
+    protected array $querySchema;
     public array $in;
+    public array $query;
 
     /**
      * Constructor de la API
      *
      * @param Router $router Router del sitio
      * @param string $method Metodo de llamada (GET POST PUT DELETE PATCH)
-     * @param array $schema Especificación de entrada ([ {name* required* type* max min filter schema} ])
+     * @param array $bodySchema Especificación de entrada ([ {name* required* type* max min filter schema} ])
+     * @param array $querySchema Especificación de entrada ([ {name* required* type* max min filter schema} ])
      * @param array $authMethods Métodos de autentificación soportados (SESSION TOKEN)
      */
-    public function __construct(Router $router, string $method, array $schema, array $authMethods = array())
+    public function __construct(Router $router, string $method, array $bodySchema = array(), array $querySchema = array(), array $authMethods = array())
     {
         $this->router = $router;
         $this->method = strtoupper($method);
-        $this->schema = $schema;
+        $this->bodySchema = $bodySchema;
+        $this->querySchema = $querySchema;
         $this->authMethods = $authMethods;
         $this->parse();
     }
@@ -44,9 +48,9 @@ class Api
     public function parse(): void
     {
         RequestParser::parse();
+        $this->query = $_GET;
         switch ($this->method) {
             case 'GET':
-                $this->in = $_GET;
                 break;
             case 'POST':
                 $this->in = empty($_POST) ? json_decode(file_get_contents("php://input"), true) : $_POST;
@@ -76,7 +80,7 @@ class Api
                         break;
                     }
                     if (!$authUser->can($scope)) {
-                        $this->send(403,Api::RES_403_Unauthorized,new stdClass());
+                        $this->send(403, Api::RES_403_Unauthorized, new stdClass());
                         return false;
                     }
                     return true;
@@ -95,7 +99,7 @@ class Api
                     break;
             }
         }
-        $this->send(403,Api::RES_403_Unauthenticaded,new stdClass());
+        $this->send(403, Api::RES_403_Unauthenticaded, new stdClass());
         return false;
     }
 
@@ -106,9 +110,17 @@ class Api
      */
     public function validate(): bool
     {
-        if (!$this->validateParam($this->in, $this->schema)) {
-            $this->send(400, API::RES_400, new stdClass());
-            return false;
+        if (!empty($this->bodySchema)) {
+            if (!$this->validateParam($this->in, $this->bodySchema)) {
+                $this->send(400, API::RES_400, new stdClass());
+                return false;
+            }
+        }
+        if (!empty($this->querySchema)) {
+            if (!$this->validateParam($this->query, $this->querySchema)) {
+                $this->send(400, API::RES_400, new stdClass());
+                return false;
+            }
         }
         return true;
     }
