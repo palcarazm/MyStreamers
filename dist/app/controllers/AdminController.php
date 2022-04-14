@@ -1,10 +1,8 @@
 <?php
 namespace Controllers;
 
-use Apis\ConfigurationApi;
 use Model\Sitio;
-use Route\Router;
-use Route\Token;
+use Router\Router;
 
 class AdminController{
     /**

@@ -4,8 +4,8 @@ namespace Model;
 
 use stdClass;
 use Exception;
-use Route\Token;
-use Route\Router;
+use Router\Token;
+use Router\Router;
 use Notihnio\RequestParser\RequestParser;
 
 class Api

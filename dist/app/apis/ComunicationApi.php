@@ -4,7 +4,7 @@ namespace Apis;
 
 use stdClass;
 use Model\Api;
-use Route\Router;
+use Router\Router;
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\PHPMailer;
 

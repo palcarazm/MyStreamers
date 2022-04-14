@@ -1,7 +1,7 @@
 <?php
 namespace Controllers;
 
-use Route\Router;
+use Router\Router;
 
 class PublicController{
     /**

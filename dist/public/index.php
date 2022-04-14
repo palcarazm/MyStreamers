@@ -5,7 +5,7 @@ if (is_file(__DIR__ . '/../config/config.php')) {
     require_once __DIR__ . '/../config/config-template.php';
 }
 
-use Route\Router;
+use Router\Router;
 use Controllers\PublicController;
 use Controllers\AdminController;
 use Apis\ConfigurationApi;

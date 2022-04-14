@@ -5,8 +5,8 @@ namespace Apis;
 use stdClass;
 use Model\Api;
 use Model\Sitio;
-use Route\Token;
-use Route\Router;
+use Router\Token;
+use Router\Router;
 use Model\Usuario;
 use GuzzleHttp\Client;
 
