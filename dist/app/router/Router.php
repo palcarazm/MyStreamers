@@ -89,6 +89,16 @@ class Router
 
         include __DIR__ . '/../../views/' . $layout . '.php';
     }
+    
+    /**
+     * Muestra la página de error genérica
+     *
+     * @return void
+     */
+    public function renderError():void
+    {
+        $this->render('public/500','layout-public',array('title'=>'Oups!'));
+    }
 
      /**
      * Valida que el parametro cumple la especificación
