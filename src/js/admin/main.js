@@ -53,6 +53,7 @@ $(function () {
       break;
   }
   setupAdminMenu();
+  setupLogoutBtn();
 });
 
 /**
@@ -73,6 +74,22 @@ function setupAdminMenu() {
           });
       }
     });
+}
+
+function setupLogoutBtn() {
+  $('a[data-widget="logout"]').click(function(e){
+    e.preventDefault();
+    ajaxCall(
+      '/api/auth/v1/auth',
+      'DELETE',
+      JSON.parse('{}'),
+      0,
+      function () {
+        window.location = '/'
+      },
+      null
+    );
+  });
 }
 
 /**
