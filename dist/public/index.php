@@ -40,6 +40,10 @@ $router->add('PATCH','/api/auth/v1/otp',[AuthentificationApi::class,'patchOTP'])
 $router->add('POST','/api/auth/v1/auth',[AuthentificationApi::class,'postAuth']);
 $router->add('DELETE','/api/auth/v1/auth',[AuthentificationApi::class,'deleteAuth']);
 
+// API Usuario
+$router->add('POST','/api/user/v1/user',[UserApi::class,'postUser']);
+$router->add('PUT','/api/user/v1/user',[UserApi::class,'putUser']);
+
 // Administración
 /// Configuración
 $router->add('GET','/admin/config/sitio',[AdminController::class,'configSitio'],Rol::PERMS_CONFIG);
