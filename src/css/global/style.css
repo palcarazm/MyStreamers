@@ -10,3 +10,23 @@
     -webkit-animation: fa-spin 2s ease-in-out infinite;
     animation: fa-spin 2s ease-in-out infinite;
 }
+img.img-size-small{
+    width: 4rem;
+    height: auto;
+}
+img.img-size-thumbnail{
+    width: 10rem;
+    height: auto;
+}
+img.img-size-medium{
+    width: 18rem;
+    height: auto;
+}
+img.img-size-medium-large{
+    width: 45rem;
+    height: auto;
+}
+img.img-size-large{
+    width: 65rem;
+    height: auto;
+}
