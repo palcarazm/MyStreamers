@@ -93,7 +93,7 @@ VALUES
   actualizado TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Última actualización',
   otp         VARCHAR(60)  NULL     COMMENT 'OTP encriptada',
   otp_valid   TIMESTAMP    NULL     COMMENT 'Caducidad del OTP',
-  imagen      VARCHAR(40)  NULL     COMMENT 'Ruta a la imagen de perfil',
+  imagen      VARCHAR(50)  NULL     COMMENT 'Ruta a la imagen de perfil',
   bloqueado   BOOLEAN      NOT NULL DEFAULT FALSE COMMENT 'Indicador de bloqueado',
   PRIMARY KEY (PK_id_user)
 ) COMMENT 'Tabla de usuarios';

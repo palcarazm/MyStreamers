@@ -8,10 +8,12 @@ use Exception;
 class Usuario extends ActiveRecord
 {
     protected static String $table = 'users';
-    protected static String $date ='actualizado';
-    protected static array $joins = array('roles'=>'id_rol');
+    protected static String $date = 'actualizado';
+    protected static array $joins = array('roles' => 'id_rol');
+    protected static String $image = 'imagen';
+    protected static String $imageDefault = '/user.png';
     protected static String $defaultOrder = 'PK_id_user';
-    protected static array $colDB = ['PK_id_user', 'username', 'email', 'pass', 'actualizado', 'FK_id_rol', 'otp', 'otp_valid'];
+    protected static array $colDB = ['PK_id_user', 'username', 'email', 'pass', 'actualizado', 'FK_id_rol', 'otp', 'otp_valid', 'imagen', 'bloqueado'];
     protected static String $PK = 'PK_id_user';
 
     protected $PK_id_user;
@@ -23,6 +25,8 @@ class Usuario extends ActiveRecord
     public $rol;
     protected $otp;
     protected $otp_valid;
+    public $imagen;
+    protected $bloqueado;
 
     public function __construct($args = [])
     {
@@ -34,6 +38,8 @@ class Usuario extends ActiveRecord
         $this->actualizado = $args['actualizado'] ?? null;
         $this->otp = $args['otp'] ?? null;
         $this->otp_valid = $args['otp_valid'] ?? null;
+        $this->imagen = $args['imagen'] ?? null;
+        $this->bloqueado = $args['bloqueado'] ?? null;
     }
 
     /**
@@ -46,15 +52,15 @@ class Usuario extends ActiveRecord
         self::$errors = [];
         if (!$this->username) {
             self::$errors[]   = 'El nombre de usuario es obligatorio';
-        }else{
-            if($this->checkval('username' , 's') && is_null($this->PK_id_user)){
+        } else {
+            if ($this->checkval('username', 's') && is_null($this->PK_id_user)) {
                 self::$errors[]   = 'Este nombre de usuario ya se encuentra registrado';
             }
         }
         if (!$this->email) {
             self::$errors[]   = 'El correo electrónico es obligatorio';
-        }else{
-            if($this->checkval('email' , 's')  && is_null($this->PK_id_user)){
+        } else {
+            if ($this->checkval('email', 's')  && is_null($this->PK_id_user)) {
                 self::$errors[]   = 'Este correo electrónico ya se encuentra registrado';
             }
         }
@@ -71,10 +77,10 @@ class Usuario extends ActiveRecord
      * @param String $pass Contraseña sin cifrar
      * @return boolean Completado con éxito (Si/No)
      */
-    public function setPass(String $pass):bool
+    public function setPass(String $pass): bool
     {
-        if(!checkPasswordStrength($pass)){
-            self::$errors[] = 'La contraseña no cumple los requisitos de seguridad.'; 
+        if (!checkPasswordStrength($pass)) {
+            self::$errors[] = 'La contraseña no cumple los requisitos de seguridad.';
             return false;
         }
         $this->pass = password_hash($pass, PASSWORD_BCRYPT, array('cost' => 12));
@@ -87,9 +93,41 @@ class Usuario extends ActiveRecord
      * @param String $pass
      * @return boolean Contraseña correcta (Si/No)
      */
-    public function validatePass(String $pass):bool
+    public function validatePass(String $pass): bool
     {
-        return password_verify($pass,$this->pass);
+        return password_verify($pass, $this->pass);
+    }
+
+    /**
+     * Verifica si el usuario está bloqueado
+     *
+     * @return boolean Bloueado (S/N)
+     */
+    public function isBlocked(): bool
+    {
+        return $this->bloqueado;
+    }
+
+    /**
+     * Bloquea al usuario
+     *
+     * @return boolean Bloqueado con éxito (S/N)
+     */
+    public function bloquear(): bool
+    {
+        $this->bloqueado = true;
+        return $this->save;
+    }
+
+    /**
+     * Desbloquea al usuario
+     *
+     * @return boolean Desbloqueado con éxito (S/N)
+     */
+    public function desbloquear(): bool
+    {
+        $this->bloqueado = false;
+        return $this->save;
     }
 
     /**
@@ -99,14 +137,14 @@ class Usuario extends ActiveRecord
      * @param array $fields
      * @return object
      */
-    protected static function createObject(mixed $record , array $fields)
+    protected static function createObject(mixed $record, array $fields)
     {
         $obj = new static;
-        $rol_values =[];
+        $rol_values = [];
         foreach ($record as $key => $value) {
             if (property_exists($obj, $key) && $fields[$key] == static::$table) {
                 $obj->$key = $value;
-            }elseif( $fields[$key] == 'roles'){
+            } elseif ($fields[$key] == 'roles') {
                 $rol_values[$key] = $value;
             }
         }
@@ -120,7 +158,7 @@ class Usuario extends ActiveRecord
      * @param String $usuario nombre o email
      * @return Usuario|null
      */
-    public static function findUser(String $usuario):Usuario|null
+    public static function findUser(String $usuario): Usuario|null
     {
         $query = "SELECT * FROM " . static::$table;
         if (!empty(static::$joins)) {
@@ -139,17 +177,16 @@ class Usuario extends ActiveRecord
      * @return string Código OTP
      * @throws Exception OTP no guardado en base de datos
      */
-    public function createOTP():string
+    public function createOTP(): string
     {
         $OTP = strtoupper(bin2hex(random_bytes(8)));
         $this->otp = password_hash($OTP, PASSWORD_BCRYPT, array('cost' => 12));
-        $this->otp_valid = date('Y-m-d H:i:s',strtotime("+2 day"));
-        if($this->save()){
+        $this->otp_valid = date('Y-m-d H:i:s', strtotime("+2 day"));
+        if ($this->save()) {
             return $OTP;
-        }else{
+        } else {
             throw new Exception('Imposible guardar en la base de datos');
         }
-        
     }
 
     /**
@@ -157,7 +194,7 @@ class Usuario extends ActiveRecord
      *
      * @return boolean Completado con éxito (Si/No)
      */
-    public function deleteOTP():bool
+    public function deleteOTP(): bool
     {
         $this->otp = null;
         $this->otp_valid = null;
@@ -179,26 +216,26 @@ class Usuario extends ActiveRecord
      * @param String $otp OTP sin encriptar
      * @return boolean Completado con éxito (Si/No)
      */
-    public function validateOTP(String $otp):bool
-    {       
+    public function validateOTP(String $otp): bool
+    {
         if (is_null($this->otp)) {
             static::$errors[] = 'No se encuentra código OTP para el usuario indicado';
             return false;
         }
-        if ( !(new DateTime($this->otp_valid))->diff(new DateTime("now"))->invert || !password_verify($otp,$this->otp)) {
+        if (!(new DateTime($this->otp_valid))->diff(new DateTime("now"))->invert || !password_verify($otp, $this->otp)) {
             static::$errors[] = 'Código OTP incorrecto o expirado';
             return false;
         }
         return true;
     }
 
-     /**
+    /**
      * Verifica si dispone de los permisos requieridos
      *
      * @param string $perms Permisos a verificar
      * @return boolean Dispone de permisos (Y/N) devuelve null si permiso desconocido
      */
-    public function can(string $perms):bool|null
+    public function can(string $perms): bool|null
     {
         return $this->rol->can($perms);
     }

@@ -9,10 +9,11 @@ class ActiveRecord
     protected static mysqli $db;
     protected static String $table = '';
     protected static String $PK = '';
-    protected static String $date ='';
+    protected static String $date = '';
     protected static array $joins = [];
     protected static bool $isAuto_Increment = true;
     protected static String $image;
+    protected static String $imageDefault;
     protected static String $defaultOrder = '';
     protected static array $colDB = [];
     protected static array $errors = [];
@@ -50,7 +51,9 @@ class ActiveRecord
     public function save(): bool
     {
         if ($this->validate()) {
-            if(static::$date != ''){$this->{static::$date} = date('Y-m-d H:i:s');}
+            if (static::$date != '') {
+                $this->{static::$date} = date('Y-m-d H:i:s');
+            }
             $attr = $this->sanitize();
             return is_null($this->{static::$PK}) ? $this->create($attr) : $this->update($attr);
         }
@@ -212,7 +215,7 @@ class ActiveRecord
     public function setImage(String $image): void
     {
         //Elimina la imagen previa
-        if (!is_null($this->{static::$PK})) {
+        if (!is_null($this->{static::$PK}) && !is_null($this->{static::$image})) {
             $this->deleteImage();
         }
         if ($image) {
@@ -227,7 +230,11 @@ class ActiveRecord
      */
     public function getImageURL(): String
     {
-        return explode('public', IMG_DIR)[1] . $this->{static::$image};
+        if (is_null($this->{static::$image})) {
+            return explode('public', IMG_DIR)[1] . static::$imageDefault;
+        } else {
+            return explode('public', IMG_DIR)[1] . $this->{static::$image};
+        }
     }
 
     /**
