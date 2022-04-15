@@ -106,67 +106,118 @@ function ajaxCall(
   authorization = null
 ) {
   try {
-    $.ajax({
-      type: method,
-      data: JSON.stringify(data),
-      url: uri,
-      dataType: "json",
-      contentType: false,
-      processData: false,
-      async: true,
-      cache: false,
-      success: function (data) {
-        //console.log(data);
-        if (success == null) {
-          if (verbose > 2) {
-            swal({
-              type: "success",
-              title: "Éxito",
-              html: data.message,
-              timer: 2000,
-            });
+    if (method.toUpperCase() == "GET") {
+      $.get(uri)
+        .beforeSend(function (xhr) {
+          if (authorization != null) {
+            xhr.setRequestHeader("Authorization", authorization);
           }
-        } else {
-          if (verbose > 2) {
-            swal({
-              type: "success",
-              title: "Éxito",
-              html: data.message,
-              timer: 2000,
-            }).then(() => success());
+        })
+        .done(function (data) {
+          if (success == null) {
+            if (verbose > 2) {
+              swal({
+                type: "success",
+                title: "Éxito",
+                html: data.message,
+                timer: 2000,
+              });
+            }
           } else {
-            success();
+            if (verbose > 2) {
+              swal({
+                type: "success",
+                title: "Éxito",
+                html: data.message,
+                timer: 2000,
+              }).then(() => success());
+            } else {
+              success();
+            }
           }
-        }
-      },
-      error: function (data) {
-        //console.log(data);
-        if (error == null) {
-          if (verbose > 1) {
-            swal({
-              type: "error",
-              title: "Error",
-              html: data.responseJSON.message,
-            });
-          }
-        } else {
-          if (verbose > 1) {
-            swal({
-              type: "error",
-              title: "Error",
-              html: data.responseJSON.message,
-            }).then(() => error());
+        })
+        .fail(function (data) {
+          if (error == null) {
+            if (verbose > 1) {
+              swal({
+                type: "error",
+                title: "Error",
+                html: data.responseJSON.message,
+              });
+            }
           } else {
-            error();
+            if (verbose > 1) {
+              swal({
+                type: "error",
+                title: "Error",
+                html: data.responseJSON.message,
+              }).then(() => error());
+            } else {
+              error();
+            }
           }
-        }
-      },
-      beforeSend: function (xhr) {
-        if (authorization != null) {
-          xhr.setRequestHeader("Authorization", authorization);
-        }
-      },
-    });
+        });
+    } else {
+      $.ajax({
+        type: method,
+        data: JSON.stringify(data),
+        url: uri,
+        dataType: "json",
+        contentType: false,
+        processData: false,
+        async: true,
+        cache: false,
+        success: function (data) {
+          if (success == null) {
+            if (verbose > 2) {
+              swal({
+                type: "success",
+                title: "Éxito",
+                html: data.message,
+                timer: 2000,
+              });
+            }
+          } else {
+            if (verbose > 2) {
+              swal({
+                type: "success",
+                title: "Éxito",
+                html: data.message,
+                timer: 2000,
+              }).then(() => success());
+            } else {
+              success();
+            }
+          }
+        },
+        error: function (data) {
+          if (error == null) {
+            if (verbose > 1) {
+              swal({
+                type: "error",
+                title: "Error",
+                html: data.responseJSON.message,
+              });
+            }
+          } else {
+            if (verbose > 1) {
+              swal({
+                type: "error",
+                title: "Error",
+                html: data.responseJSON.message,
+              }).then(() => error());
+            } else {
+              error();
+            }
+          }
+        },
+        beforeSend: function (xhr) {
+          if (authorization != null) {
+            xhr.setRequestHeader("Authorization", authorization);
+          }
+        },
+      });
+    }
     return true;
   } catch (error) {
     return false;
