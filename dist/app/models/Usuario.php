@@ -115,8 +115,8 @@ class Usuario extends ActiveRecord
      */
     public function bloquear(): bool
     {
-        $this->bloqueado = true;
-        return $this->save;
+        $this->bloqueado = 1;
+        return $this->save();
     }
 
     /**
@@ -126,8 +126,8 @@ class Usuario extends ActiveRecord
      */
     public function desbloquear(): bool
     {
-        $this->bloqueado = false;
-        return $this->save;
+        $this->bloqueado = 0;
+        return $this->save();
     }
 
     /**

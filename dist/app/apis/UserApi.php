@@ -259,4 +259,163 @@ class UserApi
         $api->send(200, 'Usuario ha sido actualizado.', new stdClass());
         return;
     }
+
+    /**
+     * Api de borrado de usuario
+     *
+     * @param Router $router
+     * @return void
+     */
+    public static function deleteUser(Router $router): void
+    {
+        $api = new Api(
+            $router,
+            'DELETE',
+            array(),
+            array(
+                array(
+                    'name' => 'id',
+                    'required' => true,
+                    'type' => 'integer'
+                )
+            ),
+            array(Api::AUTH_SESSION, Api::AUTH_TOKEN)
+        );
+
+        // Valida campos requeridos
+        if (!$api->validate()) {
+            return;
+        }
+
+        // Autentifica al usuario
+        if (!$api->auth(self::SCOPE)) {
+            return;
+        }
+
+        // Buscar usuario filtrando varaible
+        $usuario = Usuario::find($api->query['id']);
+        if (is_null($usuario)) {
+            $api->send(500, 'Usuario no encontrado.', new stdClass());
+            return;
+        }
+
+        // Borra al usuario
+        if(!$usuario->delete()) {
+            $api->sendErrorDB($usuario->errors());
+            return;
+        }
+
+        // Mensajes
+        $api->send(200, 'Usuario ha sido borrado.', new stdClass());
+    }
+
+    /**
+     * Api de bloqueo de usuarios
+     *
+     * @param Router $router
+     * @return void
+     */
+    public static function lockUser(Router $router): void
+    {
+        $api = new Api(
+            $router,
+            'PATCH',
+            array(),
+            array(
+                array(
+                    'name' => 'id',
+                    'required' => true,
+                    'type' => 'integer'
+                )
+            ),
+            array(Api::AUTH_SESSION, Api::AUTH_TOKEN)
+        );
+
+        // Valida campos requeridos
+        if (!$api->validate()) {
+            return;
+        }
+
+        // Autentifica al usuario
+        if (!$api->auth(self::SCOPE)) {
+            return;
+        }
+
+        // Buscar usuario filtrando varaible
+        $usuario = Usuario::find($api->query['id']);
+        if (is_null($usuario)) {
+            $api->send(500, 'Usuario no encontrado.', new stdClass());
+            return;
+        }
+
+        // Verifica estado de usuario
+        if($usuario->isBlocked()) {
+            $api->send(202, 'El usuario ya se encuentra bloqueado.', new stdClass());
+            return;
+        }
+
+        // Bloquea al usuario
+        if(!$usuario->bloquear()) {
+            $api->sendErrorDB($usuario->errors());
+            return;
+        }
+
+        // Mensajes
+        $api->send(200, 'Usuario ha sido bloqueado.', new stdClass());
+    }
+
+    /**
+     * Api de desbloqueo de usuarios
+     *
+     * @param Router $router
+     * @return void
+     */
+    public static function unlockUser(Router $router): void
+    {
+        $api = new Api(
+            $router,
+            'PATCH',
+            array(),
+            array(
+                array(
+                    'name' => 'id',
+                    'required' => true,
+                    'type' => 'integer'
+                )
+            ),
+            array(Api::AUTH_SESSION, Api::AUTH_TOKEN)
+        );
+
+        // Valida campos requeridos
+        if (!$api->validate()) {
+            return;
+        }
+
+        // Autentifica al usuario
+        if (!$api->auth(self::SCOPE)) {
+            return;
+        }
+
+        // Buscar usuario filtrando varaible
+        $usuario = Usuario::find($api->query['id']);
+        if (is_null($usuario)) {
+            $api->send(500, 'Usuario no encontrado.', new stdClass());
+            return;
+        }
+
+        // Verifica estado de usuario
+        if(!$usuario->isBlocked()) {
+            $api->send(202, 'El usuario ya se encuentra desbloqueado.', new stdClass());
+            return;
+        }
+
+        // Desbloquea al usuario
+        if(!$usuario->desbloquear()) {
+            $api->sendErrorDB($usuario->errors());
+            return;
+        }
+
+        // Mensajes
+        $api->send(200, 'Usuario ha sido desbloqueado.', new stdClass());
+    }
 }
