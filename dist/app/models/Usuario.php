@@ -239,4 +239,14 @@ class Usuario extends ActiveRecord
     {
         return $this->rol->can($perms);
     }
+
+    /**
+     * Imprime la fila del usuario actual de la tabla de usuarios
+     *
+     * @return void
+     */
+    public function printRow(): void
+    {
+        include TEMPLATES_DIR . '/user/admin-row.php';
+    }
 }
