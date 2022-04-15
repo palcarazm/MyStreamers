@@ -57,13 +57,13 @@ use Model\Usuario;
                                 <?php if (is_null($usuario)) : ?>
                                     <?php foreach (Rol::all() as $rol) : ?>
                                         <option value="<?php echo $rol->getID(); ?>">
-                                            <?php echo $rol->rol; ?>
+                                            <?php echo ucfirst($rol->rol); ?>
                                         </option>
                                     <?php endforeach; ?>
                                 <?php else : ?>
                                     <?php foreach (Rol::all() as $rol) : ?>
                                         <option value="<?php echo $rol->getID(); ?>" <?php echo $rol->getID() == $usuario->rol->getID() ? "selected" : ""; ?> <?php echo ($rol_edit || $rol->getID() == $usuario->rol->getID()) ? "" : "disabled"; ?>>
-                                            <?php echo $rol->rol; ?>
+                                            <?php echo ucfirst($rol->rol); ?>
                                         </option>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
@@ -82,15 +82,17 @@ use Model\Usuario;
                                 <div class="col-form-label pr-4">
                                     <img src="<?php $usuario->printImageURL(); ?>" alt="Imagen de usuario" class='img-circle img-thumbnail img-size-thumbnail'>
                                 </div>
-                                <div class="custom-file flex-grow-1">
+                                <div class="flex-grow-1">
                                 <?php else : ?>
-                                    <div class="custom-file col-sm-9 col-md-10">
+                                    <div class="col-sm-9 col-md-10">
                                     <?php endif; ?>
-                                    <input type="file" class="custom-file-input" id="imagen" name="imagen" accept="image/*">
-                                    <label class="custom-file-label" for="imagen" data-browse="Selecionar">Selecciona una imagen</label>
-                                    <small id="id_RolHelpBlock" class="form-text text-muted">
-                                        Se recomienda una imagen cuadrada de al menos 400 x 400 px.
-                                    </small>
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="imagen" name="imagen" accept="image/*">
+                                        <label class="custom-file-label" for="imagen" data-browse="Selecionar">Selecciona una imagen</label>
+                                        <small id="id_RolHelpBlock" class="form-text text-muted">
+                                            Se recomienda una imagen cuadrada de al menos 400 x 400 px.
+                                        </small>
+                                    </div>
                                     <?php if (!is_null($usuario)) : ?>
                                     </div>
                                 <?php endif; ?>
