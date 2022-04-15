@@ -19,6 +19,7 @@ class Rol extends ActiveRecord
     const PERMS_NORMAS_CREAR = 'normas_crear_perms';
     const PERMS_NORMAS_PUBLICAR = 'normas_publicar_perms';
     const PERMS_CONFIG = 'config_perms';
+    const PERMS_BASIC = 'basic_perms';
 
     protected $PK_id_rol;
     public $rol;
@@ -30,6 +31,7 @@ class Rol extends ActiveRecord
     public $normas_crear_perms;
     public $normas_publicar_perms;
     public $config_perms;
+    protected $basic_perms = true;
     protected $actualizado;
 
     public function __construct($args = [])
