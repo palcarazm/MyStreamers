@@ -13,9 +13,16 @@ class Api
     const RES_400 = 'Debe incluirse todos los valores requeridos con los formatos y longitudes adecuados.';
     const RES_403_Unauthorized = 'No dispone de autorización para emplear este servicio.';
     const RES_403_Unauthenticaded = 'Debe estar authenticado para emplear este servicio.';
+
+    const AUTH_SESSION = 'SESSION';
+    const AUTH_TOKEN = 'TOKEN';
+    const AUTH_SELF = 'SELF';
+    const AUTH_NOT = 'NOT_AUTH';
+
     protected Router $router;
     protected String $method;
     protected array $authMethods;
+    protected string $authMethod = self::AUTH_NOT;
     protected array $bodySchema;
     protected array $querySchema;
     public array $in;
@@ -28,7 +35,7 @@ class Api
      * @param string $method Metodo de llamada (GET POST PUT DELETE PATCH)
      * @param array $bodySchema Especificación de entrada ([ {name* required* type* max min filter schema} ])
      * @param array $querySchema Especificación de entrada ([ {name* required* type* max min filter schema} ])
-     * @param array $authMethods Métodos de autentificación soportados (SESSION TOKEN)
+     * @param array $authMethods Métodos de autentificación soportados (SESSION TOKEN SELF)
      */
     public function __construct(Router $router, string $method, array $bodySchema = array(), array $querySchema = array(), array $authMethods = array())
     {
@@ -72,37 +79,65 @@ class Api
         $this->in = is_null($in)? array() : $in;
     }
 
-    public function auth(string $scope): bool
+    /**
+     * Verifica si cumple los requisitos de autenticación
+     *
+     * @param string $scope Permiso que verificar
+     * @param integer $id Usuario sobre el que se hacen acciones
+     * @return boolean autenticación realizada (S/N)
+     */
+    public function auth(string $scope, int $id = 0): bool
     {
+        $auth = false;
         foreach ($this->authMethods as $authMethod) {
             switch (strtoupper($authMethod)) {
-                case 'SESSION':
+                case self::AUTH_SESSION:
                     $authUser = getAuthUser();
                     if (is_null($authUser)) {
                         break;
                     }
-                    if (!$authUser->can($scope)) {
-                        $this->send(403, Api::RES_403_Unauthorized, new stdClass());
-                        return false;
+                    if ($authUser->can($scope)) {
+                        $this->authMethod = self::AUTH_SESSION;
+                        return true;
                     }
-                    return true;
-                case 'TOKEN':
+                case self::AUTH_TOKEN:
                     if (is_null(Token::get())) {
                         break;
                     }
                     $token = Token::validate($scope);
-                    if ($token->getStatus() != Token::SUCCESS_CODE) {
-                        $this->send($token->getStatus(), $token->getMessage(), new stdClass());
-                        return false;
+                    if ($token->getStatus() == Token::SUCCESS_CODE) {
+                        $this->authMethod = self::AUTH_TOKEN;
+                        return true;
                     }
-                    return true;
+                case self::AUTH_SELF:
+                    $authUser = getAuthUser();
+                    if (is_null($authUser)) {
+                        break;
+                    }
+                    if ($authUser->getID() == $id) {
+                        $auth = true;
+                        $this->authMethod = self::AUTH_SELF;
+                    }
+                    break;
                 default:
                     throw new Exception("Metodo de autentificación no soportado por el dominio", 1);
                     break;
             }
         }
-        $this->send(403, Api::RES_403_Unauthenticaded, new stdClass());
-        return false;
+        if (!$auth) {
+            $this->send(403, Api::RES_403_Unauthenticaded, new stdClass());
+        }
+        return $auth;
+    }
+
+    /**
+     * Devuelve el método de autenticación empleado
+     *
+     * @return String método de autenticación
+     */
+    public function getAuthMethod(): String
+    {
+        return $this->authMethod;
     }
 
     /**

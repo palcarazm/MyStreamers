@@ -194,6 +194,16 @@ class ActiveRecord
     }
 
     /**
+     * Devuelve el ID o clave primaria del registro
+     *
+     * @return mixed ID o clave primaria
+     */
+    public function getID(): mixed
+    {
+        return $this->{static::$PK};
+    }
+
+    /**
      * Carga una imagen al registro
      *
      * @param String $image imagen en la carpeta de imagenes
