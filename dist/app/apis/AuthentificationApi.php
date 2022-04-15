@@ -234,6 +234,12 @@ class AuthentificationApi
             return;
         }
 
+        // Verifica que no está bloqueado
+        if ($usuario->isBlocked()) {
+            $api->send(500, 'Usuario bloqueado por algún administrador del sistema.', new stdClass());
+            return;
+        }
+
         // Validar clave
         if (!$usuario->validatePass($api->in['clave'])) {
             $api->send(500, 'Clave incorrecta.', new stdClass());
