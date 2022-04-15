@@ -109,7 +109,7 @@ class UserApi
         // Guardar Usuario
         if (!$usuario->save()) {
             debug($usuario->errors());
-            $api->sendErrorDB();
+            $api->sendErrorDB($usuario->errors());
             return;
         }
         if (isset($api->in['imagen'])) {
@@ -248,7 +248,7 @@ class UserApi
             $usuario->FK_id_rol = $api->in['id_Rol'];
         }
         if (!$usuario->save()) {
-            $api->sendErrorDB();
+            $api->sendErrorDB($usuario->errors());
             return;
         }
         if (isset($api->in['imagen'])) {

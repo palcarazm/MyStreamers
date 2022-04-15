@@ -182,11 +182,12 @@ class Api
 
     /**
      * Envia el mensaje de error genérico con la base de datos
-     *
+     * 
+     * @param array|object $content
      * @return void
      */
-    public function sendErrorDB(): void
+    public function sendErrorDB(array|object $content): void
     {
-        $this->send(500, self::RES_500_DB, new stdClass());
+        $this->send(500, self::RES_500_DB, $content);
     }
 }
