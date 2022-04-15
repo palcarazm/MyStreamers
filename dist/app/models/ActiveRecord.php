@@ -309,9 +309,9 @@ class ActiveRecord
     /** Consultar un registro por su ID    
      *
      * @param  int $id
-     * @return self
+     * @return static
      */
-    public static function find(int $id): self|null
+    public static function find(int $id): static|null
     {
         $query = "SELECT * FROM " . static::$table;
         if (!empty(static::$joins)) {
@@ -356,9 +356,9 @@ class ActiveRecord
      *
      * @param mixed $record
      * @param array $fields
-     * @return object
+     * @return static|array
      */
-    protected static function createObject(mixed $record, array $fields)
+    protected static function createObject(mixed $record, array $fields): static|array
     {
         $obj = new static;
         foreach ($record as $key => $value) {

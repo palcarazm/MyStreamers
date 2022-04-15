@@ -135,9 +135,9 @@ class Usuario extends ActiveRecord
      *
      * @param mixed $record
      * @param array $fields
-     * @return object
+     * @return static
      */
-    protected static function createObject(mixed $record, array $fields)
+    protected static function createObject(mixed $record, array $fields): static
     {
         $obj = new static;
         $rol_values = [];
