@@ -97,6 +97,24 @@ function configFileIntup() {
 }
 
 /**
+ * Configura las tablas
+ */
+function setupTable() {
+  $('table.data').DataTable({
+    "paging": true,
+    "lengthChange": true,
+    "searching": true,
+    "ordering": true,
+    "info": true,
+    "autoWidth": false,
+    "responsive": true,
+    language: {
+      url: 'https://cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json'
+  }
+  });
+}
+
+/**
  * Configura el text area para introducción de texto enriquecido
  */
 jQuery.fn.richTextMD = function () {
