@@ -56,6 +56,7 @@ $router->add('GET','/admin/config/sitio',[AdminController::class,'configSitio'],
 /// Usuarios
 $router->add('GET','/admin/usuarios/crear',[AdminController::class,'userAdd'],Rol::PERMS_USUARIOS);
 $router->add('GET','/admin/usuarios/editar',[AdminController::class,'userEdit'],Rol::PERMS_USUARIOS);
+$router->add('GET','/admin/usuarios/listar',[AdminController::class,'userList'],Rol::PERMS_USUARIOS);
 
 // Publicas
 $router->add('GET','/',[PublicController::class, 'index']);

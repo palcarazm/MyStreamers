@@ -45,6 +45,10 @@ $(function () {
       configFileIntup();
       userForm();
       break;
+    case "/admin/usuarios/listar":
+      setupTable();
+      userList();
+      break;
     default:
       break;
   }

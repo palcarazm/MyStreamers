@@ -88,4 +88,17 @@ class AdminController
             'rol_edit' => true
         ));
     }
+
+    public static function userList(Router $router)
+    {
+        $router->render('lists/admin-list', 'layout-admin', array(
+            'title' => 'Listar Usuarios',
+            'obj_type' => array(
+                'singular' => 'usuario',
+                'plural' => 'usuarios' 
+            ),
+            'header_list' => ['Usuario','E-Mail','Rol','Acciones'],
+            'obj_list' => Usuario::all()
+        ));
+    }
 }
