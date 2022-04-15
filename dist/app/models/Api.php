@@ -149,98 +149,18 @@ class Api
     public function validate(): bool
     {
         if (!empty($this->bodySchema)) {
-            if (!$this->validateParam($this->in, $this->bodySchema)) {
+            if (!$this->router->validate($this->in, $this->bodySchema)) {
                 $this->send(400, API::RES_400, new stdClass());
                 return false;
             }
         }
         if (!empty($this->querySchema)) {
-            if (!$this->validateParam($this->query, $this->querySchema)) {
+            if (!$this->router->validate($this->query, $this->querySchema)) {
                 $this->send(400, API::RES_400, new stdClass());
                 return false;
             }
         }
         return true;
-    }
-
-    /**
-     * Valida que el parametro cumple la especificación
-     *
-     * @param mixed $params Parametros
-     * @param array $specs Espeficación
-     * @return bool Cumlpe la espeficicación (S/N)
-     */
-    private function validateParam(mixed $params, array $specs): bool
-    {
-        $valid = true;
-
-        foreach ($specs as $spec) {
-            if (!$spec['required'] && !isset($params[$spec['name']])) {
-                continue;
-            } elseif ($spec['required'] && !isset($params[$spec['name']])) {
-                return false;
-            }
-            switch ($spec['type']) {
-                case 'array':
-                    foreach ($params[$spec['name']] as $param) {
-                        if (!$this->validateParam($param, $spec['schema'])) {
-                            return false;
-                        }
-                    }
-                    break;
-                case 'object':
-                    if (!$this->validateParam($params[$spec['name']], $spec['schema'])) {
-                        return false;
-                    }
-                    break;
-                case 'integer':
-                    $options = [];
-                    if (isset($spec['max'])) {
-                        $options['max_range'] = $spec['max'];
-                    }
-                    if (isset($spec['min'])) {
-                        $options['min_range'] = $spec['min'];
-                    }
-                    if (!filter_var($params[$spec['name']], FILTER_VALIDATE_INT, array($options))) {
-                        return false;
-                    }
-                    break;
-                case 'number':
-                    $options = [];
-                    if (isset($spec['max'])) {
-                        $options['max_range'] = $spec['max'];
-                    }
-                    if (isset($spec['min'])) {
-                        $options['min_range'] = $spec['min'];
-                    }
-                    if (!filter_var($params[$spec['name']], FILTER_VALIDATE_FLOAT, array($options))) {
-                        return false;
-                    }
-                    break;
-                case 'string':
-                    if (isset($spec['max']) && strlen($params[$spec['name']]) > $spec['max']) {
-                        return false;
-                    }
-                    if (isset($spec['min']) && strlen($params[$spec['name']]) < $spec['min']) {
-                        return false;
-                    }
-                    if (isset($spec['filter'])) {
-                        if (!filter_var($params[$spec['name']], $spec['filter'])) {
-                            return false;
-                        }
-                    }
-                    break;
-                case 'boolean':
-                    if (is_null(filter_var($params[$spec['name']], FILTER_VALIDATE_BOOLEAN,FILTER_NULL_ON_FAILURE))) {
-                        return false;
-                    }
-                    break;
-                default:
-                    throw new Exception("Tipo de no soportado", 1);
-                    break;
-            }
-        }
-        return $valid;
     }
 
     /**
