@@ -13,6 +13,7 @@ class Api
     const RES_400 = 'Debe incluirse todos los valores requeridos con los formatos y longitudes adecuados.';
     const RES_403_Unauthorized = 'No dispone de autorización para emplear este servicio.';
     const RES_403_Unauthenticaded = 'Debe estar authenticado para emplear este servicio.';
+    const RES_500_DB = 'Un error inesperado con la base de datos hace imposible completar la operación.';
 
     const AUTH_SESSION = 'SESSION';
     const AUTH_TOKEN = 'TOKEN';
@@ -76,7 +77,7 @@ class Api
                 throw new Exception("Metodo no soportado por el dominio", 1);
                 break;
         }
-        $this->in = is_null($in)? array() : $in;
+        $this->in = is_null($in) ? array() : $in;
     }
 
     /**
@@ -257,5 +258,15 @@ class Api
             'message' => $message,
             'content' => $content
         )));
+    }
+
+    /**
+     * Envia el mensaje de error genérico con la base de datos
+     *
+     * @return void
+     */
+    public function sendErrorDB(): void
+    {
+        $this->send(500, self::RES_500_DB, new stdClass());
     }
 }
