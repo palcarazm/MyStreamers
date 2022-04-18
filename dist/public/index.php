@@ -45,8 +45,8 @@ $router->add('DELETE','/api/auth/v1/auth',[AuthentificationApi::class,'deleteAut
 $router->add('POST','/api/user/v1/user',[UserApi::class,'postUser']);
 $router->add('PUT','/api/user/v1/user',[UserApi::class,'putUser']);
 $router->add('DELETE','/api/user/v1/user',[UserApi::class,'deleteUser']);
-$router->add('PATCH','/api/user/v1/lock',[UserApi::class,'lockUser']);
-$router->add('PATCH','/api/user/v1/unlock',[UserApi::class,'unlockUser']);
+$router->add('PATCH','/api/user/v1/user/lock',[UserApi::class,'lockUser']);
+$router->add('PATCH','/api/user/v1/user/unlock',[UserApi::class,'unlockUser']);
 
 // Administración
 /// Perfil
