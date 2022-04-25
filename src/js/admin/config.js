@@ -6,32 +6,23 @@ function configDB() {
     e.preventDefault();
     $(this).find('button[type="submit"]').attr("disabled", true);
     $(this).loadToggle();
-    if (
-      !callAPIverbose(
-        $(this).attr("action"),
-        $(this).attr("method"),
-        new FormData(this),
-        $(this).find("input,textarea,select").filter("[required]").length,
-        function () {
-          $("#configDatabase form").loadToggle();
-          $("#configDatabase.step").removeClass("current").addClass("done");
-          $("#configDatabase.step h2").addClass("text-success");
-          $("#configAdmin.step ").removeClass("todo").addClass("current");
-          $("#progreso").width("25%");
-        },
-        function () {
-          $("#configDatabase form").loadToggle();
-          $("#configDatabase form")
-            .find('button[type="submit"]')
-            .attr("disabled", false);
-        }
-      )
-    ) {
-      $("#configDatabase form").loadToggle();
-      $("#configDatabase form")
-        .find('button[type="submit"]')
-        .attr("disabled", false);
-    }
+    callAPIverbose(
+      $(this).attr("action"),
+      $(this).attr("method"),
+      new FormData(this),
+      $(this).find("input,textarea,select").filter("[required]").length,
+      function () {
+        $("#configDatabase form").loaded();
+        $("#configDatabase.step").removeClass("current").addClass("done");
+        $("#configDatabase.step h2").addClass("text-success");
+        $("#configAdmin.step ").removeClass("todo").addClass("current");
+        $("#progreso").width("25%");
+      },
+      function () {
+        $("#configDatabase form").loaded();
+        $("#configDatabase form").find('button[type="submit"]').attr("disabled", false);
+      }
+    );
   });
 }
 
@@ -42,36 +33,27 @@ function configAdmin() {
   $("#configAdmin form").on("submit", function (e) {
     e.preventDefault();
     $(this).find('button[type="submit"]').attr("disabled", true);
-    $(this).loadToggle();
-    if (
-      !callAPIverbose(
-        $(this).attr("action"),
-        $(this).attr("method"),
-        new FormData(this),
-        $(this).find("input,textarea,select").filter("[required]").length,
-        function () {
-          $("#configAdmin form").loadToggle();
-          $("#configAdmin.step").removeClass("current").addClass("done");
-          $("#configAdmin.step h2").addClass("text-success");
-          $("#configEmail.step ").removeClass("todo").addClass("current");
-          $("#configEmail form #adminEmail").val(
-            $("#configAdmin form #email").val()
-          );
-          $("#progreso").width("50%");
-        },
-        function () {
-          $("#configAdmin form").loadToggle();
-          $("#configAdmin form")
-            .find('button[type="submit"]')
-            .attr("disabled", false);
-        }
-      )
-    ) {
-      $("#configAdmin form").loadToggle();
-      $("#configAdmin form")
-        .find('button[type="submit"]')
-        .attr("disabled", false);
-    }
+    $(this).loading();
+    callAPIverbose(
+      $(this).attr("action"),
+      $(this).attr("method"),
+      new FormData(this),
+      $(this).find("input,textarea,select").filter("[required]").length,
+      function () {
+        $("#configAdmin form").loaded();
+        $("#configAdmin.step").removeClass("current").addClass("done");
+        $("#configAdmin.step h2").addClass("text-success");
+        $("#configEmail.step ").removeClass("todo").addClass("current");
+        $("#configEmail form #adminEmail").val(
+          $("#configAdmin form #email").val()
+        );
+        $("#progreso").width("50%");
+      },
+      function () {
+        $("#configAdmin form").loaded();
+        $("#configAdmin form").find('button[type="submit"]').attr("disabled", false);
+      }
+    );
   });
 }
 
@@ -82,77 +64,66 @@ function configEmail() {
   $("#configEmail form").on("submit", function (e) {
     e.preventDefault();
     $(this).find('button[type="submit"]').attr("disabled", true);
-    $(this).loadToggle();
-    if (
-      !callAPIverbose(
-        $(this).attr("action"),
-        $(this).attr("method"),
-        new FormData(this),
-        $(this).find("input,textarea,select").filter("[required]").length,
-        function () {
-          swal({
-            type: "info",
-            title: "Comprueba tu E-mail",
-            html: "Hemos mandado un email de prueba al correo del administrador.<br><b>¿Lo has recibido?</b>",
-            showCancelButton: true,
-          }).then(function (isConfirm) {
-            if (isConfirm) {
-              $.ajax({
-                type: "put",
-                data: new FormData(),
-                url: "/api/config/v1/email?confirm=true",
-                dataType: "json",
-                contentType: false,
-                processData: false,
-                async: true,
-                cache: false,
-                success: function (data) {
-                  swal({
-                    type: "success",
-                    title: "Éxito",
-                    html: data.message,
-                    timer: 2000,
-                  }).then(() => {
-                    $("#configEmail form").loadToggle();
-                    $("#configEmail.step")
-                      .removeClass("current")
-                      .addClass("done");
-                    $("#configEmail.step h2").addClass("text-success");
-                    $("#configSite.step ")
-                      .removeClass("todo")
-                      .addClass("current");
-                    $("#progreso").width("75%");
-                  });
-                },
-                error: function (data) {
-                  swal({
-                    type: "error",
-                    title: "Error",
-                    html: data.message,
-                  }).then(() => {
-                    $("#configEmail form").loadToggle();
-                    $("#configEmail form")
-                      .find('button[type="submit"]')
-                      .attr("disabled", false);
-                  });
-                },
-              });
-            }
-          });
-        },
-        function () {
-          $("#configEmail form").loadToggle();
-          $("#configEmail form")
-            .find('button[type="submit"]')
-            .attr("disabled", false);
-        }
-      )
-    ) {
-      $("#configEmail form").loadToggle();
-      $("#configEmail form")
-        .find('button[type="submit"]')
-        .attr("disabled", false);
-    }
+    $(this).loading();
+    callAPIverbose(
+      $(this).attr("action"),
+      $(this).attr("method"),
+      new FormData(this),
+      $(this).find("input,textarea,select").filter("[required]").length,
+      function () {
+        swal({
+          type: "info",
+          title: "Comprueba tu E-mail",
+          html: "Hemos mandado un email de prueba al correo del administrador.<br><b>¿Lo has recibido?</b>",
+          showCancelButton: true,
+        }).then(function (isConfirm) {
+          if (isConfirm) {
+            $.ajax({
+              type: "put",
+              data: new FormData(),
+              url: "/api/config/v1/email?confirm=true",
+              dataType: "json",
+              contentType: false,
+              processData: false,
+              async: true,
+              cache: false,
+              success: function (data) {
+                swal({
+                  type: "success",
+                  title: "Éxito",
+                  html: data.message,
+                  timer: 2000,
+                }).then(() => {
+                  $("#configEmail form").loaded();
+                  $("#configEmail.step")
+                    .removeClass("current")
+                    .addClass("done");
+                  $("#configEmail.step h2").addClass("text-success");
+                  $("#configSite.step ")
+                    .removeClass("todo")
+                    .addClass("current");
+                  $("#progreso").width("75%");
+                });
+              },
+              error: function (data) {
+                swal({
+                  type: "error",
+                  title: "Error",
+                  html: data.message,
+                }).then(() => {
+                  $("#configEmail form").loaded();
+                  $("#configEmail form").find('button[type="submit"]').attr("disabled", false);
+                });
+              },
+            });
+          }
+        });
+      },
+      function () {
+        $("#configEmail form").loaded();
+        $("#configEmail form").find('button[type="submit"]').attr("disabled", false);
+      }
+    );
   });
 }
 
@@ -185,43 +156,32 @@ function configSite() {
         .remove();
     }
     $(this).find('button[type="submit"]').attr("disabled", true);
-    $(this).loadToggle();
-    if (
-      callAPIverbose(
-        $(this).attr("action"),
-        $(this).attr("method"),
-        new FormData(this),
-        $(this).find("input,textarea,select").filter("[required]").length,
-        function () {
-          $("#configSite form").loadToggle();
-          $("#configSite.step").removeClass("current").addClass("done");
-          $("#configSite.step h2").addClass("text-success");
-          $("#configSite.step ").removeClass("todo").addClass("current");
-          $("#finalMessage.step ")
-                      .removeClass("todo")
-                      .addClass("current");
-          $("#progreso").width("100%");
-        },
-        function () {
-          $("#configSite form").loadToggle();
-          $("#configSite form")
-            .find('button[type="submit"]')
-            .attr("disabled", false);
-        }
-      )
-    ) {
-      $("#configSite form").loadToggle();
-      $("#configSite form")
-        .find('button[type="submit"]')
-        .attr("disabled", false);
-    }
+    $(this).loading();
+    callAPIverbose(
+      $(this).attr("action"),
+      $(this).attr("method"),
+      new FormData(this),
+      $(this).find("input,textarea,select").filter("[required]").length,
+      function () {
+        $("#configSite form").loaded();
+        $("#configSite.step").removeClass("current").addClass("done");
+        $("#configSite.step h2").addClass("text-success");
+        $("#configSite.step ").removeClass("todo").addClass("current");
+        $("#finalMessage.step ").removeClass("todo").addClass("current");
+        $("#progreso").width("100%");
+      },
+      function () {
+        $("#configSite form").loaded();
+        $("#configSite form").find('button[type="submit"]').attr("disabled", false);
+      }
+    );
   });
 }
 
 /**
  * Actualiza la configuración del sitio
  */
- function updateSite() {
+function updateSite() {
   $("#updateSite-form").on("submit", function (e) {
     e.preventDefault();
     if (
@@ -247,7 +207,7 @@ function configSite() {
         .remove();
     }
     $(this).find('button[type="submit"]').attr("disabled", true);
-    $(this).loadToggle();
+    $(this).loading();
     callAPI(
       $(this).attr("action"),
       $(this).attr("method"),
@@ -255,19 +215,15 @@ function configSite() {
       $(this).find("input,textarea,select").filter("[required]").length,
       3,
       function () {
-        $("#updateSite-form").loadToggle();
-        $("#updateSite-form")
-          .find('button[type="submit"]')
-          .attr("disabled", false);
+        $("#updateSite-form").loaded();
+        $("#updateSite-form").find('button[type="submit"]').attr("disabled", false);
       },
       function () {
-        $("#updateSite-form").loadToggle();
-        $("#updateSite-form")
-          .find('button[type="submit"]')
-          .attr("disabled", false);
+        $(this).find('button[type="submit"]').attr("disabled", false);
+        $(this).loaded();
       },
-      $('#token').val()
-    )
+      $("#token").val()
+    );
   });
 }
 
@@ -278,7 +234,10 @@ function validAdminuserForm() {
   $(
     "#configAdmin form #pass2 , #configAdmin form #pass , #configAdmin form #email"
   ).on("input keyup keypress blur change", function () {
-    const validPass = validatePass($("#configAdmin form #pass") , $("#configAdmin form #pass2"));
+    const validPass = validatePass(
+      $("#configAdmin form #pass"),
+      $("#configAdmin form #pass2")
+    );
     const validEmail = validEmailAdminuserForm();
     if (validPass && validEmail) {
       $(this)
