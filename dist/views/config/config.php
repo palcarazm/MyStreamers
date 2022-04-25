@@ -202,7 +202,7 @@
                 <div class="alert alert-success step-body" role="alert">
                     <h4 class="alert-heading">Bien hecho!</h4>
                     <p>Has finalizado la configuración inicial de My Streamers. Ahora ya tu web y base de datos se encuentran conectadas, has creado el administrador del sistema y configurado los datos básicos de tu sitio.</p>
-                    <p class="mb-0">¿Por qué no te pasas por el <a href="#" class="alert-link text-white">panel de administración</a> para añadir información a tu sitio?</p>
+                    <p class="mb-0">¿Por qué no te pasas por el <a href="/login" class="alert-link text-white">panel de administración</a> para añadir información a tu sitio?</p>
                 </div>
                 <p><span class="badge badge-warning"><i class="fas fa-exclamation-circle  mr-1"></i>Por seguridad, vamos a bloquear el acceso a esta sección para que nadie pueda modificar la configuración del sitio sin estar autenticado.</span></p>
             </div>

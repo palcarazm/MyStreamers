@@ -35,7 +35,7 @@ class Router
         $currentURL = explode('?', $_SERVER['REQUEST_URI'] ?? '/', 2)[0]; // Ruta solicitada
         $method = $_SERVER['REQUEST_METHOD']; //Método de solicitud
         $fn = $this->routes[$method][$currentURL]['function'] ?? null;
-        $perms = $this->routes[$method][$currentURL]['perms'];
+        $perms = $this->routes[$method][$currentURL]['perms'] ?? null;
         $isPublic = is_null($perms);
 
         if ($fn) { // Página existe
