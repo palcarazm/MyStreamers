@@ -13,33 +13,37 @@ class Usuario extends ActiveRecord
     protected static String $image = 'imagen';
     protected static String $imageDefault = '/user.png';
     protected static String $defaultOrder = 'PK_id_user';
-    protected static array $colDB = ['PK_id_user', 'username', 'email', 'pass', 'actualizado', 'FK_id_rol', 'otp', 'otp_valid', 'imagen', 'bloqueado'];
+    protected static array $colDB = ['PK_id_user', 'username', 'email', 'pass', 'actualizado', 'FK_id_rol', 'otp', 'otp_valid', 'imagen', 'bloqueado', 'descripcion', 'perfil_publico'];
     protected static String $PK = 'PK_id_user';
 
-    protected $PK_id_user;
-    public $username;
-    public $email;
-    public $pass;
-    protected $actualizado;
-    public $FK_id_rol;
-    public $rol;
-    protected $otp;
-    protected $otp_valid;
-    public $imagen;
-    protected $bloqueado;
+    protected int|null $PK_id_user;
+    public string $username;
+    public string $email;
+    public string|null $pass;
+    protected string|null $actualizado;
+    public int $FK_id_rol;
+    public Rol $rol;
+    protected string|null $otp;
+    protected string|null $otp_valid;
+    public string|null $imagen;
+    protected bool|null $bloqueado;
+    public string|null $descripcion;
+    protected bool|null $perfil_publico;
 
     public function __construct($args = [])
     {
-        $this->PK_id_user = $args['PK_id_user'] ?? null;
-        $this->username = $args['username'] ?? '';
-        $this->email = $args['email'] ?? '';
-        $this->pass = $args['pass'] ?? '';
-        $this->FK_id_rol = $args['FK_id_rol'] ?? '';
-        $this->actualizado = $args['actualizado'] ?? null;
-        $this->otp = $args['otp'] ?? null;
-        $this->otp_valid = $args['otp_valid'] ?? null;
-        $this->imagen = $args['imagen'] ?? null;
-        $this->bloqueado = $args['bloqueado'] ?? null;
+        $this->PK_id_user = is_null($args['PK_id_user'] ?? null) ? null : (int) $args['PK_id_user'];
+        $this->username = (string) ($args['username'] ?? '');
+        $this->email = (string) ($args['email'] ?? '');
+        $this->pass = (string) ($args['pass'] ?? '');
+        $this->FK_id_rol = (int) ($args['FK_id_rol'] ?? '');
+        $this->actualizado = is_null($args['actualizado'] ?? null) ? null : (string) $args['actualizado'];
+        $this->otp = is_null($args['otp'] ?? null) ? null : (string) $args['otp'];
+        $this->otp_valid = is_null($args['otp_valid'] ?? null) ? null : (string) $args['otp_valid'];
+        $this->imagen = is_null($args['imagen'] ?? null) ? null : (string) $args['imagen'];
+        $this->bloqueado = is_null($args['bloqueado'] ?? null) ? null : (bool) $args['bloqueado'];
+        $this->descripcion = is_null($args['descripcion'] ?? null) ? null : (string) $args['descripcion'];
+        $this->perfil_publico = is_null($args['perfil_publico'] ?? null) ? null : (bool) $args['perfil_publico'];
     }
 
     /**
@@ -131,6 +135,48 @@ class Usuario extends ActiveRecord
     }
 
     /**
+     * Verifica si el usuario tiene perfil público
+     *
+     * @return boolean perfil público (S/N)
+     */
+    public function hasProfile(): bool
+    {
+        return !is_null($this->perfil_publico);
+    }
+
+    /**
+     * Verifica si el perfil público está publicado
+     *
+     * @return boolean|null Publicado (S/N), sin perfil devuelve null
+     */
+    public function isPublished(): bool|null
+    {
+        return $this->perfil_publico;
+    }
+
+    /**
+     * Publica el perfil público
+     *
+     * @return boolean Publicado con éxito (S/N)
+     */
+    public function publicar(): bool
+    {
+        $this->perfil_publico = 1;
+        return $this->save();
+    }
+
+    /**
+     * Oculta el perfil público
+     *
+     * @return boolean Ocultado con éxito (S/N)
+     */
+    public function ocultar(): bool
+    {
+        $this->perfil_publico = 0;
+        return $this->save();
+    }
+
+    /**
      * Crea un objeto con los datos indicados
      *
      * @param mixed $record
@@ -169,6 +215,23 @@ class Usuario extends ActiveRecord
         $query .= " WHERE username = '${usuario}' OR email = '${usuario}'";
         $resultado = self::query($query);
         return array_shift($resultado);
+    }
+
+    /**
+     * Obtiene los usuarios con perfil público activo
+     *
+     * @return array|null
+     */
+    public static function findActiveProfiles(): array|null
+    {
+        $query = "SELECT * FROM " . static::$table;
+        if (!empty(static::$joins)) {
+            foreach (static::$joins as $table => $FK) {
+                $query .= " INNER JOIN " . $table . " ON FK_" . $FK . " = PK_"  . $FK;
+            }
+        }
+        $query .= " WHERE perfil_publico = 1";
+        return self::query($query);
     }
 
     /**
@@ -248,5 +311,47 @@ class Usuario extends ActiveRecord
     public function printRow(): void
     {
         include TEMPLATES_DIR . '/user/admin-row.php';
+    }
+
+    /**
+     * Imprime la tarjeta del usuario actual del archivo
+     *
+     * @return void
+     */
+    public function printCard(): void
+    {
+        include TEMPLATES_DIR . '/user/public-card.php';
+    }
+
+    /**
+     * Obtiene los enlaces del usuario
+     *
+     * @return array
+     */
+    public function getEnlaces(): array
+    {
+        return Enlace::findUserLinks($this->PK_id_user);
+    }
+
+    /**
+     * Establece los enlaces del usuario
+     *
+     * @param array $enlaces [{FK_id_enlace,enlace}]
+     * @return bool Enlaces establecidos (S/N)
+     */
+    public function setEnlaces(array $enlaces): bool
+    {
+        if (!Enlace::deleteUserLinks($this->PK_id_user)) {
+            static::$errors[] = 'Error al borrar los enlaces previos.';
+            return false;
+        }
+        foreach ($enlaces as $args) {
+            $args['FK_id_user'] = $this->PK_id_user;
+            $enlace = new Enlace($args);
+            if (!$enlace->save()) {
+                static::$errors[] = 'Error al guardar el enlace ' . $args['enlace'] . '.';
+            }
+        }
+        return empty(static::$errors);
     }
 }
