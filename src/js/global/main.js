@@ -125,23 +125,49 @@ function ajaxCall(
             }
           } else {
             if (verbose > 2) {
-              try {
-                swal({
-                  type: "success",
-                  title: "Éxito",
-                  html: data.message,
-                  timer: 2000,
-                }).then(() => success());
-              } catch (err) {
-                swal({
-                  type: "success",
-                  title: "Éxito",
-                  html: "",
-                  timer: 2000,
-                }).then(() => success());
+              if (success.length == 0) {
+                try {
+                  swal({
+                    type: "success",
+                    title: "Éxito",
+                    html: data.message,
+                    timer: 2000,
+                  }).then(() => success());
+                } catch (err) {
+                  swal({
+                    type: "success",
+                    title: "Éxito",
+                    html: "",
+                    timer: 2000,
+                  }).then(() => success());
+                }
+              } else {
+                try {
+                  swal({
+                    type: "success",
+                    title: "Éxito",
+                    html: data.message,
+                    timer: 2000,
+                  }).then(() => success(data));
+                } catch (err) {
+                  swal({
+                    type: "success",
+                    title: "Éxito",
+                    html: "",
+                    timer: 2000,
+                  }).then(() => success(""));
+                }
               }
             } else {
-              success();
+              if (success.length == 0) {
+                success();
+              } else {
+                try {
+                  success(data);
+                } catch (error) {
+                  success("");
+                }
+              }
             }
           }
         })
@@ -156,21 +182,45 @@ function ajaxCall(
             }
           } else {
             if (verbose > 1) {
-              try {
-                swal({
-                  type: "error",
-                  title: "Error",
-                  html: data.responseJSON.message,
-                }).then(() => error());
-              } catch (err) {
-                swal({
-                  type: "error",
-                  title: "Error",
-                  html: "El motivo de error no se ha podido recuperar",
-                }).then(() => error());
+              if (error.length == 0) {
+                try {
+                  swal({
+                    type: "error",
+                    title: "Error",
+                    html: data.responseJSON.message,
+                  }).then(() => error());
+                } catch (err) {
+                  swal({
+                    type: "error",
+                    title: "Error",
+                    html: "El motivo de error no se ha podido recuperar",
+                  }).then(() => error());
+                }
+              } else {
+                try {
+                  swal({
+                    type: "error",
+                    title: "Error",
+                    html: data.responseJSON.message,
+                  }).then(() => error(data.responseJSON));
+                } catch (err) {
+                  swal({
+                    type: "error",
+                    title: "Error",
+                    html: "El motivo de error no se ha podido recuperar",
+                  }).then(() => error(""));
+                }
               }
             } else {
-              error();
+              if (error.length == 0) {
+                error();
+              } else {
+                try {
+                  error(data.responseJSON);
+                } catch (error) {
+                  error("");
+                }
+              }
             }
           }
         });
@@ -196,23 +246,49 @@ function ajaxCall(
             }
           } else {
             if (verbose > 2) {
-              try {
-                swal({
-                  type: "success",
-                  title: "Éxito",
-                  html: data.message,
-                  timer: 2000,
-                }).then(() => success());
-              } catch (err) {
-                swal({
-                  type: "success",
-                  title: "Éxito",
-                  html: "",
-                  timer: 2000,
-                }).then(() => success());
+              if (success.length == 0) {
+                try {
+                  swal({
+                    type: "success",
+                    title: "Éxito",
+                    html: data.message,
+                    timer: 2000,
+                  }).then(() => success());
+                } catch (err) {
+                  swal({
+                    type: "success",
+                    title: "Éxito",
+                    html: "",
+                    timer: 2000,
+                  }).then(() => success());
+                }
+              } else {
+                try {
+                  swal({
+                    type: "success",
+                    title: "Éxito",
+                    html: data.message,
+                    timer: 2000,
+                  }).then(() => success(data));
+                } catch (err) {
+                  swal({
+                    type: "success",
+                    title: "Éxito",
+                    html: "",
+                    timer: 2000,
+                  }).then(() => success(""));
+                }
               }
             } else {
-              success();
+              if (success.length == 0) {
+                success();
+              } else {
+                try {
+                  success(data);
+                } catch (err) {
+                  success("");
+                }
+              }
             }
           }
         },
@@ -227,21 +303,45 @@ function ajaxCall(
             }
           } else {
             if (verbose > 1) {
-              try {
-                swal({
-                  type: "error",
-                  title: "Error",
-                  html: data.responseJSON.message,
-                }).then(() => error());
-              } catch (err) {
-                swal({
-                  type: "error",
-                  title: "Error",
-                  html: "El motivo de error no se ha podido recuperar",
-                }).then(() => error());
+              if (error.length == 0) {
+                try {
+                  swal({
+                    type: "error",
+                    title: "Error",
+                    html: data.responseJSON.message,
+                  }).then(() => error());
+                } catch (err) {
+                  swal({
+                    type: "error",
+                    title: "Error",
+                    html: "El motivo de error no se ha podido recuperar",
+                  }).then(() => error());
+                }
+              } else {
+                try {
+                  swal({
+                    type: "error",
+                    title: "Error",
+                    html: data.responseJSON.message,
+                  }).then(() => error(data.responseJSON));
+                } catch (err) {
+                  swal({
+                    type: "error",
+                    title: "Error",
+                    html: "El motivo de error no se ha podido recuperar",
+                  }).then(() => error(""));
+                }
               }
             } else {
-              error();
+              if (error.length == 0) {
+                error();
+              } else {
+                try {
+                  error(data.responseJSON);
+                } catch (err) {
+                  error("");
+                }
+              }
             }
           }
         },
