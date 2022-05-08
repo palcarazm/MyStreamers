@@ -11,6 +11,7 @@ class ActiveRecord
     protected static String $PK = '';
     protected static String $date = '';
     protected static array $joins = [];
+    protected static array $constraints = [];
     protected static bool $isAuto_Increment = true;
     protected static String $image;
     protected static String $imageDefault;
@@ -55,7 +56,7 @@ class ActiveRecord
                 $this->{static::$date} = date('Y-m-d H:i:s');
             }
             $attr = $this->sanitize();
-            return is_null($this->{static::$PK}) ? $this->create($attr) : $this->update($attr);
+            return is_null($this->{static::$PK} ?? null) ? $this->create($attr) : $this->update($attr);
         }
         return false;
     }
@@ -74,7 +75,7 @@ class ActiveRecord
         $query .= join("' , '", array_values($attr));
         $query .= "')";
         if (self::$db->query($query)) {
-            if (static::$isAuto_Increment) {
+            if (static::$isAuto_Increment || is_null($this->{static::$PK} ?? null)) {
                 $this->{static::$PK} = self::$db->insert_id;
             }
             return true;
@@ -92,6 +93,11 @@ class ActiveRecord
      */
     protected function update(array $args): bool
     {
+        if (is_null($this->{static::$PK} ?? null)) {
+            static::$errors[] = 'Operación de actualización no soportada.';
+            return false;
+        }
+
         $attr = [];
         foreach ($args as $key => $value) {
             $attr[] = "{$key} = '{$value}'";
@@ -116,7 +122,23 @@ class ActiveRecord
      */
     public function delete(): bool
     {
-        $this->deleteImage();
+        if (is_null($this->{static::$PK} ?? null)) {
+            static::$errors[] = 'Operación de borrado no soportada.';
+            return false;
+        }
+
+        if (isset(static::$image)) {
+            $this->deleteImage();
+        }
+        if (!empty(static::$constraints)) {
+            foreach (static::$constraints as $table => $column) {
+                $query = "DELETE FROM " . $table . " WHERE " . $column . " = '"  . static::getID() . "'";
+                if (!self::$db->query($query)) {
+                    static::$errors[] = self::$db->error;
+                    return false;
+                }
+            }
+        }
         $query = "DELETE FROM " . static::$table . " WHERE " . static::$PK . " = '" . self::$db->escape_string($this->{static::$PK}) . "'";
         if (self::$db->query($query)) {
             return true;
@@ -152,7 +174,17 @@ class ActiveRecord
         $attr = $this->attr();
         $santized = [];
         foreach ($attr as $key => $value) {
-            $santized[$key] = self::$db->escape_string($value);
+            switch (gettype($value)) {
+                case 'string':
+                    $santized[$key] = self::$db->escape_string($value);
+                    break;
+                case 'boolean':
+                    $santized[$key] = $value ? 1 : 0;
+                    break;
+                default:
+                    $santized[$key] = $value;
+                    break;
+            }
         }
         return $santized;
     }
@@ -203,7 +235,7 @@ class ActiveRecord
      */
     public function getID(): mixed
     {
-        return $this->{static::$PK};
+        return $this->{static::$PK} ?? null;
     }
 
     /**
@@ -215,7 +247,7 @@ class ActiveRecord
     public function setImage(String $image): void
     {
         //Elimina la imagen previa
-        if (!is_null($this->{static::$PK}) && !is_null($this->{static::$image})) {
+        if (!is_null($this->{static::$PK} ?? null) && !is_null($this->{static::$image} ?? null)) {
             $this->deleteImage();
         }
         if ($image) {
