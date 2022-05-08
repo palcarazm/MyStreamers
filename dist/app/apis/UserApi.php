@@ -9,6 +9,7 @@ use Model\Usuario;
 use Router\Router;
 use GuzzleHttp\Client;
 use Intervention\Image\ImageManagerStatic;
+use Model\TipoEnlace;
 
 class UserApi
 {
@@ -39,6 +40,12 @@ class UserApi
                     'name' => 'id_Rol',
                     'required' => true,
                     'type' => 'integer'
+                ),
+                array(
+                    'name' => 'descripcion',
+                    'required' => false,
+                    'type' => 'string',
+                    'max' => 2 ** 32 - 1,
                 ),
                 array(
                     'name' => 'imagen',
@@ -94,7 +101,8 @@ class UserApi
             'username' => $api->in['username'],
             'email' => $api->in['email'],
             'pass' => password_hash(strtoupper(bin2hex(random_bytes(12))), PASSWORD_BCRYPT, array('cost' => 12)),
-            'FK_id_rol' => $api->in['id_Rol']
+            'FK_id_rol' => $api->in['id_Rol'],
+            'descripcion' => $api->in['descripcion'] ?? null
         ));
 
         // Subir imagen
@@ -169,6 +177,12 @@ class UserApi
                     'name' => 'id_Rol',
                     'required' => true,
                     'type' => 'integer'
+                ),
+                array(
+                    'name' => 'descripcion',
+                    'required' => false,
+                    'type' => 'string',
+                    'max' => 2 ** 32 - 1,
                 ),
                 array(
                     'name' => 'imagen',
@@ -247,6 +261,9 @@ class UserApi
         if ($api->getAuthMethod() != Api::AUTH_SELF) {
             $usuario->FK_id_rol = $api->in['id_Rol'];
         }
+        if (isset($api->in['descripcion'])) {
+            $usuario->descripcion = $api->in['descripcion'];
+        }
         if (!$usuario->save()) {
             $api->sendErrorDB($usuario->errors());
             return;
@@ -256,6 +273,10 @@ class UserApi
         }
 
         // Mensaje de respuesta
+        if ($api->getAuthMethod() != Api::AUTH_SELF){
+            loadSession();
+            $_SESSION['auth']['usuario'] = Usuario::find(getAuthUser()->getID());
+        }
         $api->send(200, 'Usuario ha sido actualizado.', new stdClass());
         return;
     }
@@ -300,7 +321,7 @@ class UserApi
         }
 
         // Borra al usuario
-        if(!$usuario->delete()) {
+        if (!$usuario->delete()) {
             $api->sendErrorDB($usuario->errors());
             return;
         }
@@ -349,13 +370,13 @@ class UserApi
         }
 
         // Verifica estado de usuario
-        if($usuario->isBlocked()) {
+        if ($usuario->isBlocked()) {
             $api->send(202, 'El usuario ya se encuentra bloqueado.', new stdClass());
             return;
         }
 
         // Bloquea al usuario
-        if(!$usuario->bloquear()) {
+        if (!$usuario->bloquear()) {
             $api->sendErrorDB($usuario->errors());
             return;
         }
@@ -404,18 +425,452 @@ class UserApi
         }
 
         // Verifica estado de usuario
-        if(!$usuario->isBlocked()) {
+        if (!$usuario->isBlocked()) {
             $api->send(202, 'El usuario ya se encuentra desbloqueado.', new stdClass());
             return;
         }
 
         // Desbloquea al usuario
-        if(!$usuario->desbloquear()) {
+        if (!$usuario->desbloquear()) {
             $api->sendErrorDB($usuario->errors());
             return;
         }
 
         // Mensajes
         $api->send(200, 'Usuario ha sido desbloqueado.', new stdClass());
+    }
+
+    /**
+     * Api de creación de tipos de enlaces
+     *
+     * @param Router $router
+     * @return void
+     */
+    public static function postLink(Router $router): void
+    {
+        $api = new Api(
+            $router,
+            'POST',
+            array(
+                array(
+                    'name' => 'icono',
+                    'required' => true,
+                    'type' => 'string',
+                    'min' => 1,
+                    'max' => 40
+                ),
+                array(
+                    'name' => 'tipo',
+                    'required' => true,
+                    'type' => 'string',
+                    'min' => 1,
+                    'max' => 50
+                )
+            ),
+            array(),
+            array(Api::AUTH_SESSION, Api::AUTH_TOKEN)
+        );
+
+        // Valida campos requeridos
+        if (!$api->validate()) {
+            return;
+        }
+
+        // Autentifica al usuario
+        if (!$api->auth(self::SCOPE)) {
+            return;
+        }
+
+        // Crea el tipo de enlace
+        $tipo = new TipoEnlace(array(
+            'icono' => $api->in['icono'],
+            'tipo' => $api->in['tipo'],
+        ));
+
+        // Guardar el tipo de enlace
+        if (!$tipo->save()) {
+            $api->sendErrorDB($tipo->errors());
+            return;
+        }
+        // Mensajes
+        $api->send(201, 'El tipo de enlace ha sido creado.', new stdClass());
+    }
+
+    /**
+     * Api de edición de tipos de enlaces
+     *
+     * @param Router $router
+     * @return void
+     */
+    public static function putLink(Router $router): void
+    {
+        $api = new Api(
+            $router,
+            'PUT',
+            array(
+                array(
+                    'name' => 'icono',
+                    'required' => true,
+                    'type' => 'string',
+                    'min' => 1,
+                    'max' => 40
+                ),
+                array(
+                    'name' => 'tipo',
+                    'required' => true,
+                    'type' => 'string',
+                    'min' => 1,
+                    'max' => 50
+                )
+            ),
+            array(
+                array(
+                    'name' => 'id',
+                    'required' => true,
+                    'type' => 'integer'
+                )
+            ),
+            array(Api::AUTH_SESSION, Api::AUTH_TOKEN)
+        );
+
+        // Valida campos requeridos
+        if (!$api->validate()) {
+            return;
+        }
+
+        // Autentifica al usuario
+        if (!$api->auth(self::SCOPE)) {
+            return;
+        }
+
+        // Carga el tipo de enlace
+        $tipo = TipoEnlace::find($api->query['id']);
+        if (is_null($tipo)) {
+            $api->send(500, 'Tipo de enlace no encontrado.', new stdClass());
+            return;
+        }
+
+        // Actualiza el tipo de enlace
+        $tipo->icono = $api->in['icono'];
+        $tipo->tipo = $api->in['tipo'];
+        if (!$tipo->save()) {
+            $api->sendErrorDB($tipo->errors());
+            return;
+        }
+
+        // Mensajes
+        $api->send(200, 'El tipo de enlace ha sido actualizado.', new stdClass());
+    }
+
+    /**
+     * Api de supresión de tipos de enlaces
+     *
+     * @param Router $router
+     * @return void
+     */
+    public static function deleteLink(Router $router): void
+    {
+        $api = new Api(
+            $router,
+            'DELETE',
+            array(),
+            array(
+                array(
+                    'name' => 'id',
+                    'required' => true,
+                    'type' => 'integer'
+                )
+            ),
+            array(Api::AUTH_SESSION, Api::AUTH_TOKEN)
+        );
+
+        // Valida campos requeridos
+        if (!$api->validate()) {
+            return;
+        }
+
+        // Autentifica al usuario
+        if (!$api->auth(self::SCOPE)) {
+            return;
+        }
+
+        // Carga el tipo de enlace
+        $tipo = TipoEnlace::find($api->query['id']);
+        if (is_null($tipo)) {
+            $api->send(500, 'Tipo de enlace no encontrado.', new stdClass());
+            return;
+        }
+
+        // Borrar el tipo de enlace
+        if (!$tipo->delete()) {
+            $api->sendErrorDB($tipo->errors());
+            return;
+        }
+
+        // Mensajes
+        $api->send(200, 'El tipo de enlace ha sido borrado.', new stdClass());
+    }
+
+    /**
+     * Api de establecimiento de los enlaces del perfil público de usuario
+     *
+     * @param Router $router
+     * @return void
+     */
+    public static function putProfileLinks(Router $router): void
+    {
+        $api = new Api(
+            $router,
+            'PUT',
+            array(
+                array(
+                    'name' => 'enlaces',
+                    'required' => true,
+                    'type' => 'array',
+                    'schema' => array(
+                        array(
+                            'name' => 'id',
+                            'required' => true,
+                            'type' => 'integer',
+                        ),
+                        array(
+                            'name' => 'enlace',
+                            'required' => true,
+                            'type' => 'string',
+                        )
+                    )
+                )
+            ),
+            array(
+                array(
+                    'name' => 'id',
+                    'required' => true,
+                    'type' => 'integer'
+                )
+            ),
+            array(Api::AUTH_TOKEN, Api::AUTH_SELF)
+        );
+
+        // Valida campos requeridos
+        if (!$api->validate()) {
+            return;
+        }
+
+        // Autentifica al usuario
+        if (!$api->auth(self::SCOPE,$api->query['id'])) {
+            return;
+        }
+
+        // Buscar usuario filtrando varaible
+        $usuario = Usuario::find($api->query['id']);
+        if (is_null($usuario)) {
+            $api->send(500, 'Usuario no encontrado.', new stdClass());
+            return;
+        }
+
+        // Filtrado de enlaces
+        $enlaces = [];
+        $error_tipo = [];
+        $error_enlace = [];
+        foreach ($api->in['enlaces'] as $enlace) {
+            if (is_null(TipoEnlace::find($enlace['id']))) {
+                $error_tipo[] = $enlace['id'];
+                continue;
+            }
+            if (!filter_var($enlace['enlace'], FILTER_VALIDATE_URL)) {
+                $error_enlace[] = $enlace['enlace'];
+                continue;
+            }
+            $enlaces[] = array('FK_id_enlace' => $enlace['id'], 'enlace' => $enlace['enlace']);
+        }
+
+        // Establece los enlaces
+        if (!$usuario->setEnlaces($enlaces)) {
+            $api->sendErrorDB($usuario->errors());
+            return;
+        }
+
+        // Mensajes
+        if (!empty($error_tipo) || !empty($error_enlace)) {
+            $api->send(202, 'Enlaces establecidos pero algunos enlaces no superarón la validación.', array(
+                'tipo_en_error' => $error_tipo,
+                'enlace_en_error' => $error_enlace
+            ));
+        } else {
+            $api->send(200, 'Enlaces estabecidos.', new stdClass());
+        }
+    }
+
+    /**
+     * Api de creación de perfiles de usuario
+     *
+     * @param Router $router
+     * @return void
+     */
+    public static function postProfile(Router $router): void
+    {
+        $api = new Api(
+            $router,
+            'POST',
+            array(),
+            array(
+                array(
+                    'name' => 'id',
+                    'required' => true,
+                    'type' => 'integer'
+                )
+            ),
+            array(Api::AUTH_SESSION, Api::AUTH_TOKEN)
+        );
+
+        // Valida campos requeridos
+        if (!$api->validate()) {
+            return;
+        }
+
+        // Autentifica al usuario
+        if (!$api->auth(self::SCOPE)) {
+            return;
+        }
+
+        // Buscar usuario filtrando varaible
+        $usuario = Usuario::find($api->query['id']);
+        if (is_null($usuario)) {
+            $api->send(500, 'Usuario no encontrado.', new stdClass());
+            return;
+        }
+
+        // Verifica estado de usuario
+        if ($usuario->hasProfile()) {
+            $api->send(202, 'El usuario ya dispone de perfil público.', new stdClass());
+            return;
+        }
+
+        // Crea el perfil público de usuario en oculto
+        if (!$usuario->ocultar()) {
+            $api->sendErrorDB($usuario->errors());
+            return;
+        }
+
+        // Mensajes
+        $api->send(200, 'Se ha asociado un perfil público al usuario.', new stdClass());
+    }
+
+    /**
+     * Api de bloqueo de perfiles de usuario
+     *
+     * @param Router $router
+     * @return void
+     */
+    public static function lockProfile(Router $router): void
+    {
+        $api = new Api(
+            $router,
+            'PATCH',
+            array(),
+            array(
+                array(
+                    'name' => 'id',
+                    'required' => true,
+                    'type' => 'integer'
+                )
+            ),
+            array(Api::AUTH_SESSION, Api::AUTH_TOKEN)
+        );
+
+        // Valida campos requeridos
+        if (!$api->validate()) {
+            return;
+        }
+
+        // Autentifica al usuario
+        if (!$api->auth(self::SCOPE)) {
+            return;
+        }
+
+        // Buscar usuario filtrando varaible
+        $usuario = Usuario::find($api->query['id']);
+        if (is_null($usuario)) {
+            $api->send(500, 'Usuario no encontrado.', new stdClass());
+            return;
+        }
+
+        // Verifica estado de usuario
+        if (!$usuario->hasProfile()) {
+            $api->send(500, 'El usuario no dispone de perfil público.', new stdClass());
+            return;
+        }
+        if (!$usuario->isPublished()) {
+            $api->send(202, 'El usuario ya tiene el perfil público bloqueado.', new stdClass());
+            return;
+        }
+
+        // Oculta el perfil público
+        if (!$usuario->ocultar()) {
+            $api->sendErrorDB($usuario->errors());
+            return;
+        }
+
+        // Mensajes
+        $api->send(200, 'Se ha bloqueado el perfil público al usuario.', new stdClass());
+    }
+
+    /**
+     * Api de desbloqueo de perfiles de usuario
+     *
+     * @param Router $router
+     * @return void
+     */
+    public static function unlockProfile(Router $router): void
+    {
+        $api = new Api(
+            $router,
+            'PATCH',
+            array(),
+            array(
+                array(
+                    'name' => 'id',
+                    'required' => true,
+                    'type' => 'integer'
+                )
+            ),
+            array(Api::AUTH_SESSION, Api::AUTH_TOKEN)
+        );
+
+        // Valida campos requeridos
+        if (!$api->validate()) {
+            return;
+        }
+
+        // Autentifica al usuario
+        if (!$api->auth(self::SCOPE)) {
+            return;
+        }
+
+        // Buscar usuario filtrando varaible
+        $usuario = Usuario::find($api->query['id']);
+        if (is_null($usuario)) {
+            $api->send(500, 'Usuario no encontrado.', new stdClass());
+            return;
+        }
+
+        // Verifica estado de usuario
+        if (!$usuario->hasProfile()) {
+            $api->send(500, 'El usuario no dispone de perfil público.', new stdClass());
+            return;
+        }
+        if ($usuario->isPublished()) {
+            $api->send(202, 'El usuario ya tiene el perfil público desbloqueado.', new stdClass());
+            return;
+        }
+
+        // Oculta el perfil público
+        if (!$usuario->publicar()) {
+            $api->sendErrorDB($usuario->errors());
+            return;
+        }
+
+        // Mensajes
+        $api->send(200, 'Se ha desbloqueado el perfil público al usuario.', new stdClass());
     }
 }
