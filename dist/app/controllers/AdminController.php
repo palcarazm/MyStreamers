@@ -3,6 +3,7 @@
 namespace Controllers;
 
 use Model\Sitio;
+use Model\TipoEnlace;
 use Model\Usuario;
 use Router\Router;
 
@@ -36,10 +37,9 @@ class AdminController
      */
     public static function perfil(Router $router)
     {
-        $router->render('forms/user', 'layout-admin', array(
+        $router->render('forms/mi-perfil', 'layout-admin', array(
             'title' => 'Mi perfil',
-            'usuario' => getAuthUser(),
-            'rol_edit' => false
+            'usuario' => getAuthUser()
         ));
     }
 
@@ -89,6 +89,12 @@ class AdminController
         ));
     }
 
+    /**
+     * Página de Listado usuarios
+     *
+     * @param Router $router
+     * @return void
+     */
     public static function userList(Router $router)
     {
         $router->render('lists/admin-list', 'layout-admin', array(
@@ -97,8 +103,71 @@ class AdminController
                 'singular' => 'usuario',
                 'plural' => 'usuarios' 
             ),
-            'header_list' => ['Usuario','E-Mail','Rol','Acciones'],
+            'header_list' => ['Usuario','E-Mail','Rol','Perfil','Gestión de perfil','Gestión de Usuario'],
             'obj_list' => Usuario::all()
+        ));
+    }
+
+    /**
+     * Pagina de creación de tipo de enlace
+     *
+     * @param Router $router
+     * @return void
+     */
+    public static function linkAdd(Router $router)
+    {
+        $router->render('forms/link', 'layout-admin', array(
+            'title' => 'Crear Enlace',
+            'enlace' => null
+        ));
+    }
+
+    /**
+     * Pagina de edición de tipo de enlace
+     *
+     * @param Router $router
+     * @return void
+     */
+    public static function linkEdit(Router $router)
+    {
+        $querySchema = array(
+            array(
+                'name' => 'id',
+                'required' => true,
+                'type' => 'integer'
+            )
+        );
+        if (!$router->validate($_GET, $querySchema)) {
+            $router->renderError();
+            return;
+        }
+        $enlace = TipoEnlace::find($_GET['id']);
+        if (is_null($enlace)) {
+            $router->renderError();
+            return;
+        }
+        $router->render('forms/link', 'layout-admin', array(
+            'title' => 'Editar enlace',
+            'enlace' => $enlace
+        ));
+    }
+
+    /**
+     * Página de listado de tipos de enlaces
+     *
+     * @param Router $router
+     * @return void
+     */
+    public static function linkList(Router $router)
+    {
+        $router->render('lists/admin-list', 'layout-admin', array(
+            'title' => 'Listar tipo de enlaces del perfil público de usuario',
+            'obj_type' => array(
+                'singular' => 'tipo de enlaces',
+                'plural' => 'tipos de enlaces' 
+            ),
+            'header_list' => ['Tipo de enlaces','Acciones'],
+            'obj_list' => TipoEnlace::all()
         ));
     }
 }

@@ -35,7 +35,9 @@ $(function () {
       break;
     case "/admin/miperfil":
       configFileIntup();
+      $(".custom-textarea").richTextMD();
       userForm();
+      profileLinksForm();
       break;
     case "/admin/usuarios/editar":
       configFileIntup();
@@ -48,6 +50,18 @@ $(function () {
     case "/admin/usuarios/listar":
       setupTable();
       userList();
+      break;
+    case "/admin/usuarios/enlaces/crear":
+      configIconPicker();
+      linkForm();
+      break;
+    case "/admin/usuarios/enlaces/editar":
+      configIconPicker();
+      linkForm();
+      break;
+    case "/admin/usuarios/enlaces/listar":
+      setupTable();
+      linkList();
       break;
     default:
       break;
@@ -332,4 +346,20 @@ function validatePass(password, passwordRepeat) {
     password.removeClass("is-invalid").addClass("is-valid");
     return true;
   }
+}
+
+/**
+ * Configura el selector de iconos
+ */
+function configIconPicker() {
+  $('.icp').iconpicker({});
+  $('.icp').on('iconpickerSelected', function (e) {
+    $(this).children('span').each((ind,child)=>{
+      $(child).html('');
+    });
+    $(this).siblings('input[type="hidden"]').each((ind,sibling)=>{
+      $(sibling).val(e.iconpickerValue);
+    });
+  });
+
 }

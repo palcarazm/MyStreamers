@@ -28,6 +28,29 @@ if (!is_null($usuario)) :
                             <p>Añadir</p>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <div class="nav-link">
+                            <i class="nav-icon fas fa-link"></i>
+                            <p>
+                                Enlaces
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </div>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="/admin/usuarios/enlaces/listar" class="nav-link">
+                                    <i class="nav-icon fas fa-list"></i>
+                                    <p>Listar</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/admin/usuarios/enlaces/crear" class="nav-link">
+                                    <i class="nav-icon fas fa-plus-circle"></i>
+                                    <p>Añadir</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
                 </ul>
             </li>
         <?php endif; ?>

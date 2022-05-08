@@ -1,14 +1,13 @@
 <?php
 
 use Model\Rol;
-use Model\Usuario;
 ?>
 <!-- Content Header (Page header) -->
 <section class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-12">
-                <h1><?php echo is_null($usuario) ? 'Crear' : 'Editar'; ?> <?php echo $rol_edit ? '' : 'mi perfil de '; ?>usuario</h1>
+                <h1><?php echo is_null($usuario) ? 'Crear' : 'Editar'; ?> usuario</h1>
             </div>
         </div>
     </div><!-- /.container-fluid -->
@@ -34,19 +33,19 @@ use Model\Usuario;
         <?php if (is_null($usuario)) : ?>
             <form enctype="multipart/form-data" action="/api/user/v1/user" method="POST" class="border-secondary" id="user-form" form-success="reset">
             <?php else : ?>
-                <form enctype="multipart/form-data" action="/api/user/v1/user<?php echo '?id=' . $usuario->getID(); ?>" method="PUT" class="border-secondary" id="user-form" <?php echo $rol_edit ? 'form-success="redirect" destino="/admin/usuarios"' : ''; ?>>
+                <form enctype="multipart/form-data" action="/api/user/v1/user<?php echo '?id=' . $usuario->getID(); ?>" method="PUT" class="border-secondary" id="user-form" form-success="redirect" destino="/admin/usuarios/listar">
                 <?php endif; ?>
                 <div class="card-body">
                     <div class="form-group row">
                         <label for="username" class="col-sm-3 col-md-2 col-form-label">Usuario*</label>
                         <div class="col-sm-9 col-md-10">
-                            <input type="text" class="form-control" id="username" name="username" placeholder="Nombre de usuario" required value="<?php echo is_null($usuario) ? '' : $usuario->username; ?>">
+                            <input type="text" class="form-control" id="username" name="username" placeholder="Nombre de usuario" required value="<?php echo $usuario->username ?? ''; ?>">
                         </div>
                     </div>
                     <div class="form-group row">
                         <label for="email" class="col-sm-3 col-md-2 col-form-label">E-Mail*</label>
                         <div class="col-sm-9 col-md-10">
-                            <input type="email" class="form-control" id="email" name="email" placeholder="Dirección de e-mail" required value="<?php echo is_null($usuario) ? '' : $usuario->email; ?>">
+                            <input type="email" class="form-control" id="email" name="email" placeholder="Dirección de e-mail" required value="<?php echo $usuario->email ?? ''; ?>">
                         </div>
                     </div>
                     <div class="form-group row">
@@ -62,17 +61,12 @@ use Model\Usuario;
                                     <?php endforeach; ?>
                                 <?php else : ?>
                                     <?php foreach (Rol::all() as $rol) : ?>
-                                        <option value="<?php echo $rol->getID(); ?>" <?php echo $rol->getID() == $usuario->rol->getID() ? "selected" : ""; ?> <?php echo ($rol_edit || $rol->getID() == $usuario->rol->getID()) ? "" : "disabled"; ?>>
+                                        <option value="<?php echo $rol->getID(); ?>" <?php echo $rol->getID() == $usuario->rol->getID() ? "selected" : ""; ?>>
                                             <?php echo ucfirst($rol->rol); ?>
                                         </option>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
                             </select>
-                            <?php if (!$rol_edit) : ?>
-                                <small id="id_RolHelpBlock" class="form-text text-muted">
-                                    No puedes modificar tu propio rol.
-                                </small>
-                            <?php endif; ?>
                         </div>
                     </div>
                     <div class="form-group row align-items-center">
