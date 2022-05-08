@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS enlaces
   PK_id_enlace INT(3)       NOT NULL AUTO_INCREMENT COMMENT 'ID del tipo de enlace',
   icono        VARCHAR (40) NOT NULL COMMENT 'Icono del tipo de enlace',
   tipo         VARCHAR(50)  NOT NULL COMMENT 'Nombre del tipo de enlace',
+  actualizado  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Última actualización',
   PRIMARY KEY (PK_id_enlace)
 ) COMMENT 'Tabla de tipos de enlaces';
 
@@ -149,3 +150,10 @@ VALUES
     '0',
     '0'
   );
+/* INSERTAR TIPO DE ENLACES */
+REPLACE INTO `enlaces`(`icono`,`tipo`) VALUES
+('fab fa-youtube','YouTube'),
+('fab fa-twitch','Twitch'),
+('fab fa-instagram','Instagram'),
+('fab fa-twitter','Twitter'),
+('fab fa-tiktok','TikTok');
