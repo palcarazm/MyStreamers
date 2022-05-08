@@ -35,6 +35,16 @@ class Sitio extends ActiveRecord
     }
 
     /**
+     * Devuelve el directorio del tema del sitio
+     *
+     * @return string
+     */
+    public static function getTemaDir():string
+    {
+        return '/themes/'. self::getTema();
+    }
+
+    /**
      * Imprime el tema del sitio
      *
      * @return void
