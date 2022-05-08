@@ -1,32 +1,88 @@
-.overlay.loading{
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    font-size: xx-large;
+.fs-1 {
+  font-size: calc(1.375rem + 1.5vw) !important;
 }
-.fa-spin-ease{
-    -webkit-animation: fa-spin 2s ease-in-out infinite;
-    animation: fa-spin 2s ease-in-out infinite;
+
+.fs-2 {
+  font-size: calc(1.325rem + 0.9vw) !important;
 }
-img.img-size-small{
-    width: 4rem;
-    height: auto;
+
+.fs-3 {
+  font-size: calc(1.3rem + 0.6vw) !important;
 }
-img.img-size-thumbnail{
-    width: 10rem;
-    height: auto;
+
+.fs-4 {
+  font-size: calc(1.275rem + 0.3vw) !important;
 }
-img.img-size-medium{
-    width: 18rem;
-    height: auto;
+
+.fs-5 {
+  font-size: 1.25rem !important;
 }
-img.img-size-medium-large{
-    width: 45rem;
-    height: auto;
+
+.fs-6 {
+  font-size: 1rem !important;
 }
-img.img-size-large{
-    width: 65rem;
-    height: auto;
+
+@media (min-width: 1200px) {
+  .fs-1 {
+    font-size: 2.5rem !important;
+  }
+
+  .fs-2 {
+    font-size: 2rem !important;
+  }
+
+  .fs-3 {
+    font-size: 1.75rem !important;
+  }
+
+  .fs-4 {
+    font-size: 1.5rem !important;
+  }
+}
+.overlay.loading {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  font-size: xx-large;
+}
+.fa-spin-ease {
+  -webkit-animation: fa-spin 2s ease-in-out infinite;
+  animation: fa-spin 2s ease-in-out infinite;
+}
+img.img-size-small {
+  width: 4rem;
+  height: auto;
+}
+img.img-size-thumbnail {
+  width: 10rem;
+  height: auto;
+}
+img.img-size-medium {
+  width: 18rem;
+  height: auto;
+}
+img.img-size-medium-large {
+  width: 45rem;
+  height: auto;
+}
+img.img-size-large {
+  width: 65rem;
+  height: auto;
+}
+.card-user img {
+  transition: transform 0.2s;
+}
+.card-user img:hover {
+  transform: scale(1.2);
+  margin-bottom: 1rem;
+}
+.profile-link {
+  transition: transform 0.2s, filter 0.5s;
+  font-size: x-large;
+}
+.profile-link:hover {
+  transform: scale(1.2);
+  filter: brightness(0.9);
 }
