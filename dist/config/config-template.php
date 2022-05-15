@@ -17,11 +17,16 @@ define('SMTP_PASS','SMTP_PASS');
 define('SMTP_EMAIL','SMTP_EMAIL');
 define('SMTP_NAME','SMTP_NAME');
 
+/* INFORMACIÓN DE LA CONEXIÓN CON TWITCH */
+define('TWITCH_CLIENT_ID','TWITCH_CLIENT_ID');
+define('TWITCH_CLIENT_SECRET','TWITCH_CLIENT_SECRET');
+
 /* INFORMACIÓN DE ESTADO DE CONFIGURACION */
 define('IS_CONFIG_DATABASE',false);
 define('IS_CONFIG_ADMIN',false);
 define('IS_CONFIG_EMAIL',false);
 define('IS_CONFIG_SITE',false);
+define('IS_CONFIG_TWITCH',false);
 
 /* DIRECTORIOS */
 define('APP_FILE',__DIR__ . '/../includes/app.php');

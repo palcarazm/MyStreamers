@@ -19,13 +19,15 @@ $router = new Router;
 
 /* AÑADIR RUTAS */
 // Configuración
-if(!IS_CONFIG_SITE){$router->add('GET', '/config', [PublicController::class, 'config']);}
+if(!IS_CONFIG_TWITCH){$router->add('GET', '/config', [PublicController::class, 'config']);}
 $router->add('POST', '/api/config/v1/database', [ConfigurationApi::class, 'postDatabase']);
 $router->add('POST', '/api/config/v1/admin', [ConfigurationApi::class, 'postAdmin']);
 $router->add('POST', '/api/config/v1/email', [ConfigurationApi::class, 'postEmail']);
 $router->add('PUT', '/api/config/v1/email', [ConfigurationApi::class, 'putEmail']);
 $router->add('POST', '/api/config/v1/site', [ConfigurationApi::class, 'postSite']);
 $router->add('PUT', '/api/config/v1/site', [ConfigurationApi::class, 'putSite']);
+$router->add('POST', '/api/config/v1/twitch', [ConfigurationApi::class, 'postTwitch']);
+$router->add('PUT', '/api/config/v1/twitch', [ConfigurationApi::class, 'putTwitch']);
 
 // Comunicación
 $router->add('POST','/api/com/v1/email',[ComunicationApi::class,'postEmail']);

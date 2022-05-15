@@ -6,8 +6,9 @@ use mysqli;
 use stdClass;
 use Model\Api;
 use Model\Rol;
-use Router\Router;
 use Model\Usuario;
+use Router\Router;
+use GuzzleHttp\Client;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\PHPMailer;
@@ -15,6 +16,43 @@ use PHPMailer\PHPMailer\PHPMailer;
 class ConfigurationApi
 {
     const SCOPE = Rol::PERMS_CONFIG;
+    const CONFIG_FILE = __DIR__ . '/../../config/config.php';
+    const CONFIG_TEMPLATE  = __DIR__ . '/../../config/config-template.php';
+
+    /**
+     * Guarda el parametro en el fichero de configuración
+     *
+     * @param string $key Parametro
+     * @param string|boolean $value Valor
+     * @return boolean Realizado con éxito (S/N)
+     */
+    private static function setValue(string $key, string|bool $value): bool
+    {
+        switch (gettype($value)) {
+            case 'string':
+                $valueString = "'{$value}'";
+                break;
+            case 'boolean':
+                if ($value) {
+                    $valueString = "true";
+                } else {
+                    $valueString = "false";
+                }
+                break;
+
+            default:
+                return false;
+                break;
+        }
+        try {
+            $data = file_get_contents(self::CONFIG_FILE);
+            $data = preg_replace("/define\('{$key}',\S+\)/", "define('{$key}',{$valueString})", $data);
+            file_put_contents(self::CONFIG_FILE, $data);
+        } catch (\Exception $e) {
+            return false;
+        }
+        return true;
+    }
     /**
      * Valida los datos de conexión de la base de datos.
      * Si son correctos lanza la configuración de la misma.
@@ -65,14 +103,19 @@ class ConfigurationApi
 
         if (self::verifyDB($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME)) { //Conexión verificada
             try { // Crear fichero de configuración
-                $data = file_get_contents(__DIR__ . '/../../config/config-template.php');
-                $data = preg_replace('/define\(\'SECRET\',\'\S+\'\)/', "define('SECRET','" . strtoupper(bin2hex(random_bytes(20))) . "')", $data);
-                $data = preg_replace('/define\(\'DB_HOST\',\'\S+\'\)/', "define('DB_HOST','{$DB_HOST}')", $data);
-                $data = preg_replace('/define\(\'DB_NAME\',\'\S+\'\)/', "define('DB_NAME','{$DB_NAME}')", $data);
-                $data = preg_replace('/define\(\'DB_USER\',\'\S+\'\)/', "define('DB_USER','{$DB_USER}')", $data);
-                $data = preg_replace('/define\(\'DB_PASS\',\'\S+\'\)/', "define('DB_PASS','{$DB_PASS}')", $data);
-                file_put_contents(__DIR__ . '/../../config/config.php', $data);
+                $data = file_get_contents(self::CONFIG_TEMPLATE);
+                file_put_contents(self::CONFIG_FILE, $data);
             } catch (\Exception $e) {
+                $api->send(500, 'No se ha conseguido guardar los datos de conexión con la base de datos en el fichero de configuración', new stdClass());
+                return;
+            }
+            $result = self::setValue('SECRET', strtoupper(bin2hex(random_bytes(20))));
+            $result = $result && self::setValue('DB_HOST', $DB_HOST);
+            $result = $result && self::setValue('DB_NAME', $DB_NAME);
+            $result = $result && self::setValue('DB_USER', $DB_USER);
+            $result = $result && self::setValue('DB_PASS', $DB_PASS);
+
+            if (!$result) {
                 $api->send(500, 'No se ha conseguido guardar los datos de conexión con la base de datos en el fichero de configuración', new stdClass());
                 return;
             }
@@ -98,11 +141,8 @@ class ConfigurationApi
                 return;
             }
 
-            try { // Alcualiza fichero de configuración
-                $data = file_get_contents(__DIR__ . '/../../config/config.php');
-                $data = preg_replace('/define\(\'IS_CONFIG_DATABASE\',\S+\)/', "define('IS_CONFIG_DATABASE',true)", $data);
-                file_put_contents(__DIR__ . '/../../config/config.php', $data);
-            } catch (\Exception $e) {
+            if (!self::setValue('IS_CONFIG_DATABASE', true)) // Bloqueo del acceso a la API
+            {
                 $api->send(202, 'No se ha conseguido bloquear el acceso a la API de configuración de la base de datos. Realice un bloqueo manual', new stdClass());
                 return;
             }
@@ -182,11 +222,7 @@ class ConfigurationApi
 
         if ($user->validate()) { // validación de usuario
             if ($user->save()) { // guargar usuario
-                try { // Alcualiza fichero de configuración
-                    $data = file_get_contents(__DIR__ . '/../../config/config.php');
-                    $data = preg_replace('/define\(\'IS_CONFIG_ADMIN\',\S+\)/', "define('IS_CONFIG_ADMIN',true)", $data);
-                    file_put_contents(__DIR__ . '/../../config/config.php', $data);
-                } catch (\Exception $e) {
+                if (!self::setValue('IS_CONFIG_ADMIN', true)) { // Bloquear acceso a la API
                     $api->send(202, 'No se ha conseguido bloquear el acceso a la API de configuración del administrador. Realice un bloqueo manual', new stdClass());
                     return;
                 }
@@ -286,16 +322,14 @@ class ConfigurationApi
             return;
         }
 
-        try { // Guardar datos en el fichero de configuración
-            $data = file_get_contents(__DIR__ . '/../../config/config.php');
-            $data = preg_replace('/define\(\'SMTP_HOST\',\'\S+\'\)/', "define('SMTP_HOST','{$hostSMTP}')", $data);
-            $data = preg_replace('/define\(\'SMTP_PORT\',\'\S+\'\)/', "define('SMTP_PORT','{$portSMTP}')", $data);
-            $data = preg_replace('/define\(\'SMTP_USER\',\'\S+\'\)/', "define('SMTP_USER','{$userEmail}')", $data);
-            $data = preg_replace('/define\(\'SMTP_PASS\',\'\S+\'\)/', "define('SMTP_PASS','{$passEmail}')", $data);
-            $data = preg_replace('/define\(\'SMTP_EMAIL\',\'\S+\'\)/', "define('SMTP_EMAIL','{$fromEmail}')", $data);
-            $data = preg_replace('/define\(\'SMTP_NAME\',\'\S+\'\)/', "define('SMTP_NAME','{$fromName}')", $data);
-            file_put_contents(__DIR__ . '/../../config/config.php', $data);
-        } catch (\Exception $e) {
+        $result = static::setValue('SMTP_HOST', $hostSMTP);
+        $result = $result && static::setValue('SMTP_PORT', $portSMTP);
+        $result = $result && static::setValue('SMTP_USER', $userEmail);
+        $result = $result && static::setValue('SMTP_PASS', $passEmail);
+        $result = $result && static::setValue('SMTP_EMAIL', $fromEmail);
+        $result = $result && static::setValue('SMTP_NAME', $fromName);
+
+        if (!$result) {
             $api->send(500, 'Se ha producido un error al guardar los datos de configuración', new stdClass());
             return;
         }
@@ -347,11 +381,7 @@ class ConfigurationApi
                     return;
                 }
 
-                try { // Alcualiza fichero de configuración
-                    $data = file_get_contents(__DIR__ . '/../../config/config.php');
-                    $data = preg_replace('/define\(\'IS_CONFIG_EMAIL\',\S+\)/', "define('IS_CONFIG_EMAIL',true)", $data);
-                    file_put_contents(__DIR__ . '/../../config/config.php', $data);
-                } catch (\Exception $e) {
+                if (!self::setValue('IS_CONFIG_EMAIL', true)) { // Bloqueo de la API
                     $api->send(202, 'No se ha conseguido bloquear el acceso a la API de configuración del servidor de email. Realice un bloqueo manual', new stdClass());
                     return;
                 }
@@ -373,51 +403,55 @@ class ConfigurationApi
      */
     public static function putSite(Router $router): void
     {
-        $api = new Api($router, 'PUT', array(
+        $api = new Api(
+            $router,
+            'PUT',
             array(
-                'name' => 'titulo',
-                'required' => true,
-                'type' => 'string',
-                'min' => 1,
-                'max' => 2 ** 32 - 1
+                array(
+                    'name' => 'titulo',
+                    'required' => true,
+                    'type' => 'string',
+                    'min' => 1,
+                    'max' => 2 ** 32 - 1
+                ),
+                array(
+                    'name' => 'tema',
+                    'required' => true,
+                    'type' => 'string',
+                    'min' => 1,
+                    'max' => 2 ** 32 - 1
+                ),
+                array(
+                    'name' => 'descripcion',
+                    'required' => true,
+                    'type' => 'string',
+                    'min' => 1,
+                    'max' => 2 ** 32 - 1
+                ),
+                array(
+                    'name' => 'eventos',
+                    'required' => false,
+                    'type' => 'boolean'
+                ),
+                array(
+                    'name' => 'noticias',
+                    'required' => false,
+                    'type' => 'boolean'
+                ),
+                array(
+                    'name' => 'normas',
+                    'required' => false,
+                    'type' => 'boolean'
+                ),
+                array(
+                    'name' => 'enlaces',
+                    'required' => false,
+                    'type' => 'boolean'
+                )
             ),
-            array(
-                'name' => 'tema',
-                'required' => true,
-                'type' => 'string',
-                'min' => 1,
-                'max' => 2 ** 32 - 1
-            ),
-            array(
-                'name' => 'descripcion',
-                'required' => true,
-                'type' => 'string',
-                'min' => 1,
-                'max' => 2 ** 32 - 1
-            ),
-            array(
-                'name' => 'eventos',
-                'required' => false,
-                'type' => 'boolean'
-            ),
-            array(
-                'name' => 'noticias',
-                'required' => false,
-                'type' => 'boolean'
-            ),
-            array(
-                'name' => 'normas',
-                'required' => false,
-                'type' => 'boolean'
-            ),
-            array(
-                'name' => 'enlaces',
-                'required' => false,
-                'type' => 'boolean'
-            )
-        ),
-        array(),
-        array('SESSION', 'TOKEN'));
+            array(),
+            array('SESSION', 'TOKEN')
+        );
 
         // Valida la autentificación
         if (!$api->auth(self::SCOPE)) {
@@ -540,16 +574,137 @@ class ConfigurationApi
             return;
         }
 
-        try { // Alcualiza fichero de configuración
-            $data = file_get_contents(__DIR__ . '/../../config/config.php');
-            $data = preg_replace('/define\(\'IS_CONFIG_SITE\',\S+\)/', "define('IS_CONFIG_SITE',true)", $data);
-            file_put_contents(__DIR__ . '/../../config/config.php', $data);
-        } catch (\Exception $e) {
+        if (!self::setValue('IS_CONFIG_SITE', true)) { // Bloqueo de la API
             $api->send(202, 'No se ha conseguido bloquear el acceso a la API de configuración del sitio. Realice un bloqueo manual', new stdClass());
             return;
         }
 
         $api->send(201, 'Configuración del sitio completada', new stdClass());
+        return;
+    }
+
+    /**
+     * Establece la configuración de la conexión con Twitch
+     *
+     * @param Router $router
+     */
+    public static function postTwitch(Router $router): void
+    {
+        $api = new Api($router, 'POST', array(
+            array(
+                'name' => 'client_id',
+                'required' => true,
+                'type' => 'string',
+            ),
+            array(
+                'name' => 'client_secret',
+                'required' => true,
+                'type' => 'string',
+            )
+        ));
+
+        // Valida configuración inicial
+        if (IS_CONFIG_TWITCH) {
+            $api->send(403, 'La configuración inicial de la conexión con Twitch ya ha sido efectuada y no puede volver a ejecutarse.', new stdClass());
+            return;
+        }
+
+        self::configTwitch($api);
+    }
+
+    /**
+     * Modifica la configuración de la conexión con Twitch
+     *
+     * @param Router $router
+     */
+    public static function putTwitch(Router $router): void
+    {
+        $api = new Api(
+            $router,
+            'PUT',
+            array(
+                array(
+                    'name' => 'client_id',
+                    'required' => true,
+                    'type' => 'string',
+                ),
+                array(
+                    'name' => 'client_secret',
+                    'required' => true,
+                    'type' => 'string',
+                )
+            ),
+            array(),
+            array('SESSION', 'TOKEN')
+        );
+
+        // Valida la autentificación
+        if (!$api->auth(self::SCOPE)) {
+            return;
+        }
+
+        self::configTwitch($api);
+    }
+
+    /**
+     * Configura la conexión con Twitch
+     *
+     * @param API $api
+     */
+    public static function configTwitch(API $api): void
+    {
+        // Valida campos requeridos
+        if (!$api->validate()) {
+            return;
+        }
+
+        // Intentar conexión con Twitch
+        try {
+            $client = new Client(['headers' => array(
+                'Content-Type'     => 'application/json',
+                'Accept'     => 'application/json'
+            )]);
+            $res = $client->request(
+                "POST",
+                "https://id.twitch.tv/oauth2/token",
+                [
+                    "json" => array(
+                        'client_id' => $api->in['client_id'],
+                        'client_secret' => $api->in['client_secret'],
+                        'grant_type' => 'client_credentials'
+                    ),
+                    'http_errors' => false
+                ]
+            );
+
+            if ($res->getStatusCode() != 200) {
+                $bodyout = json_decode($res->getBody()->getContents());
+
+                $api->send(500, 'Configuración no válida: ' . (isset($bodyout->message) ? $bodyout->message : ''), new stdClass());
+                return;
+            }
+        } catch (\Exception $e) {
+            $api->send(500, 'Se produjo un error al contactar con Twitch', new stdClass());
+            return;
+        }
+
+        $result = static::setValue('TWITCH_CLIENT_ID', $api->in['client_id']);
+        $result = $result && static::setValue('TWITCH_CLIENT_SECRET', $api->in['client_secret']);
+
+        if (!$result) {
+            $api->send(500, 'Se ha producido un error al guardar los datos de configuración', new stdClass());
+            return;
+        }
+
+        if ($api->getMethod() == 'POST') {
+            if (!static::setValue('IS_CONFIG_TWITCH', true)) { // Bloqueo de la API
+                $api->send(202, 'No se ha conseguido bloquear el acceso a la API de configuración de la conexión con Twitch. Realice un bloqueo manual.', new stdClass());
+                return;
+            }
+            $api->send(201, 'Configuración de la configuración de la conexión con Twitch registrada.', new stdClass());
+        } else {
+            $api->send(200, 'Configuración de la configuración de la conexión con Twitch registrada.', new stdClass());
+        }
         return;
     }
 

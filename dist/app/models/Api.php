@@ -142,6 +142,16 @@ class Api
     }
 
     /**
+     * Devuelve el método a la que ha sido llamada la API
+     *
+     * @return String método de solicitud
+     */
+    public function getMethod(): String
+    {
+        return $this->method;
+    }
+
+    /**
      * Valida que la entrada cumple la especificación y lanza la respuesta de error en caso contrario.
      *
      * @return bool Cumlpe la espeficicación (S/N)
