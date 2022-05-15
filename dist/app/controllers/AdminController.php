@@ -28,6 +28,19 @@ class AdminController
             'enlaces' => Sitio::isEnabled("enlaces")
         ));
     }
+    
+    /**
+     * Página de configuración de la conexión con Twitch
+     *
+     * @param Router $router
+     * @return void
+     */
+    public static function configTwitch(Router $router)
+    {
+        $router->render('config/twitch', 'layout-admin', array(
+            'title' => 'Configuración de Twitch'
+        ));
+    }
 
     /**
      * Página de perfil de usuario

@@ -196,6 +196,32 @@
             </form>
         </li>
         <!-- Fin siteConfig -->
+        <!-- Inicio twitchConfig -->
+        <li class="list-group-item step todo" id="configTwitch">
+            <h2 class="card-subtitle"><i></i><span>Configuración de la conexión con Twitch</span></h2>
+            <form action="/api/config/v1/twitch" method="post" class="border-secondary step-body">
+                <div class="card-body pt-2 pb-2">
+                    <p class="card-text">Ahora con la conexión con twitch. Debes registrar una aplicación en la consola de desarrolladores de Twitch. <a href="https://dev.twitch.tv/docs/authentication/register-app" target="_blank" rel="noopener noreferrer">Aquí tienes la guía de Twitch</a>.</p>
+                    <div class="alert alert-warning" role="alert">
+                        Dado que MyStreamers no requiere acceder a la información privada de su perfil, se recomiendo registrar la aplicación en una cuenta de twitch secundaria para que en caso de que ocurra un compromiso de seguridad sus datos no sean expuestos.
+                    </div>
+                    <div class="form-group row">
+                        <label for="client_id" class="col-sm-3 col-md-2 col-form-label">Client ID</label>
+                        <div class="col-sm-9 col-md-10">
+                            <input type="text" class="form-control" id="client_id" name="client_id" placeholder="Client ID de la aplicación registrada en Twitch" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="client_secret" class="col-sm-3 col-md-2 col-form-label">Client Secret</label>
+                        <div class="col-sm-9 col-md-10">
+                            <input type="text" class="form-control" secret="client_secret" name="client_secret" placeholder="Client Secret de la aplicación registrada en Twitch" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary d-block ml-auto mr-0">Registrar información de conexión</button>
+                </div>
+            </form>
+        </li>
+        <!-- Fin twitchConfig -->
         <!-- Inicio finalMessage -->
         <li class="list-group-item step todo" id="finalMessage">
             <div class="step-body">

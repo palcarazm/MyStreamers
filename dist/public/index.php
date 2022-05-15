@@ -62,6 +62,7 @@ $router->add('PATCH','/api/user/v1/profile/unlock',[UserApi::class,'unlockProfil
 $router->add('GET','/admin/miperfil',[AdminController::class,'perfil'],Rol::PERMS_BASIC);
 /// Configuración
 $router->add('GET','/admin/config/sitio',[AdminController::class,'configSitio'],Rol::PERMS_CONFIG);
+$router->add('GET','/admin/config/twitch',[AdminController::class,'configTwitch'],Rol::PERMS_CONFIG);
 /// Usuarios
 $router->add('GET','/admin/usuarios/crear',[AdminController::class,'userAdd'],Rol::PERMS_USUARIOS);
 $router->add('GET','/admin/usuarios/editar',[AdminController::class,'userEdit'],Rol::PERMS_USUARIOS);

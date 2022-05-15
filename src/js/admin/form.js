@@ -111,3 +111,28 @@ function profileLinksForm() {
     );
   });
 }
+
+/**
+ * AJAX Formulario de Usuario
+ */
+ function profileStreamsForm() {
+  $("#profile-streams-form").on("submit", function (e) {
+    e.preventDefault();
+    $(this).find('button[type="submit"]').attr("disabled", true);
+    $(this).loading();
+    callAPIverbose(
+      $(this).attr("action"),
+      $(this).attr("method"),
+      new FormData(this),
+      $(this).find("input,textarea,select").filter("[required]").length,
+      function () {
+        $("#profile-streams-form").loaded();
+        $("#profile-streams-form").find('button[type="submit"]').attr("disabled", false);
+      },
+      function () {
+        $("#profile-streams-form").loaded();
+        $("#profile-streams-form").find('button[type="submit"]').attr("disabled", false);
+      }
+    );
+  });
+}

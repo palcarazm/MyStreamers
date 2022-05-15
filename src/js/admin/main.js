@@ -12,6 +12,7 @@ $(function () {
       validAdminuserForm();
       configEmail();
       configSite();
+      configTwitch();
       break;
     case "/login":
       togglePassword();
@@ -33,11 +34,15 @@ $(function () {
       $(".custom-textarea").richTextMD();
       updateSite();
       break;
+    case "/admin/config/twitch":
+      updateTwitch();
+      break;
     case "/admin/miperfil":
       configFileIntup();
       $(".custom-textarea").richTextMD();
       userForm();
       profileLinksForm();
+      profileStreamsForm();
       break;
     case "/admin/usuarios/editar":
       configFileIntup();

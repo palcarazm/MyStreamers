@@ -70,6 +70,12 @@ if (!is_null($usuario)) :
                             <p>Sitio</p>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="/admin/config/twitch" class="nav-link">
+                            <i class="nav-icon fab fa-twitch"></i>
+                            <p>Twitch</p>
+                        </a>
+                    </li>
                 </ul>
             </li>
         <?php endif; ?>

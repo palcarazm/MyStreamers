@@ -16,7 +16,7 @@ function configDB() {
         $("#configDatabase.step").removeClass("current").addClass("done");
         $("#configDatabase.step h2").addClass("text-success");
         $("#configAdmin.step ").removeClass("todo").addClass("current");
-        $("#progreso").width("25%");
+        $("#progreso").width("20%");
       },
       function () {
         $("#configDatabase form").loaded();
@@ -47,7 +47,7 @@ function configAdmin() {
         $("#configEmail form #adminEmail").val(
           $("#configAdmin form #email").val()
         );
-        $("#progreso").width("50%");
+        $("#progreso").width("40%");
       },
       function () {
         $("#configAdmin form").loaded();
@@ -102,7 +102,7 @@ function configEmail() {
                   $("#configSite.step ")
                     .removeClass("todo")
                     .addClass("current");
-                  $("#progreso").width("75%");
+                  $("#progreso").width("60%");
                 });
               },
               error: function (data) {
@@ -166,13 +166,40 @@ function configSite() {
         $("#configSite form").loaded();
         $("#configSite.step").removeClass("current").addClass("done");
         $("#configSite.step h2").addClass("text-success");
-        $("#configSite.step ").removeClass("todo").addClass("current");
-        $("#finalMessage.step ").removeClass("todo").addClass("current");
-        $("#progreso").width("100%");
+        $("#configTwitch.step ").removeClass("todo").addClass("current");
+        $("#progreso").width("80%");
       },
       function () {
         $("#configSite form").loaded();
         $("#configSite form").find('button[type="submit"]').attr("disabled", false);
+      }
+    );
+  });
+}
+
+/**
+ * Configura conexión con Twitch
+ */
+ function configTwitch() {
+  $("#configTwitch form").on("submit", function (e) {
+    e.preventDefault();
+    $(this).find('button[type="submit"]').attr("disabled", true);
+    $(this).loading();
+    callAPIverbose(
+      $(this).attr("action"),
+      $(this).attr("method"),
+      new FormData(this),
+      $(this).find("input,textarea,select").filter("[required]").length,
+      function () {
+        $("#configTwitch form").loaded();
+        $("#configTwitch.step").removeClass("current").addClass("done");
+        $("#configTwitch.step h2").addClass("text-success");
+        $("#finalMessage.step ").removeClass("todo").addClass("current");
+        $("#progreso").width("100%");
+      },
+      function () {
+        $("#configTwitch form").loaded();
+        $("#configTwitch form").find('button[type="submit"]').attr("disabled", false);
       }
     );
   });
@@ -219,10 +246,36 @@ function updateSite() {
         $("#updateSite-form").find('button[type="submit"]').attr("disabled", false);
       },
       function () {
-        $(this).find('button[type="submit"]').attr("disabled", false);
-        $(this).loaded();
+        $("#updateSite-form").find('button[type="submit"]').attr("disabled", false);
+        $("#updateSite-form").loaded();
       },
       $("#token").val()
+    );
+  });
+}
+
+/**
+ * Actualiza la configuración de la conexión con Twitch
+ */
+function updateTwitch() {
+  $("#updateTwitch-form").on("submit", function (e) {
+    e.preventDefault();
+    $(this).find('button[type="submit"]').attr("disabled", true);
+    $(this).loading();
+    callAPI(
+      $(this).attr("action"),
+      $(this).attr("method"),
+      new FormData(this),
+      $(this).find("input,textarea,select").filter("[required]").length,
+      3,
+      function () {
+        $("#updateTwitch-form").loaded();
+        $("#updateTwitch-form").find('button[type="submit"]').attr("disabled", false);
+      },
+      function () {
+        $("#updateTwitch-form").find('button[type="submit"]').attr("disabled", false);
+        $("#updateTwitch-form").loaded();
+      }
     );
   });
 }
