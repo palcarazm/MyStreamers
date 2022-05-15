@@ -59,6 +59,7 @@ CREATE TABLE IF NOT EXISTS users
   bloqueado      BOOLEAN      NOT NULL DEFAULT FALSE COMMENT 'Indicador de bloqueado',
   descripcion    LONGTEXT     NULL     COMMENT 'Descripción del perfil público de usuario',
   perfil_publico BOOLEAN      NULL     COMMENT 'Indicador de perfil público',
+  twitch_user    VARCHAR(25)  NULL     COMMENT 'Nombre de usuario de Twitch',
   PRIMARY KEY (PK_id_user)
 ) COMMENT 'Tabla de usuarios';
 
@@ -70,6 +71,9 @@ ALTER TABLE users
 
 ALTER TABLE users
   ADD CONSTRAINT UQ_imagen UNIQUE (imagen);
+
+ALTER TABLE users
+  ADD CONSTRAINT UQ_twitch_user UNIQUE (twitch_user);
 
 CREATE TABLE IF NOT EXISTS users_x_enlaces
 (

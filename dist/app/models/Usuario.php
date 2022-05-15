@@ -13,7 +13,7 @@ class Usuario extends ActiveRecord
     protected static String $image = 'imagen';
     protected static String $imageDefault = '/user.png';
     protected static String $defaultOrder = 'PK_id_user';
-    protected static array $colDB = ['PK_id_user', 'username', 'email', 'pass', 'actualizado', 'FK_id_rol', 'otp', 'otp_valid', 'imagen', 'bloqueado', 'descripcion', 'perfil_publico'];
+    protected static array $colDB = ['PK_id_user', 'username', 'email', 'pass', 'actualizado', 'FK_id_rol', 'otp', 'otp_valid', 'imagen', 'bloqueado', 'descripcion', 'perfil_publico', 'twitch_user'];
     protected static String $PK = 'PK_id_user';
 
     protected int|null $PK_id_user;
@@ -29,6 +29,7 @@ class Usuario extends ActiveRecord
     protected bool|null $bloqueado;
     public string|null $descripcion;
     protected bool|null $perfil_publico;
+    public string|null $twitch_user;
 
     public function __construct($args = [])
     {
@@ -44,6 +45,7 @@ class Usuario extends ActiveRecord
         $this->bloqueado = is_null($args['bloqueado'] ?? null) ? null : (bool) $args['bloqueado'];
         $this->descripcion = is_null($args['descripcion'] ?? null) ? null : (string) $args['descripcion'];
         $this->perfil_publico = is_null($args['perfil_publico'] ?? null) ? null : (bool) $args['perfil_publico'];
+        $this->twitch_user = is_null($args['twitch_user'] ?? null) ? null : (string) $args['twitch_user'];
     }
 
     /**
@@ -177,6 +179,18 @@ class Usuario extends ActiveRecord
     }
 
     /**
+     * Cambia el usuario de Twitch 
+     *
+     * @param String $twitch_user Usuario de Twitch
+     * @return boolean Completado con éxito (Si/No)
+     */
+    public function setTwitch(String $twitch_user): bool
+    {
+        $this->twitch_user = $twitch_user;
+        return $this->save();
+    }
+
+    /**
      * Crea un objeto con los datos indicados
      *
      * @param mixed $record
@@ -231,6 +245,23 @@ class Usuario extends ActiveRecord
             }
         }
         $query .= " WHERE perfil_publico = 1";
+        return self::query($query);
+    }
+
+    /**
+     * Obtiene los usuarios con perfil público activo con Twitch
+     *
+     * @return array|null
+     */
+    public static function findActiveStreamProfiles(): array|null
+    {
+        $query = "SELECT * FROM " . static::$table;
+        if (!empty(static::$joins)) {
+            foreach (static::$joins as $table => $FK) {
+                $query .= " INNER JOIN " . $table . " ON FK_" . $FK . " = PK_"  . $FK;
+            }
+        }
+        $query .= " WHERE perfil_publico = 1 AND twitch_user IS NOT NULL";
         return self::query($query);
     }
 
@@ -318,7 +349,7 @@ class Usuario extends ActiveRecord
      *
      * @return void
      */
-    public function printCard(): void
+    public function printCard($link = 'PROFILE'): void
     {
         include TEMPLATES_DIR . '/user/public-card.php';
     }
