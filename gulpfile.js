@@ -12,8 +12,10 @@ const prettyData = require('gulp-pretty-data');
 const paths = {
   globalcss: { src: "src/css/global/*.css", dest: "./dist/public/css" },
   admincss: { src: "src/css/admin/*.css", dest: "./dist/public/css" },
+  publiccss: { src: "src/css/public/*.css", dest: "./dist/public/css" },
   globaljs: { src: "src/js/global/*.js", dest: "./dist/public/js" },
   adminjs: { src: "src/js/admin/*.js", dest: "./dist/public/js" },
+  publicjs: { src: "src/js/public/*.js", dest: "./dist/public/js" },
   theme: { src: "src/theme/*.css", dest: "./dist/public/themes/mystreamers" },
   sql: {src: "src/sql/*.sql",dest:"./dist/config"}
 };
@@ -37,8 +39,12 @@ function globalcss() {
 function admincss() {
   return css(paths.admincss,"admin");
 }
+function publiccss() {
+  return css(paths.publiccss,"public");
+}
 exports.globalcss = globalcss;
 exports.admincss = admincss;
+exports.publiccss = publiccss;
 
 /* COMPILACIÓN DE THEME
 ========================== */
@@ -74,8 +80,12 @@ function globaljs() {
 function adminjs() {
   return js(paths.adminjs,"admin");
 }
+function publicjs() {
+  return js(paths.publicjs,"public");
+}
 exports.globaljs = globaljs;
 exports.adminjs = adminjs;
+exports.publicjs = publicjs;
 
 /* COMPILACIÓN SQL
 ========================== */
@@ -98,8 +108,10 @@ function watchDev() {
   watch(paths.globaljs.src, globaljs);
   watch(paths.admincss.src, admincss);
   watch(paths.adminjs.src, adminjs);
+  watch(paths.publicjs.src, publicjs);
+  watch(paths.publiccss.src, publiccss);
   watch(paths.sql.src, sql);
   watch(paths.theme.src, theme);
 }
 exports.default = watchDev;
-exports.build = parallel(globalcss, globaljs, admincss, adminjs, sql, theme);
+exports.build = parallel(globalcss, globaljs, admincss, adminjs, publiccss, publicjs, sql, theme);

@@ -18,6 +18,7 @@ use Model\Sitio;
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.1.0/css/adminlte.min.css" integrity="sha512-mxrUXSjrxl8vm5GwafxcqTrEwO1/oBNU25l20GODsysHReZo4uhVISzAKzaABH6/tTfAxZrY2FprmeAP5UZY8A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <!-- My Streamers Style -->
   <link rel="stylesheet" href="/css/main.min.css">
+  <link rel="stylesheet" href="/css/public.min.css">
 </head>
 
 <body class="hold-transition layout-top-nav layout-navbar-fixed">
@@ -88,5 +89,6 @@ use Model\Sitio;
 <script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.1.0/js/adminlte.min.js" integrity="sha512-AJUWwfMxFuQLv1iPZOTZX0N/jTCIrLxyZjTRKQostNU71MzZTEPHjajSK20Kj1TwJELpP7gl+ShXw5brpnKwEg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <!-- My Streamers -->
 <script src="/js/main.min.js"></script>
+<script src="/js/public.min.js"></script>
 </body>
 </html>
