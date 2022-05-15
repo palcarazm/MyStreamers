@@ -116,6 +116,26 @@ foreach($enlacesUser as $enlace){
                                 <!-- /.card-footer-->
                             </form>
                         </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Emisiones en directo</h3>
+                            </div>
+                            <form action="/api/user/v1/profile/streams<?php echo '?id=' . $usuario->getID(); ?>" method="PUT" class="border-secondary" id="profile-streams-form">
+                                <div class="card-body">
+                                        <div class="form-group row">
+                                        <label for="twitch" class="col-auto col-form-label">Ususarios de Twitch*</label>
+                                        <div class="col">
+                                            <input type="text" class="form-control" id="twitch" name="twitch" placeholder="Nombre de usuario" value="<?php echo $usuario->twitch_user ?? ''; ?>" minlength="4" maxlength="10" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /.card-body -->
+                                <div class="card-footer">
+                                    <button type="submit" class="btn btn-primary d-block ml-auto mr-0"><i class="fas fa-save"></i> Guardar</button>
+                                </div>
+                                <!-- /.card-footer-->
+                            </form>
+                        </div>
                     <?php endif; ?>
                 </div>
             <?php endif; ?>

@@ -873,4 +873,129 @@ class UserApi
         // Mensajes
         $api->send(200, 'Se ha desbloqueado el perfil público al usuario.', new stdClass());
     }
+
+    /**
+     * Api de establecer fuentes de emisión en directo
+     *
+     * @param Router $router
+     * @return void
+     */
+    public static function putProfileStreams(Router $router): void
+    {
+        $api = new Api(
+            $router,
+            'PUT',
+            array(
+                array(
+                    'name' => 'twitch',
+                    'required' => true,
+                    'type' => 'string',
+                    'min' => 4,
+                    'max' => 25
+                )
+            ),
+            array(
+                array(
+                    'name' => 'id',
+                    'required' => true,
+                    'type' => 'integer'
+                )
+            ),
+            array(Api::AUTH_SELF, Api::AUTH_TOKEN)
+        );
+
+        // Valida campos requeridos
+        if (!$api->validate()) {
+            return;
+        }
+
+        // Autentifica al usuario
+        if (!$api->auth(self::SCOPE, $api->query['id'])) {
+            return;
+        }
+
+        // General un token de Twitch
+        try {
+            $client = new Client(['headers' => array(
+                'Content-Type'     => 'application/json',
+                'Accept'     => 'application/json'
+            )]);
+            $res = $client->request(
+                "POST",
+                "https://id.twitch.tv/oauth2/token",
+                [
+                    "json" => array(
+                        'client_id' => TWITCH_CLIENT_ID,
+                        'client_secret' => TWITCH_CLIENT_SECRET,
+                        'grant_type' => 'client_credentials'
+                    ),
+                    'http_errors' => false
+                ]
+            );
+
+            if ($res->getStatusCode() != 200) {
+                $api->send(500, 'Se produjo un error al contactar con Twitch', new stdClass());
+                return;
+            }else{
+                $bodyout = json_decode($res->getBody()->getContents());
+
+                // Verificar si el usaurio existe en Twitch
+                try {
+                    $client = new Client(['headers' => array(
+                        'Content-Type'     => 'application/json',
+                        'Accept'     => 'application/json',
+                        'Client-id' => TWITCH_CLIENT_ID,
+                        'Authorization' => 'Bearer ' . $bodyout->access_token
+
+                    )]);
+                    $res = $client->request(
+                        "GET",
+                        "https://api.twitch.tv/helix/users",
+                        [
+                            "query" => array(
+                                'login' => $api->in['twitch']
+                            ),
+                            'http_errors' => false
+                        ]
+                    );
+        
+                    if ($res->getStatusCode() != 200) {
+                       
+        
+                        $api->send(500, 'Se produjo un error al contactar con Twitch', new stdClass());
+                        return;
+                    }else{
+                        $bodyout = json_decode($res->getBody()->getContents());
+                        if (count($bodyout->data) != 1) {
+                            $api->send(500, 'Usuario no encontrado en Twitch.', new stdClass());
+                            return;
+                        }
+                    }
+                } catch (\Exception $e) {
+                    $api->send(500, 'Se produjo un error al contactar con Twitch', new stdClass());
+                    return;
+                }
+            }
+
+        } catch (\Exception $e) {
+            $api->send(500, 'Se produjo un error al contactar con Twitch', new stdClass());
+            return;
+        }
+
+        // Buscar usuario filtrando varaible
+        $usuario = Usuario::find($api->query['id']);
+        if (is_null($usuario)) {
+            $api->send(500, 'Usuario no encontrado.', new stdClass());
+            return;
+        }
+
+        // Graudar información del perfil
+        if (!$usuario->setTwitch($api->in['twitch'])) {
+            $api->sendErrorDB($usuario->errors());
+            return;
+        }
+
+        // Mensajes
+        $api->send(200, 'Fuentes de emisión en directo establecidas.', new stdClass());
+    }
 }
