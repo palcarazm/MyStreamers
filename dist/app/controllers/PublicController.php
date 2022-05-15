@@ -27,7 +27,10 @@ class PublicController
      */
     public static function index(Router $router)
     {
-        $router->render('public/index', 'layout-public', array('title' => 'Inicio'));
+        $router->render('public/index', 'layout-public', array(
+            'title' => 'Inicio',
+            'participantes' => Usuario::findActiveStreamProfiles()
+        ));
     }
 
     /**
@@ -83,6 +86,7 @@ class PublicController
             'title' => 'Participantes',
             'archivo_titulo' => 'Participantes',
             'archivo_descripcion' => null,
+            'archivo_item' =>'participante',
             'archivo' => Usuario::findActiveProfiles()
         ));
     }

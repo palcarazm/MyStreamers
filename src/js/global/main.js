@@ -106,14 +106,15 @@ function ajaxCall(
   authorization = null
 ) {
   try {
-    if (method.toUpperCase() == "GET") {
-      $.get(uri)
-        .beforeSend(function (xhr) {
-          if (authorization != null) {
-            xhr.setRequestHeader("Authorization", authorization);
-          }
-        })
-        .done(function (data) {
+     if (method.toUpperCase() == "GET") {
+      $.ajax({
+        type: method,
+        url: uri,
+        contentType: false,
+        processData: false,
+        async: true,
+        cache: false,
+        success: function (data) {
           if (success == null) {
             if (verbose > 2) {
               swal({
@@ -143,7 +144,7 @@ function ajaxCall(
                 }
               } else {
                 try {
-                  swal({
+                      swal({
                     type: "success",
                     title: "Éxito",
                     html: data.message,
@@ -163,15 +164,15 @@ function ajaxCall(
                 success();
               } else {
                 try {
-                  success(data);
+                      success(data);
                 } catch (error) {
                   success("");
                 }
               }
             }
           }
-        })
-        .fail(function (data) {
+        },
+        error: function (data) {
           if (error == null) {
             if (verbose > 1) {
               swal({
@@ -223,8 +224,14 @@ function ajaxCall(
               }
             }
           }
-        });
-    } else {
+        },
+        beforeSend: function (xhr) {
+          if (authorization != null) {
+            xhr.setRequestHeader("Authorization", authorization);
+          }
+        },
+      });
+    } else { 
       $.ajax({
         type: method,
         data: JSON.stringify(data),
@@ -264,7 +271,7 @@ function ajaxCall(
                 }
               } else {
                 try {
-                  swal({
+                      swal({
                     type: "success",
                     title: "Éxito",
                     html: data.message,
@@ -284,7 +291,7 @@ function ajaxCall(
                 success();
               } else {
                 try {
-                  success(data);
+                      success(data);
                 } catch (err) {
                   success("");
                 }

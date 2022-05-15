@@ -11,6 +11,7 @@ use Controllers\AdminController;
 use Apis\ConfigurationApi;
 use Apis\ComunicationApi;
 use Apis\AuthentificationApi;
+use Apis\StreamsApi;
 use Apis\UserApi;
 use Model\ActiveRecord;
 use Model\Rol;
@@ -57,6 +58,9 @@ $router->add('PUT','/api/user/v1/profile/streams',[UserApi::class,'putProfileStr
 $router->add('POST','/api/user/v1/profile',[UserApi::class,'postProfile']);
 $router->add('PATCH','/api/user/v1/profile/lock',[UserApi::class,'lockProfile']);
 $router->add('PATCH','/api/user/v1/profile/unlock',[UserApi::class,'unlockProfile']);
+
+// API STREAMS
+$router->add('GET','/api/streams/v1/status',[StreamsApi::class, 'getStatus']);
 
 // Administración
 /// Perfil
