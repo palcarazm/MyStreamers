@@ -3,6 +3,7 @@
 namespace Controllers;
 
 use Model\Rol;
+use Model\Sitio;
 use Model\Usuario;
 use Router\Router;
 
@@ -30,6 +31,36 @@ class PublicController
         $router->render('public/index', 'layout-public', array(
             'title' => 'Inicio',
             'participantes' => Usuario::findActiveStreamProfiles()
+        ));
+    }
+
+    /**
+     * Controlador de la página de busca
+     *
+     * @param Router $router
+     * @return void
+     */
+    public static function buscar(Router $router)
+    {
+        $querySchema = array(
+            array(
+                'name' => 'search',
+                'required' => true,
+                'type' => 'string'
+            )
+        );
+        if (!$router->validate($_GET, $querySchema)) {
+            $router->renderError();
+            return;
+        }
+        $resultados = Sitio::search($_GET['search']);
+        $desc = empty($resultados)?'No se han encontrado resultados en esta búsqueda':null;
+        $router->render('public/archivo', 'layout-public', array(
+            'title' => 'Busqueda',
+            'archivo_titulo' => 'Resultados de busqueda',
+            'archivo_descripcion' => $desc,
+            'archivo_item' =>'registro',
+            'archivo' => $resultados
         ));
     }
 

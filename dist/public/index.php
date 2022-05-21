@@ -78,6 +78,7 @@ $router->add('GET','/admin/usuarios/enlaces/listar',[AdminController::class,'lin
 
 // Publicas
 $router->add('GET','/',[PublicController::class, 'index']);
+$router->add('GET','/buscar',[PublicController::class, 'buscar']);
 $router->add('GET','/participantes',[PublicController::class, 'participantes']);
 $router->add('GET','/participantes/ficha',[PublicController::class, 'participante']);
 

@@ -9,6 +9,7 @@ class ActiveRecord
     protected static mysqli $db;
     protected static String $table = '';
     protected static String $PK = '';
+    protected static array $searchTerm = [];
     protected static String $date = '';
     protected static array $joins = [];
     protected static array $constraints = [];
@@ -354,6 +355,36 @@ class ActiveRecord
         $query .= " WHERE " . static::$PK . " = ${id}";
         $resultado = self::query($query);
         return array_shift($resultado);
+    }
+
+    /** Consultar registros que coincidan con los campos de busqueda dado un patrón   
+     *
+     * @param  string $pattern
+     * @return array
+     */
+    public static function search(string $pattern): array
+    {
+        if (!empty(static::$searchTerm)) {
+            $pattern = '%' . str_replace(' ', '%', $pattern) . '%';
+            $lastTerm = count(static::$searchTerm) - 1;
+            $query = "SELECT * FROM " . static::$table;
+            if (!empty(static::$joins)) {
+                foreach (static::$joins as $table => $FK) {
+                    $query .= " INNER JOIN " . $table . " ON FK_" . $FK . " = PK_"  . $FK;
+                }
+            }
+            $query .= " WHERE ";
+            foreach (static::$searchTerm as $index => $term) {
+                $query .= $term . " like '" . $pattern . "'";
+                if($index != $lastTerm){
+                    $query .= " OR ";
+                }
+            }
+            $resultado = self::query($query);
+        } else {
+            $resultado = [];
+        }
+        return $resultado;
     }
 
     /**

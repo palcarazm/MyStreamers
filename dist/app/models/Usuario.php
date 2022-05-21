@@ -15,6 +15,7 @@ class Usuario extends ActiveRecord
     protected static String $defaultOrder = 'PK_id_user';
     protected static array $colDB = ['PK_id_user', 'username', 'email', 'pass', 'actualizado', 'FK_id_rol', 'otp', 'otp_valid', 'imagen', 'bloqueado', 'descripcion', 'perfil_publico', 'twitch_user'];
     protected static String $PK = 'PK_id_user';
+    protected static array $searchTerm = ['username'];
 
     protected int|null $PK_id_user;
     public string $username;

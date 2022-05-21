@@ -39,9 +39,9 @@ use Model\Sitio;
       <div class="collapse navbar-collapse order-3" id="navbarCollapse">
       <?php include TEMPLATES_DIR . '/menu/public.php' ?>
         <!-- SEARCH FORM -->
-        <form class="form-inline ml-auto">
+        <form class="form-inline ml-auto" id="search-form" method="get" action="/buscar">
           <div class="input-group input-group-sm">
-            <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
+            <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search" name="search">
             <div class="input-group-append">
               <button class="btn btn-navbar" type="submit">
                 <i class="fas fa-search"></i>

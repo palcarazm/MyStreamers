@@ -95,4 +95,16 @@ class Sitio extends ActiveRecord
     {
         return $record;
     }
+
+    /**
+     * Devuelve los objetos que coinciden con un patron
+     *
+     * @param string $pattern
+     * @return void
+     * @override
+     */
+    public static function search(string $pattern): array
+    {
+        return array_merge([], Usuario::search($pattern));
+    }
 }
