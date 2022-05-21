@@ -74,7 +74,7 @@ use Model\Sitio;
   <footer class="main-footer">
     <!-- To the right -->
     <div class="float-right d-none d-sm-inline">
-    Fuciona con <b>MyStreamers <?php echo VERSION ?></b>
+    Fuciona con <a href="http://mystreamers.alcarazm.es/?host=<?php echo $_SERVER['HTTP_HOST']; ?>&version=<?php echo VERSION; ?>" target="_blank" rel="noopener noreferrer"><b>MyStreamers <?php echo VERSION ?></b></a>
     </div>
     <!-- Default to the left -->
   </footer>

@@ -163,7 +163,7 @@
 
   <footer class="main-footer">
     <div class="float-right d-none d-sm-block">
-      Fuciona con <b>MyStreamers <?php echo VERSION ?></b>
+      Fuciona con <a href="http://mystreamers.alcarazm.es/?host=<?php echo $_SERVER['HTTP_HOST']; ?>&version=<?php echo VERSION; ?>" target="_blank" rel="noopener noreferrer"><b>MyStreamers <?php echo VERSION ?></b></a>
     </div>
     Desarrollado en base a <a href="https://adminlte.io" class="text-black">AdminLTE.io</a>
   </footer>
