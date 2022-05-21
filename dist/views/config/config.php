@@ -164,28 +164,31 @@
                     </div>
                     <fieldset class="mb-3">
                         <legend>Módulos</legend>
+                        <div class="alert alert-info" role="alert">
+                            Próximamente disponibles!
+                        </div>
                         <div class="form-row">
                             <div class=" col-md-6 col-lg-3">
                                 <div class="custom-control custom-switch">
-                                    <input type="checkbox" class="custom-control-input form-control" id="eventos" name="eventos" checked>
+                                    <input type="checkbox" class="custom-control-input form-control" id="eventos" name="eventos" disabled>
                                     <label class="custom-control-label" for="eventos">Eventos</label>
                                 </div>
                             </div>
                             <div class=" col-md-6 col-lg-3">
                                 <div class="custom-control custom-switch">
-                                    <input type="checkbox" class="custom-control-input form-control" id="noticias" name="noticias" checked>
+                                    <input type="checkbox" class="custom-control-input form-control" id="noticias" name="noticias" disabled>
                                     <label class="custom-control-label" for="noticias">Noticias</label>
                                 </div>
                             </div>
                             <div class=" col-md-6 col-lg-3">
                                 <div class="custom-control custom-switch">
-                                    <input type="checkbox" class="custom-control-input form-control" id="normas" name="normas" checked>
+                                    <input type="checkbox" class="custom-control-input form-control" id="normas" name="normas" disabled>
                                     <label class="custom-control-label" for="normas">Normas</label>
                                 </div>
                             </div>
                             <div class=" col-md-6 col-lg-3">
                                 <div class="custom-control custom-switch">
-                                    <input type="checkbox" class="custom-control-input form-control" id="enlaces" name="enlaces" checked>
+                                    <input type="checkbox" class="custom-control-input form-control" id="enlaces" name="enlaces" disabled>
                                     <label class="custom-control-label" for="enlaces">Enlaces personalizados</label>
                                 </div>
                             </div>
