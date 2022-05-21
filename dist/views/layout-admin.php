@@ -48,6 +48,7 @@
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
       <!-- Navbar Search -->
+      <!--
       <li class="nav-item">
         <a class="nav-link" data-widget="navbar-search" href="#" role="button">
           <i class="fas fa-search"></i>
@@ -68,8 +69,10 @@
           </form>
         </div>
       </li>
+      -->
 
       <!-- Notifications Dropdown Menu -->
+      <!--
       <li class="nav-item dropdown">
         <a class="nav-link" data-toggle="dropdown" href="#">
           <i class="far fa-bell"></i>
@@ -96,6 +99,7 @@
           <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
         </div>
       </li>
+      -->
 
       <!-- Logout Button -->
       <li class="nav-item">
