@@ -5,7 +5,7 @@ use Model\TipoEnlace;
 
 $enlacesUser = $usuario->getEnlaces();
 $enlacesUserTipo = [];
-foreach($enlacesUser as $enlace){
+foreach ($enlacesUser as $enlace) {
     $enlacesUserTipo[$enlace->tipo->tipo] = $enlace->enlace;
 }
 ?>
@@ -21,7 +21,7 @@ foreach($enlacesUser as $enlace){
 </section>
 
 <!-- Main content -->
-<section class="content">
+<main class="content">
     <div class="container-fluid">
         <div class="row">
             <div class="col">
@@ -100,14 +100,14 @@ foreach($enlacesUser as $enlace){
                             </div>
                             <form enctype="multipart/form-data" action="/api/user/v1/profile/links<?php echo '?id=' . $usuario->getID(); ?>" method="PUT" class="border-secondary" id="profile-links-form">
                                 <div class="card-body">
-                                    <?php foreach(TipoEnlace::all() as $tipoEnlace):?>
+                                    <?php foreach (TipoEnlace::all() as $tipoEnlace) : ?>
                                         <div class="form-group row">
-                                        <label for="tipoenlace-<?php echo $tipoEnlace->getID();?>" class="col-auto col-form-label" title="<?php echo $tipoEnlace->tipo?>"><?php $tipoEnlace->print();?></label>
-                                        <div class="col">
-                                            <input type="url" class="form-control" id="tipoenlace-<?php echo $tipoEnlace->getID();?>" name="<?php echo $tipoEnlace->getID();?>" placeholder="Enlace a tu perfil de <?php echo $tipoEnlace->tipo;?>" value="<?php echo $enlacesUserTipo[$tipoEnlace->tipo] ?? ''; ?>">
+                                            <label for="tipoenlace-<?php echo $tipoEnlace->getID(); ?>" class="col-auto col-form-label" title="<?php echo $tipoEnlace->tipo ?>"><?php $tipoEnlace->print(); ?></label>
+                                            <div class="col">
+                                                <input type="url" class="form-control" id="tipoenlace-<?php echo $tipoEnlace->getID(); ?>" name="<?php echo $tipoEnlace->getID(); ?>" placeholder="Enlace a tu perfil de <?php echo $tipoEnlace->tipo; ?>" value="<?php echo $enlacesUserTipo[$tipoEnlace->tipo] ?? ''; ?>">
+                                            </div>
                                         </div>
-                                    </div>
-                                    <?php endforeach;?>
+                                    <?php endforeach; ?>
                                 </div>
                                 <!-- /.card-body -->
                                 <div class="card-footer">
@@ -122,7 +122,7 @@ foreach($enlacesUser as $enlace){
                             </div>
                             <form action="/api/user/v1/profile/streams<?php echo '?id=' . $usuario->getID(); ?>" method="PUT" class="border-secondary" id="profile-streams-form">
                                 <div class="card-body">
-                                        <div class="form-group row">
+                                    <div class="form-group row">
                                         <label for="twitch" class="col-auto col-form-label">Ususarios de Twitch*</label>
                                         <div class="col">
                                             <input type="text" class="form-control" id="twitch" name="twitch" placeholder="Nombre de usuario" value="<?php echo $usuario->twitch_user ?? ''; ?>" minlength="4" maxlength="10" required>
@@ -141,4 +141,4 @@ foreach($enlacesUser as $enlace){
             <?php endif; ?>
         </div>
     </div>
-</section>
+</main>

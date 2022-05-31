@@ -15,7 +15,7 @@ use Model\Usuario;
 </section>
 
 <!-- Main content -->
-<section class="content">
+<main class="content">
 
     <!-- Default box -->
     <div class="card">
@@ -58,4 +58,4 @@ use Model\Usuario;
     </div>
     <!-- /.card -->
 
-</section>
+</main>

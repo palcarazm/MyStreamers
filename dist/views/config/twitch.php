@@ -10,7 +10,7 @@
 </section>
 
 <!-- Main content -->
-<section class="content">
+<main class="content">
 
     <!-- Default box -->
     <div class="card">
@@ -28,21 +28,21 @@
         </div>
         <form action="/api/config/v1/twitch" method="put" class="border-secondary step-body" id="updateTwitch-form">
             <div class="card-body">
-            <div class="alert alert-warning" role="alert">
-                        Dado que MyStreamers no requiere acceder a la información privada de su perfil, se recomiendo registrar la aplicación en una cuenta de twitch secundaria para que en caso de que ocurra un compromiso de seguridad sus datos no sean expuestos.
+                <div class="alert alert-warning" role="alert">
+                    Dado que MyStreamers no requiere acceder a la información privada de su perfil, se recomiendo registrar la aplicación en una cuenta de twitch secundaria para que en caso de que ocurra un compromiso de seguridad sus datos no sean expuestos.
+                </div>
+                <div class="form-group row">
+                    <label for="client_id" class="col-sm-3 col-md-2 col-form-label">Client ID</label>
+                    <div class="col-sm-9 col-md-10">
+                        <input type="text" class="form-control" id="client_id" name="client_id" placeholder="Client ID de la aplicación registrada en Twitch" value="<?php echo TWITCH_CLIENT_ID; ?>" required>
                     </div>
-                    <div class="form-group row">
-                        <label for="client_id" class="col-sm-3 col-md-2 col-form-label">Client ID</label>
-                        <div class="col-sm-9 col-md-10">
-                            <input type="text" class="form-control" id="client_id" name="client_id" placeholder="Client ID de la aplicación registrada en Twitch" value="<?php echo TWITCH_CLIENT_ID; ?>" required>
-                        </div>
+                </div>
+                <div class="form-group row">
+                    <label for="client_secret" class="col-sm-3 col-md-2 col-form-label">Client Secret</label>
+                    <div class="col-sm-9 col-md-10">
+                        <input type="text" class="form-control" secret="client_secret" name="client_secret" placeholder="Client Secret de la aplicación registrada en Twitch" value="<?php echo TWITCH_CLIENT_SECRET; ?>" required>
                     </div>
-                    <div class="form-group row">
-                        <label for="client_secret" class="col-sm-3 col-md-2 col-form-label">Client Secret</label>
-                        <div class="col-sm-9 col-md-10">
-                            <input type="text" class="form-control" secret="client_secret" name="client_secret" placeholder="Client Secret de la aplicación registrada en Twitch" value="<?php echo TWITCH_CLIENT_SECRET; ?>" required>
-                        </div>
-                    </div>
+                </div>
             </div>
             <!-- /.card-body -->
             <div class="card-footer">
@@ -53,4 +53,4 @@
     </div>
     <!-- /.card -->
 
-</section>
+</main>

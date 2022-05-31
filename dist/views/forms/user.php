@@ -14,7 +14,7 @@ use Model\Rol;
 </section>
 
 <!-- Main content -->
-<section class="content">
+<main class="content">
 
     <!-- Default box -->
     <div class="card">
@@ -102,4 +102,4 @@ use Model\Rol;
     </div>
     <!-- /.card -->
 
-</section>
+</main>

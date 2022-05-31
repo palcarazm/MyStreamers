@@ -10,7 +10,7 @@
 </section>
 
 <!-- Main content -->
-<section class="content">
+<main class="content">
 
     <!-- Default box -->
     <div class="card">
@@ -58,25 +58,29 @@
                     <div class="form-row">
                         <div class=" col-md-6 col-lg-3">
                             <div class="custom-control custom-switch">
-                                <input type="checkbox" class="custom-control-input form-control" id="eventos" name="eventos" <?php echo "disabled";//echo $eventos ? "checked" : ""; ?>>
+                                <input type="checkbox" class="custom-control-input form-control" id="eventos" name="eventos" <?php echo "disabled"; //echo $eventos ? "checked" : ""; 
+                                                                                                                                ?>>
                                 <label class="custom-control-label" for="eventos">Eventos</label>
                             </div>
                         </div>
                         <div class=" col-md-6 col-lg-3">
                             <div class="custom-control custom-switch">
-                                <input type="checkbox" class="custom-control-input form-control" id="noticias" name="noticias" <?php echo "disabled";//echo $noticias ? "checked" : ""; ?>>
+                                <input type="checkbox" class="custom-control-input form-control" id="noticias" name="noticias" <?php echo "disabled"; //echo $noticias ? "checked" : ""; 
+                                                                                                                                ?>>
                                 <label class="custom-control-label" for="noticias">Noticias</label>
                             </div>
                         </div>
                         <div class=" col-md-6 col-lg-3">
                             <div class="custom-control custom-switch">
-                                <input type="checkbox" class="custom-control-input form-control" id="normas" name="normas" <?php echo "disabled";//echo $normas ? "checked" : ""; ?>>
+                                <input type="checkbox" class="custom-control-input form-control" id="normas" name="normas" <?php echo "disabled"; //echo $normas ? "checked" : ""; 
+                                                                                                                            ?>>
                                 <label class="custom-control-label" for="normas">Normas</label>
                             </div>
                         </div>
                         <div class=" col-md-6 col-lg-3">
                             <div class="custom-control custom-switch">
-                                <input type="checkbox" class="custom-control-input form-control" id="enlaces" name="enlaces" <?php echo "disabled";//echo $enlaces ? "checked" : ""; ?>>
+                                <input type="checkbox" class="custom-control-input form-control" id="enlaces" name="enlaces" <?php echo "disabled"; //echo $enlaces ? "checked" : ""; 
+                                                                                                                                ?>>
                                 <label class="custom-control-label" for="enlaces">Enlaces personalizados</label>
                             </div>
                         </div>
@@ -92,4 +96,4 @@
     </div>
     <!-- /.card -->
 
-</section>
+</main>
