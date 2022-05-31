@@ -10,6 +10,19 @@ use Router\Router;
 class PublicController
 {
     /**
+     * Página de información de My Streamers
+     *
+     * @param Router $router
+     * @return void
+     */
+    public static function mystreamers(Router $router)
+    {
+        $router->render('mystreamers/mystreamers', 'layout-public', array(
+            'title' => 'Sobre My Streamers'
+        ));
+    }
+
+    /**
      * Controlador de la página de configuración
      *
      * @param Router $router
@@ -54,12 +67,12 @@ class PublicController
             return;
         }
         $resultados = Sitio::search($_GET['search']);
-        $desc = empty($resultados)?'No se han encontrado resultados en esta búsqueda':null;
+        $desc = empty($resultados) ? 'No se han encontrado resultados en esta búsqueda' : null;
         $router->render('public/archivo', 'layout-public', array(
             'title' => 'Busqueda',
             'archivo_titulo' => 'Resultados de busqueda',
             'archivo_descripcion' => $desc,
-            'archivo_item' =>'registro',
+            'archivo_item' => 'registro',
             'archivo' => $resultados
         ));
     }
@@ -88,13 +101,13 @@ class PublicController
             $router->renderError();
             return;
         }
-        if(!$usuario->isPublished()){
-            if(isAuth()){
-                if(!getAuthUser()->can(Rol::PERMS_USUARIOS)){
+        if (!$usuario->isPublished()) {
+            if (isAuth()) {
+                if (!getAuthUser()->can(Rol::PERMS_USUARIOS)) {
                     $router->renderError();
                     return;
                 }
-            }else{
+            } else {
                 $router->renderError();
                 return;
             }
@@ -117,7 +130,7 @@ class PublicController
             'title' => 'Participantes',
             'archivo_titulo' => 'Participantes',
             'archivo_descripcion' => null,
-            'archivo_item' =>'participante',
+            'archivo_item' => 'participante',
             'archivo' => Usuario::findActiveProfiles()
         ));
     }

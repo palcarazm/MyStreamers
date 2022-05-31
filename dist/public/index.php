@@ -63,6 +63,7 @@ $router->add('PATCH','/api/user/v1/profile/unlock',[UserApi::class,'unlockProfil
 $router->add('GET','/api/streams/v1/status',[StreamsApi::class, 'getStatus']);
 
 // Administración
+$router->add('GET','/admin',[AdminController::class,'mystreamers'],Rol::PERMS_BASIC);
 /// Perfil
 $router->add('GET','/admin/miperfil',[AdminController::class,'perfil'],Rol::PERMS_BASIC);
 /// Configuración
@@ -81,6 +82,7 @@ $router->add('GET','/',[PublicController::class, 'index']);
 $router->add('GET','/buscar',[PublicController::class, 'buscar']);
 $router->add('GET','/participantes',[PublicController::class, 'participantes']);
 $router->add('GET','/participantes/ficha',[PublicController::class, 'participante']);
+$router->add('GET','/mystreamers',[PublicController::class,'mystreamers']);
 
 /* ENROUTAR */
 if (is_file(__DIR__ . '/../config/config.php')) {

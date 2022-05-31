@@ -33,7 +33,7 @@
   <link rel="stylesheet" href="/css/main.min.css">
   <link rel="stylesheet" href="/css/admin.min.css">
 </head>
-<body class="hold-transition sidebar-mini">
+<body class="hold-transition sidebar-mini sidebar-collapse">
 <!-- Site wrapper -->
 <div class="wrapper">
   <!-- Navbar -->

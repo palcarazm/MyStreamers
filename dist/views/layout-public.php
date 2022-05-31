@@ -72,6 +72,7 @@ use Model\Sitio;
 
   <!-- Main Footer -->
   <footer class="main-footer">
+    <a href="/mystreamers">Acerca de MyStreamers</a>
     <!-- To the right -->
     <div class="float-right d-none d-sm-inline">
     Fuciona con <a href="http://mystreamers.alcarazm.es/?host=<?php echo $_SERVER['HTTP_HOST']; ?>&version=<?php echo VERSION; ?>" target="_blank" rel="noopener noreferrer"><b>MyStreamers <?php echo VERSION ?></b></a>

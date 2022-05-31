@@ -10,6 +10,19 @@ use Router\Router;
 class AdminController
 {
     /**
+     * Página de información de My Streamers
+     *
+     * @param Router $router
+     * @return void
+     */
+    public static function mystreamers(Router $router)
+    {
+        $router->render('mystreamers/mystreamers', 'layout-admin', array(
+            'title' => 'Sobre My Streamers'
+        ));
+    }
+
+    /**
      * Página de configuración del sitio
      *
      * @param Router $router
@@ -28,7 +41,7 @@ class AdminController
             'enlaces' => Sitio::isEnabled("enlaces")
         ));
     }
-    
+
     /**
      * Página de configuración de la conexión con Twitch
      *
@@ -114,9 +127,9 @@ class AdminController
             'title' => 'Listar Usuarios',
             'obj_type' => array(
                 'singular' => 'usuario',
-                'plural' => 'usuarios' 
+                'plural' => 'usuarios'
             ),
-            'header_list' => ['Usuario','E-Mail','Rol','Perfil','Gestión de perfil','Gestión de Usuario'],
+            'header_list' => ['Usuario', 'E-Mail', 'Rol', 'Perfil', 'Gestión de perfil', 'Gestión de Usuario'],
             'obj_list' => Usuario::all()
         ));
     }
@@ -177,9 +190,9 @@ class AdminController
             'title' => 'Listar tipo de enlaces del perfil público de usuario',
             'obj_type' => array(
                 'singular' => 'tipo de enlaces',
-                'plural' => 'tipos de enlaces' 
+                'plural' => 'tipos de enlaces'
             ),
-            'header_list' => ['Tipo de enlaces','Acciones'],
+            'header_list' => ['Tipo de enlaces', 'Acciones'],
             'obj_list' => TipoEnlace::all()
         ));
     }

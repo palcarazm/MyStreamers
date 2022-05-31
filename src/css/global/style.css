@@ -1,3 +1,4 @@
+p, li{text-align: justify;}
 .fs-1 {
   font-size: calc(1.375rem + 1.5vw) !important;
 }
