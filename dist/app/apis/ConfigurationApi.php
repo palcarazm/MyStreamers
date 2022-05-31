@@ -709,6 +709,120 @@ class ConfigurationApi
     }
 
     /**
+     * Establece la configuración de la conexión con Youtube
+     *
+     * @param Router $router
+     */
+    public static function postYoutube(Router $router): void
+    {
+        $api = new Api($router, 'POST', array(
+            array(
+                'name' => 'apiKey',
+                'required' => true,
+                'type' => 'string',
+            )
+        ));
+
+        // Valida configuración inicial
+        if (IS_CONFIG_YOUTUBE) {
+            $api->send(403, 'La configuración inicial de la conexión con YouTube ya ha sido efectuada y no puede volver a ejecutarse.', new stdClass());
+            return;
+        }
+
+        self::configYoutube($api);
+    }
+
+    /**
+     * Modifica la configuración de la conexión con Youtube
+     *
+     * @param Router $router
+     */
+    public static function putYoutube(Router $router): void
+    {
+        $api = new Api(
+            $router,
+            'PUT',
+            array(
+                array(
+                    'name' => 'apiKey',
+                    'required' => true,
+                    'type' => 'string',
+                )
+            ),
+            array(),
+            array('SESSION', 'TOKEN')
+        );
+
+        // Valida la autentificación
+        if (!$api->auth(self::SCOPE)) {
+            return;
+        }
+
+        self::configYoutube($api);
+    }
+
+    /**
+     * Configura la conexión con Youtube
+     *
+     * @param API $api
+     */
+    public static function configYoutube(API $api): void
+    {
+        // Valida campos requeridos
+        if (!$api->validate()) {
+            return;
+        }
+
+        // Intentar conexión con Twitch
+        try {
+            $client = new Client(['headers' => array(
+                'Content-Type'     => 'application/json',
+                'Accept'     => 'application/json'
+            )]);
+            $res = $client->request(
+                "GET",
+                "https://www.googleapis.com/youtube/v3/search",
+                [
+                    "query" => array(
+                        'key' => $api->in['apiKey'],
+                        'part' => 'id',
+                        'maxResults' => '1'
+                    ),
+                    'http_errors' => false
+                ]
+            );
+
+            if ($res->getStatusCode() != 200) {
+                $bodyout = json_decode($res->getBody()->getContents());
+
+                $api->send(500, 'Configuración no válida: ' . (isset($bodyout->error->message) ? $bodyout->error->message : ''), new stdClass());
+                return;
+            }
+        } catch (\Exception $e) {
+            $api->send(500, 'Se produjo un error al contactar con YouTube', new stdClass());
+            return;
+        }
+
+        $result = static::setValue('YOUTUBE_APIKEY', $api->in['apiKey']);
+
+        if (!$result) {
+            $api->send(500, 'Se ha producido un error al guardar los datos de configuración', new stdClass());
+            return;
+        }
+
+        if ($api->getMethod() == 'POST') {
+            if (!static::setValue('IS_CONFIG_YOUTUBE', true)) { // Bloqueo de la API
+                $api->send(202, 'No se ha conseguido bloquear el acceso a la API de configuración de la conexión con YouTube. Realice un bloqueo manual.', new stdClass());
+                return;
+            }
+            $api->send(201, 'Configuración de la configuración de la conexión con YouTube registrada.', new stdClass());
+        } else {
+            $api->send(200, 'Configuración de la configuración de la conexión con YouTube registrada.', new stdClass());
+        }
+        return;
+    }
+
+    /**
      * Verificar conexion con la base de datos
      * @param String $DB_HOST Host de conexion
      * @param String $DB_USER Usuario de conexion

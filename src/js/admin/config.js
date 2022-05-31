@@ -1,3 +1,5 @@
+const CONFIG_STEPS = 6;
+
 /** Configurar base de datos
  *
  */
@@ -16,7 +18,7 @@ function configDB() {
         $("#configDatabase.step").removeClass("current").addClass("done");
         $("#configDatabase.step h2").addClass("text-success");
         $("#configAdmin.step ").removeClass("todo").addClass("current");
-        $("#progreso").width("20%");
+        $("#progreso").width($("#progreso").width()+100/CONFIG_STEPS+'%');
       },
       function () {
         $("#configDatabase form").loaded();
@@ -47,7 +49,7 @@ function configAdmin() {
         $("#configEmail form #adminEmail").val(
           $("#configAdmin form #email").val()
         );
-        $("#progreso").width("40%");
+        $("#progreso").width($("#progreso").width()+100/CONFIG_STEPS+'%');
       },
       function () {
         $("#configAdmin form").loaded();
@@ -102,7 +104,7 @@ function configEmail() {
                   $("#configSite.step ")
                     .removeClass("todo")
                     .addClass("current");
-                  $("#progreso").width("60%");
+                  $("#progreso").width($("#progreso").width()+100/CONFIG_STEPS+'%');
                 });
               },
               error: function (data) {
@@ -167,7 +169,7 @@ function configSite() {
         $("#configSite.step").removeClass("current").addClass("done");
         $("#configSite.step h2").addClass("text-success");
         $("#configTwitch.step ").removeClass("todo").addClass("current");
-        $("#progreso").width("80%");
+        $("#progreso").width($("#progreso").width()+100/CONFIG_STEPS+'%');
       },
       function () {
         $("#configSite form").loaded();
@@ -195,11 +197,39 @@ function configSite() {
         $("#configTwitch.step").removeClass("current").addClass("done");
         $("#configTwitch.step h2").addClass("text-success");
         $("#finalMessage.step ").removeClass("todo").addClass("current");
-        $("#progreso").width("100%");
+        $("#progreso").width($("#progreso").width()+100/CONFIG_STEPS+'%');
       },
       function () {
         $("#configTwitch form").loaded();
         $("#configTwitch form").find('button[type="submit"]').attr("disabled", false);
+      }
+    );
+  });
+}
+
+/**
+ * Configura conexión con YouTube
+ */
+ function configYoutube() {
+  $("#configYoutube form").on("submit", function (e) {
+    e.preventDefault();
+    $(this).find('button[type="submit"]').attr("disabled", true);
+    $(this).loading();
+    callAPIverbose(
+      $(this).attr("action"),
+      $(this).attr("method"),
+      new FormData(this),
+      $(this).find("input,textarea,select").filter("[required]").length,
+      function () {
+        $("#configYoutube form").loaded();
+        $("#configYoutube.step").removeClass("current").addClass("done");
+        $("#configYoutube.step h2").addClass("text-success");
+        $("#finalMessage.step ").removeClass("todo").addClass("current");
+        $("#progreso").width("100%");
+      },
+      function () {
+        $("#configYoutube form").loaded();
+        $("#configYoutube form").find('button[type="submit"]').attr("disabled", false);
       }
     );
   });
@@ -275,6 +305,32 @@ function updateTwitch() {
       function () {
         $("#updateTwitch-form").find('button[type="submit"]').attr("disabled", false);
         $("#updateTwitch-form").loaded();
+      }
+    );
+  });
+}
+
+/**
+ * Actualiza la configuración de la conexión con YouTube
+ */
+function updateYoutube() {
+  $("#updateYoutube-form").on("submit", function (e) {
+    e.preventDefault();
+    $(this).find('button[type="submit"]').attr("disabled", true);
+    $(this).loading();
+    callAPI(
+      $(this).attr("action"),
+      $(this).attr("method"),
+      new FormData(this),
+      $(this).find("input,textarea,select").filter("[required]").length,
+      3,
+      function () {
+        $("#updateYoutube-form").loaded();
+        $("#updateYoutube-form").find('button[type="submit"]').attr("disabled", false);
+      },
+      function () {
+        $("#updateYoutube-form").find('button[type="submit"]').attr("disabled", false);
+        $("#updateYoutube-form").loaded();
       }
     );
   });

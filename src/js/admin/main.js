@@ -13,6 +13,7 @@ $(function () {
       configEmail();
       configSite();
       configTwitch();
+      configYoutube();
       break;
     case "/login":
       togglePassword();
@@ -36,6 +37,9 @@ $(function () {
       break;
     case "/admin/config/twitch":
       updateTwitch();
+      break;
+    case "/admin/config/youtube":
+      updateYoutube();
       break;
     case "/admin/miperfil":
       configFileIntup();

@@ -20,7 +20,7 @@ $router = new Router;
 
 /* AÑADIR RUTAS */
 // Configuración
-if(!IS_CONFIG_TWITCH){$router->add('GET', '/config', [PublicController::class, 'config']);}
+if(!IS_CONFIG_YOUTUBE){$router->add('GET', '/config', [PublicController::class, 'config']);}
 $router->add('POST', '/api/config/v1/database', [ConfigurationApi::class, 'postDatabase']);
 $router->add('POST', '/api/config/v1/admin', [ConfigurationApi::class, 'postAdmin']);
 $router->add('POST', '/api/config/v1/email', [ConfigurationApi::class, 'postEmail']);
@@ -29,6 +29,8 @@ $router->add('POST', '/api/config/v1/site', [ConfigurationApi::class, 'postSite'
 $router->add('PUT', '/api/config/v1/site', [ConfigurationApi::class, 'putSite']);
 $router->add('POST', '/api/config/v1/twitch', [ConfigurationApi::class, 'postTwitch']);
 $router->add('PUT', '/api/config/v1/twitch', [ConfigurationApi::class, 'putTwitch']);
+$router->add('POST', '/api/config/v1/youtube', [ConfigurationApi::class, 'postYoutube']);
+$router->add('PUT', '/api/config/v1/youtube', [ConfigurationApi::class, 'putYoutube']);
 
 // Comunicación
 $router->add('POST','/api/com/v1/email',[ComunicationApi::class,'postEmail']);
@@ -69,6 +71,7 @@ $router->add('GET','/admin/miperfil',[AdminController::class,'perfil'],Rol::PERM
 /// Configuración
 $router->add('GET','/admin/config/sitio',[AdminController::class,'configSitio'],Rol::PERMS_CONFIG);
 $router->add('GET','/admin/config/twitch',[AdminController::class,'configTwitch'],Rol::PERMS_CONFIG);
+$router->add('GET','/admin/config/youtube',[AdminController::class,'configYoutube'],Rol::PERMS_CONFIG);
 /// Usuarios
 $router->add('GET','/admin/usuarios/crear',[AdminController::class,'userAdd'],Rol::PERMS_USUARIOS);
 $router->add('GET','/admin/usuarios/editar',[AdminController::class,'userEdit'],Rol::PERMS_USUARIOS);

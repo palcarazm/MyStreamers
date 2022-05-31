@@ -76,6 +76,12 @@ if (!is_null($usuario)) :
                             <p>Twitch</p>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="/admin/config/youtube" class="nav-link">
+                            <i class="nav-icon fab fa-youtube"></i>
+                            <p>YouTube</p>
+                        </a>
+                    </li>
                 </ul>
             </li>
         <?php endif; ?>

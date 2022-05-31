@@ -56,6 +56,19 @@ class AdminController
     }
 
     /**
+     * Página de configuración de la conexión con YouTube
+     *
+     * @param Router $router
+     * @return void
+     */
+    public static function configYoutube(Router $router)
+    {
+        $router->render('config/youtube', 'layout-admin', array(
+            'title' => 'Configuración de YouTube'
+        ));
+    }
+
+    /**
      * Página de perfil de usuario
      *
      * @param Router $router

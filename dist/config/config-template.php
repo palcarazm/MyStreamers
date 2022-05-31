@@ -21,12 +21,16 @@ define('SMTP_NAME','SMTP_NAME');
 define('TWITCH_CLIENT_ID','TWITCH_CLIENT_ID');
 define('TWITCH_CLIENT_SECRET','TWITCH_CLIENT_SECRET');
 
+/* INFORMACIÓN DE LA CONEXIÓN CON TWITCH */
+define('YOUTUBE_APIKEY','YOUTUBE_APIKEY');
+
 /* INFORMACIÓN DE ESTADO DE CONFIGURACION */
 define('IS_CONFIG_DATABASE',false);
 define('IS_CONFIG_ADMIN',false);
 define('IS_CONFIG_EMAIL',false);
 define('IS_CONFIG_SITE',false);
 define('IS_CONFIG_TWITCH',false);
+define('IS_CONFIG_YOUTUBE',false);
 
 /* DIRECTORIOS */
 define('APP_FILE',__DIR__ . '/../includes/app.php');

@@ -225,6 +225,29 @@
             </form>
         </li>
         <!-- Fin twitchConfig -->
+        <!-- Inicio youtubeConfig -->
+        <li class="list-group-item step current" id="configYoutube">
+            <h2 class="card-subtitle"><i></i><span>Configuración de la conexión con YouTube</span></h2>
+            <form action="/api/config/v1/youtube" method="post" class="border-secondary step-body">
+                <div class="card-body pt-2 pb-2">
+                    <p class="card-text">Ahora con la conexión con YouTube. Debes registrar una aplicación en la consola de desarrolladores de Google. <a href="https://developers.google.com/youtube/v3/getting-started?hl=es" target="_blank" rel="noopener noreferrer">Aquí tienes la guía de Google</a>.</p>
+                    <div class="alert alert-danger" role="alert">
+                        No olvide activar el servicio YouTube Data API v3 en el proyecto de la consola de desarrolladores de Google desde el menú API y servicios > Biblioteca.
+                    </div>
+                    <div class="alert alert-warning" role="alert">
+                        Dado que MyStreamers no requiere acceder a la información privada de su perfil, se recomiendo registrar la aplicación en una cuenta de Google secundaria para que en caso de que ocurra un compromiso de seguridad sus datos no sean exuestos
+                    </div>
+                    <div class="form-group row">
+                        <label for="apiKey" class="col-sm-3 col-md-2 col-form-label">API Key *</label>
+                        <div class="col-sm-9 col-md-10">
+                            <input type="text" class="form-control" id="apiKey" name="apiKey" placeholder="API Key de la aplicación registrada en Google" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary d-block ml-auto mr-0">Registrar información de conexión</button>
+                </div>
+            </form>
+        </li>
+        <!-- Fin youtubeConfig -->
         <!-- Inicio finalMessage -->
         <li class="list-group-item step todo" id="finalMessage">
             <div class="step-body">
