@@ -74,7 +74,7 @@
                         <li class="list-group-item"><a href="https://github.com/phpmailer/phpmailer" target="_blank" rel="noopener noreferrer">PHP Mailer - LGPL 2.1 License</a></li>
                         <li class="list-group-item"><a href="https://github.com/guzzle/guzzle/" target="_blank" rel="noopener noreferrer">Guzzle - MIT License</a></li>
                         <li class="list-group-item"><a href="https://github.com/firebase/php-jwt" target="_blank" rel="noopener noreferrer">Firebase PHP JWT - BSD 3 Clause License</a></li>
-                        <li class="list-group-item"><a href="https://github.com/intervention/image" target="_blank" rel="noopener noreferrer">intervention Image - MIT License</a></li>
+                        <li class="list-group-item"><a href="https://github.com/intervention/image" target="_blank" rel="noopener noreferrer">Intervention Image - MIT License</a></li>
                     </ul>
                 </div>
             </div>
