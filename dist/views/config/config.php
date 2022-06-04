@@ -226,7 +226,7 @@
         </li>
         <!-- Fin twitchConfig -->
         <!-- Inicio youtubeConfig -->
-        <li class="list-group-item step current" id="configYoutube">
+        <li class="list-group-item step todo" id="configYoutube">
             <h2 class="card-subtitle"><i></i><span>Configuración de la conexión con YouTube</span></h2>
             <form action="/api/config/v1/youtube" method="post" class="border-secondary step-body">
                 <div class="card-body pt-2 pb-2">

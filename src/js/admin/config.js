@@ -196,7 +196,7 @@ function configSite() {
         $("#configTwitch form").loaded();
         $("#configTwitch.step").removeClass("current").addClass("done");
         $("#configTwitch.step h2").addClass("text-success");
-        $("#finalMessage.step ").removeClass("todo").addClass("current");
+        $("#configYoutube.step ").removeClass("todo").addClass("current");
         $("#progreso").width($("#progreso").width()+100/CONFIG_STEPS+'%');
       },
       function () {

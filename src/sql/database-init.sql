@@ -1,5 +1,14 @@
-/* CONFIGURACIÓN INICIAL */
-        
+/* CONFIGURACIÓN INICIAL */            
+CREATE TABLE IF NOT EXISTS Canales
+(
+  PK_id_canal CHAR(24) NOT NULL COMMENT 'ID de canal de YouTube',
+  FK_id_user  INT(11)  NOT NULL COMMENT 'ID de usuario',
+  PRIMARY KEY (PK_id_canal)
+) COMMENT 'Tabla de canales de YouTube';
+
+ALTER TABLE Canales
+  ADD CONSTRAINT UQ_PK_id_canal UNIQUE (PK_id_canal);
+
 CREATE TABLE IF NOT EXISTS enlaces
 (
   PK_id_enlace INT(3)       NOT NULL AUTO_INCREMENT COMMENT 'ID del tipo de enlace',
@@ -82,6 +91,18 @@ CREATE TABLE IF NOT EXISTS users_x_enlaces
   enlace       VARCHAR(2083) NOT NULL COMMENT 'Dirrección del enlace'
 ) COMMENT 'Tabla de enlaces asociados a cada perfil de usuario';
 
+CREATE TABLE IF NOT EXISTS videos
+(
+  PK_id_video CHAR(11)     NOT NULL COMMENT 'Id de video de YouTube',
+  FK_id_user  INT(11)      NOT NULL COMMENT 'ID de usuario',
+  titulo      VARCHAR(100) NOT NULL COMMENT 'Título del video',
+  fecha       char(25)     NOT NULL COMMENT 'Fecha de publicación del video formato  ISO 8601',
+  PRIMARY KEY (PK_id_video)
+) COMMENT 'Tabla de videos de YouTube';
+
+ALTER TABLE videos
+  ADD CONSTRAINT UQ_PK_id_video UNIQUE (PK_id_video);
+
 ALTER TABLE users
   ADD CONSTRAINT FK_roles_TO_users
     FOREIGN KEY (FK_id_rol)
@@ -94,6 +115,16 @@ ALTER TABLE users_x_enlaces
 
 ALTER TABLE users_x_enlaces
   ADD CONSTRAINT FK_users_TO_users_x_enlaces
+    FOREIGN KEY (FK_id_user)
+    REFERENCES users (PK_id_user);
+
+ALTER TABLE Canales
+  ADD CONSTRAINT FK_users_TO_Canales
+    FOREIGN KEY (FK_id_user)
+    REFERENCES users (PK_id_user);
+
+ALTER TABLE videos
+  ADD CONSTRAINT FK_users_TO_videos
     FOREIGN KEY (FK_id_user)
     REFERENCES users (PK_id_user);
 
