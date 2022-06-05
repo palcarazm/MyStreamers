@@ -39,33 +39,33 @@ class Router
         $isPublic = is_null($perms);
 
         if ($fn) { // Página existe
-            if(!$isPublic){ //No es publica
+            if (!$isPublic) { //No es publica
                 if (!isAuth()) { // No está authentificado
                     header('Location:/login?dest=' . $currentURL);
                 }
-                if(!getAuthUser()->can($perms)){
-                    if(preg_match('/^\/api/',$currentURL)){
+                if (!getAuthUser()->can($perms)) {
+                    if (preg_match('/^\/api/', $currentURL)) {
                         $this->render('api/api', 'layout-api', array('response' => array(
                             'status' => 403,
                             'message' => 'Acceso no autorizado',
                             'content' => array()
                         )));
-                    }else{
-                        $this->render('public/403','layout-public',array('title'=>'Acceso no autorizado'));
+                    } else {
+                        $this->render('public/403', 'layout-public', array('title' => 'Acceso no autorizado'));
                     }
                     return;
                 }
             }
             call_user_func($fn, $this);
         } else { // Redirección a página 404
-            if(preg_match('/^\/api/',$currentURL)){
+            if (preg_match('/^\/api/', $currentURL)) {
                 $this->render('api/api', 'layout-api', array('response' => array(
                     'status' => 404,
                     'message' => 'API no encontrada',
                     'content' => array()
                 )));
-            }else{
-                $this->render('public/404','layout-public',array('title'=>'Página no encontrada'));
+            } else {
+                $this->render('public/404', 'layout-public', array('title' => 'Página no encontrada'));
             }
         }
     }
@@ -89,25 +89,25 @@ class Router
 
         include __DIR__ . '/../../views/' . $layout . '.php';
     }
-    
+
     /**
      * Muestra la página de error genérica
      *
      * @return void
      */
-    public function renderError():void
+    public function renderError(): void
     {
-        $this->render('public/500','layout-public',array('title'=>'Oups!'));
+        $this->render('public/500', 'layout-public', array('title' => 'Oups!'));
     }
 
-     /**
+    /**
      * Valida que el parametro cumple la especificación
      *
-     * @param mixed $params Parametros
+     * @param array $params Parametros
      * @param array $specs Espeficación ([ {name* required* type* max min filter schema} ])
      * @return bool Cumlpe la espeficicación (S/N)
      */
-    public function validate(mixed $params, array $specs): bool
+    public function validate(array $params, array $specs): bool
     {
         $valid = true;
 
@@ -120,7 +120,7 @@ class Router
             switch ($spec['type']) {
                 case 'array':
                     foreach ($params[$spec['name']] as $param) {
-                        if (!$this->validate($param, $spec['schema'])) {
+                        if (!$this->validateArrayItem($param, $spec['schema'])) {
                             return false;
                         }
                     }
@@ -178,5 +178,18 @@ class Router
             }
         }
         return $valid;
+    }
+
+    /**
+     * Valida que el parametro de un array cumple la especificación
+     *
+     * @param mixed $params Parametros
+     * @param array $specs Espeficación ([ {required* type* max min filter schema} ])
+     * @return bool Cumlpe la espeficicación (S/N)
+     */
+    private function validateArrayItem(mixed $param, array $specs): bool
+    {
+        $specs['name'] = 'array_item';
+        return $this->validate(array('array_item' => $param), [$specs]);
     }
 }
