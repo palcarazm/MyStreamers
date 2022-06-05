@@ -3,9 +3,11 @@
 namespace Controllers;
 
 use Model\Sitio;
-use Model\TipoEnlace;
 use Model\Usuario;
 use Router\Router;
+use Model\TipoEnlace;
+use GuzzleHttp\Client;
+//use GuzzleHttp\TransferStats;
 
 class AdminController
 {
@@ -207,6 +209,84 @@ class AdminController
             ),
             'header_list' => ['Tipo de enlaces', 'Acciones'],
             'obj_list' => TipoEnlace::all()
+        ));
+    }
+
+    /**
+     * Pagina de asociación de video
+     *
+     * @param Router $router
+     * @return void
+     */
+    public static function videoAdd(Router $router)
+    {
+        $usuario = getAuthUser();
+        if (!$usuario->hasProfile()) {
+            $router->render('public/403', 'layout-admin', array('title' => 'Acceso no autorizado'));
+            return;
+        }
+        $channels = $usuario->getYoutubeChannels();
+        $canalesAlert = empty($channels);
+
+        // Importar videos de Youtube
+        $youtubeAlert = false;
+        $videos = [];
+        if (!$canalesAlert) {
+            $userID = $usuario->getID();
+            $channelsID = [];
+            foreach ($channels as $channel) {
+                $channelsID[] = $channel->getID();
+            }
+            $channelsID = join("&channelId=", $channelsID);
+            try {
+                $url = '';
+                $client = new Client(['headers' => array(
+                    'Accept'     => 'application/json'
+                )]);
+                $res = $client->request(
+                    "GET",
+                    "https://www.googleapis.com/youtube/v3/search",
+                    [
+                        "query" => 'key=' . YOUTUBE_APIKEY . '&part=snippet&order=date&maxResults=50&channelId=' . $channelsID,
+                        /*'on_stats' => function (TransferStats $stats) use (&$url) {
+                            $url = $stats->getEffectiveUri();
+                        },*/
+                        'http_errors' => false
+                    ]
+                );
+                //debug($url);
+
+                if ($res->getStatusCode() != 200) {
+                    $youtubeAlert = true;
+                } else {
+                    $bodyout = json_decode($res->getBody()->getContents());
+                    //debug($bodyout);
+                    $videosUsuarioID = [];
+                    foreach ($usuario->getYoutubeVideos() as $video) {
+                        $videosUsuarioID[] = $video->getID();
+                    }
+                    foreach ($bodyout->items as $item) {
+                        if ($item->id->kind == "youtube#video") {
+                            $videos[] = array(
+                                'userID' => $userID,
+                                'id' => $item->id->videoId,
+                                'titulo' => $item->snippet->title,
+                                'fecha' => date('c', strtotime($item->snippet->publishedAt)),
+                                'added' => in_array($item->id->videoId, $videosUsuarioID)
+                            );
+                        }
+                    }
+                }
+            } catch (\Exception $e) {
+                $youtubeAlert = true;
+            }
+        }
+
+        $router->render('lists/video-add-list', 'layout-admin', array(
+            'title' => 'Asociar videos',
+            'videos' => $videos,
+            'canalesAlert' => $canalesAlert,
+            'youtubeAlert' => $youtubeAlert
         ));
     }
 }

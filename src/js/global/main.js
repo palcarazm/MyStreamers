@@ -430,6 +430,18 @@ function currentURL() {
     .split("?")[0]
     .split("#")[0];
 }
+
+/**
+ * Carga los widget de Hora
+ */
+function fechaWidget(){
+  let fecha;
+  $('.fecha-widget').each(function(){
+    fecha = new Date($(this).attr('data-widget'));
+    $(this).html((fecha.toLocaleString()).replace(',',''));
+  });
+}
+
 /**
  * Muestra un overlay de carga
  */

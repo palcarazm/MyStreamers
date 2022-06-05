@@ -20,7 +20,7 @@ use Model\Usuario;
     <!-- Default box -->
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title">Formulario de <?php echo $obj_type['singular']; ?></h3>
+            <h3 class="card-title">Listado de <?php echo $obj_type['singular']; ?></h3>
 
             <!-- <div class="card-tools">
                 <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">

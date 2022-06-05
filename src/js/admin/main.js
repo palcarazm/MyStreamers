@@ -73,6 +73,11 @@ $(function () {
       setupTable();
       linkList();
       break;
+    case "/admin/videos/crear":
+      fechaWidget();
+      setupTable();
+      videoList();
+      break;
     default:
       break;
   }

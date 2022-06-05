@@ -20,6 +20,7 @@ class Rol extends ActiveRecord
     const PERMS_NORMAS_PUBLICAR = 'normas_publicar_perms';
     const PERMS_CONFIG = 'config_perms';
     const PERMS_BASIC = 'basic_perms';
+    const PERMS_SELF = 'self_perms';
 
     protected $PK_id_rol;
     public $rol;

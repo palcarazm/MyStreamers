@@ -12,6 +12,7 @@ use Apis\ConfigurationApi;
 use Apis\ComunicationApi;
 use Apis\AuthentificationApi;
 use Apis\StreamsApi;
+use Apis\VideosApi;
 use Apis\UserApi;
 use Model\ActiveRecord;
 use Model\Rol;
@@ -65,10 +66,14 @@ $router->add('PATCH','/api/user/v1/profile/unlock',[UserApi::class,'unlockProfil
 // API STREAMS
 $router->add('GET','/api/streams/v1/status',[StreamsApi::class, 'getStatus']);
 
+// API VIDEOS
+$router->add('POST','/api/video/v1/video',[VideosApi::class,'postVideo']);
+
 // Administración
 $router->add('GET','/admin',[AdminController::class,'mystreamers'],Rol::PERMS_BASIC);
 /// Perfil
 $router->add('GET','/admin/miperfil',[AdminController::class,'perfil'],Rol::PERMS_BASIC);
+$router->add('GET','/admin/videos/crear',[AdminController::class,'videoAdd'],Rol::PERMS_BASIC);
 /// Configuración
 $router->add('GET','/admin/config/sitio',[AdminController::class,'configSitio'],Rol::PERMS_CONFIG);
 $router->add('GET','/admin/config/twitch',[AdminController::class,'configTwitch'],Rol::PERMS_CONFIG);

@@ -77,4 +77,20 @@ class Video extends ActiveRecord
         $query .= " WHERE FK_id_user = ${userID}";
         return self::query($query);
     }
+
+    /**
+     * Imprime la fila de un video Temporal
+     *
+     * @return void
+     */
+    public static function printRowTemp(array $videoTemp): void
+    {
+        $userID = $videoTemp['userID'] ?? null;
+        $id = $videoTemp['id'] ?? null;
+        $titulo = $videoTemp['titulo'] ?? null;
+        $fecha = $videoTemp['fecha'] ?? null;
+        $added = $videoTemp['added'] ?? null;
+        $imagen = is_null($id) ? '' : 'https://i.ytimg.com/vi/' . $id . '/default.jpg';
+        include TEMPLATES_DIR . '/video/admin-row-temp.php';
+    }
 }
