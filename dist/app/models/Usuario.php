@@ -395,7 +395,12 @@ class Usuario extends ActiveRecord
     public function setYoutubeChannel(String $channel): bool
     {
         $canal = new Canal(['FK_id_user' => $this->getID(), 'PK_id_canal' => $channel]);
-        return $canal->save();
+        if($canal->save()){
+            return true;
+        }else{
+            static::$errors=array_merge(static::$errors,$canal->errors());
+            return false;
+        }
     }
 
     /**
@@ -405,5 +410,36 @@ class Usuario extends ActiveRecord
     public function getYoutubeChannels(): array
     {
         return Canal::findByUserID($this->getID());
+    }
+
+    /**
+     * Establece un video de YouTube para el usuario
+     * @param String $videoID ID del video de YouTube
+     * @param String $videoTitle Titulo del video de YouTube
+     * @param String $videoDate Fecha de publicación del video de YouTube
+     * @return bool Video establecido (S/N)
+     */
+    public function setYoutubeVideo(String $videoID, String $videoTitle, String $videoDate): bool
+    {
+        $video = new Video(array(
+            'FK_id_user' => $this->getID(),
+            'PK_id_video' => $videoID,
+            'titulo' => $videoTitle
+        ));
+        if($video->setFecha($videoDate)){
+            return true;
+        }else{
+            static::$errors=array_merge(static::$errors,$video->errors());
+            return false;
+        }
+    }
+
+    /**
+     * Devuelve los videos de YouTube del usuario
+     * @return array Canales
+     */
+    public function getYoutubeVideos(): array
+    {
+        return Video::findByUserID($this->getID());
     }
 }
