@@ -99,14 +99,23 @@ class ActiveRecord
             return false;
         }
 
-        $attr = [];
-        foreach ($args as $key => $value) {
-            $attr[] = "{$key} = '{$value}'";
+        if (static::$isAuto_Increment) {
+            $attr = [];
+            foreach ($args as $key => $value) {
+                $attr[] = "{$key} = '{$value}'";
+            }
+            $query = "UPDATE " . static::$table . " SET ";
+            $query .= join(" , ", $attr);
+            $query .= " WHERE " . static::$PK . " = '" . self::$db->escape_string($this->{static::$PK}) . "'";
+        } else {
+            $attr = $args;
+            $attr[static::$PK] = $this->{static::$PK};
+            $query  = "REPLACE INTO " . static::$table . " ( ";
+            $query .= join(" , ", array_keys($attr));
+            $query .= " ) VALUES ('";
+            $query .= join("' , '", array_values($attr));
+            $query .= "')";
         }
-
-        $query = "UPDATE " . static::$table . " SET ";
-        $query .= join(" , ", $attr);
-        $query .= " WHERE " . static::$PK . " = '" . self::$db->escape_string($this->{static::$PK}) . "'";
 
         if (self::$db->query($query)) {
             return true;
@@ -376,7 +385,7 @@ class ActiveRecord
             $query .= " WHERE ";
             foreach (static::$searchTerm as $index => $term) {
                 $query .= $term . " like '" . $pattern . "'";
-                if($index != $lastTerm){
+                if ($index != $lastTerm) {
                     $query .= " OR ";
                 }
             }
