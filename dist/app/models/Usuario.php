@@ -386,4 +386,24 @@ class Usuario extends ActiveRecord
         }
         return empty(static::$errors);
     }
+
+    /**
+     * Establece un canal de YouTube para el usuario
+     * @param String $channels ID del canal de YouTube
+     * @return bool Canal establecido (S/N)
+     */
+    public function setYoutubeChannel(String $channel): bool
+    {
+        $canal = new Canal(['FK_id_user' => $this->getID(), 'PK_id_canal' => $channel]);
+        return $canal->save();
+    }
+
+    /**
+     * Devuelve los canales de YouTube del usuario
+     * @return array Canales
+     */
+    public function getYoutubeChannels(): array
+    {
+        return Canal::findByUserID($this->getID());
+    }
 }
