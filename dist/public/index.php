@@ -57,6 +57,7 @@ $router->add('PUT','/api/user/v1/link',[UserApi::class,'putLink']);
 $router->add('DELETE','/api/user/v1/link',[UserApi::class,'deleteLink']);
 $router->add('PUT','/api/user/v1/profile/links',[UserApi::class,'putProfileLinks']);
 $router->add('PUT','/api/user/v1/profile/streams',[UserApi::class,'putProfileStreams']);
+$router->add('PUT','/api/user/v1/profile/channels',[UserApi::class,'putProfileChannels']);
 $router->add('POST','/api/user/v1/profile',[UserApi::class,'postProfile']);
 $router->add('PATCH','/api/user/v1/profile/lock',[UserApi::class,'lockProfile']);
 $router->add('PATCH','/api/user/v1/profile/unlock',[UserApi::class,'unlockProfile']);

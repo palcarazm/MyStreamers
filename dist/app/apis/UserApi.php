@@ -7,9 +7,10 @@ use Model\Api;
 use Model\Rol;
 use Model\Usuario;
 use Router\Router;
-use GuzzleHttp\Client;
-use Intervention\Image\ImageManagerStatic;
 use Model\TipoEnlace;
+use GuzzleHttp\Client;
+//use GuzzleHttp\TransferStats;
+use Intervention\Image\ImageManagerStatic;
 
 class UserApi
 {
@@ -273,7 +274,7 @@ class UserApi
         }
 
         // Mensaje de respuesta
-        if ($api->getAuthMethod() != Api::AUTH_SELF){
+        if ($api->getAuthMethod() != Api::AUTH_SELF) {
             loadSession();
             $_SESSION['auth']['usuario'] = Usuario::find(getAuthUser()->getID());
         }
@@ -657,7 +658,7 @@ class UserApi
         }
 
         // Autentifica al usuario
-        if (!$api->auth(self::SCOPE,$api->query['id'])) {
+        if (!$api->auth(self::SCOPE, $api->query['id'])) {
             return;
         }
 
@@ -936,7 +937,7 @@ class UserApi
             if ($res->getStatusCode() != 200) {
                 $api->send(500, 'Se produjo un error al contactar con Twitch', new stdClass());
                 return;
-            }else{
+            } else {
                 $bodyout = json_decode($res->getBody()->getContents());
 
                 // Verificar si el usaurio existe en Twitch
@@ -958,13 +959,13 @@ class UserApi
                             'http_errors' => false
                         ]
                     );
-        
+
                     if ($res->getStatusCode() != 200) {
-                       
-        
+
+
                         $api->send(500, 'Se produjo un error al contactar con Twitch', new stdClass());
                         return;
-                    }else{
+                    } else {
                         $bodyout = json_decode($res->getBody()->getContents());
                         if (count($bodyout->data) != 1) {
                             $api->send(500, 'Usuario no encontrado en Twitch.', new stdClass());
@@ -976,7 +977,6 @@ class UserApi
                     return;
                 }
             }
-
         } catch (\Exception $e) {
             $api->send(500, 'Se produjo un error al contactar con Twitch', new stdClass());
             return;
@@ -997,5 +997,129 @@ class UserApi
 
         // Mensajes
         $api->send(200, 'Fuentes de emisión en directo establecidas.', new stdClass());
+    }
+
+    /**
+     * Api de establecer canales de YouTube
+     *
+     * @param Router $router
+     * @return void
+     */
+    public static function putProfileChannels(Router $router): void
+    {
+        $api = new Api(
+            $router,
+            'PUT',
+            array(
+                array(
+                    'name' => 'channels',
+                    'required' => true,
+                    'type' => 'array',
+                    'schema' => array(
+                        'type' => 'string',
+                        'required' => false,
+                        'min' => 24,
+                        'max' => 24
+                    )
+                )
+            ),
+            array(
+                array(
+                    'name' => 'id',
+                    'required' => true,
+                    'type' => 'integer'
+                )
+            ),
+            array(Api::AUTH_SELF, Api::AUTH_TOKEN)
+        );
+
+        // Valida campos requeridos
+        if (!$api->validate()) {
+            return;
+        }
+
+        // Autentifica al usuario
+        if (!$api->auth(self::SCOPE, $api->query['id'])) {
+            return;
+        }
+
+        // Buscar usuario filtrando varaible
+        $usuario = Usuario::find($api->query['id']);
+        if (is_null($usuario)) {
+            $api->send(500, 'Usuario no encontrado.', new stdClass());
+            return;
+        }
+
+        // Verificar canales de YouTube
+        $successChannels = [];
+        $errorChannels = [];
+        $twitchChannels = [];
+        if (!empty($api->in['channels'])) {
+            $channels = join("&id=", $api->in['channels']);
+            try {
+                $url = '';
+                $client = new Client(['headers' => array(
+                    'Accept'     => 'application/json'
+                )]);
+                $res = $client->request(
+                    "GET",
+                    "https://www.googleapis.com/youtube/v3/channels",
+                    [
+                        "query" => 'key=' . YOUTUBE_APIKEY . '&part=id&id=' . $channels,
+                        /*'on_stats' => function (TransferStats $stats) use (&$url) {
+                            $url = $stats->getEffectiveUri();
+                        },*/
+                        'http_errors' => false
+                    ]
+                );
+                //debug($url);
+
+                if ($res->getStatusCode() != 200) {
+                    $api->send(500, 'Se produjo un error al contactar con YouTube', new stdClass());
+                    return;
+                } else {
+                    $bodyout = json_decode($res->getBody()->getContents());
+                    //debug($bodyout);
+                    foreach ($bodyout->items as $item) {
+                        $twitchChannels[] = $item->id;
+                    }
+                    foreach ($api->in['channels'] as $channel) {
+                        if (in_array($channel, $twitchChannels)) {
+                            $successChannels[] = $channel;
+                        } else {
+                            $errorChannels[] = $channel;
+                        }
+                    }
+                }
+            } catch (\Exception $e) {
+                $api->send(500, 'Se produjo un error al contactar con YouTube', new stdClass());
+                return;
+            }
+        }
+
+        // Eliminar canales previos
+        foreach ($usuario->getYoutubeChannels() as $channel) {
+            if (!$channel->delete()) {
+                $api->sendErrorDB($usuario->errors());
+                return;
+            }
+        }
+        // Guardar información de los canales
+        foreach ($successChannels as $channel) {
+            if (!$usuario->setYoutubeChannel($channel)) {
+                $api->sendErrorDB($usuario->errors());
+                return;
+            }
+        }
+
+        // Mensajes
+        if (empty($errorChannels)) {
+            $api->send(200, 'Los canales de YouTube han sido guardados.', new stdClass());
+        } else {
+            $api->send(202, 'Los canales de YouTube han sido guardados, pero algunos son desconocidos por YouTube.', array(
+                'successChannels' => $successChannels,
+                'errorChannels' => $errorChannels
+            ));
+        }
     }
 }

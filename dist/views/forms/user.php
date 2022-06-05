@@ -17,24 +17,15 @@ use Model\Rol;
 <main class="content">
 
     <!-- Default box -->
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">Formulario de usuario</h3>
-
-            <!-- <div class="card-tools">
-                <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
-                    <i class="fas fa-minus"></i>
-                </button>
-                <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div> -->
-        </div>
-        <?php if (is_null($usuario)) : ?>
-            <form enctype="multipart/form-data" action="/api/user/v1/user" method="POST" class="border-secondary" id="user-form" form-success="reset">
-            <?php else : ?>
-                <form enctype="multipart/form-data" action="/api/user/v1/user<?php echo '?id=' . $usuario->getID(); ?>" method="PUT" class="border-secondary" id="user-form" form-success="redirect" destino="/admin/usuarios/listar">
-                <?php endif; ?>
+    <?php if (is_null($usuario)) : ?>
+        <form enctype="multipart/form-data" action="/api/user/v1/user" method="POST" class="border-secondary" id="user-form" form-success="reset">
+        <?php else : ?>
+            <form enctype="multipart/form-data" action="/api/user/v1/user<?php echo '?id=' . $usuario->getID(); ?>" method="PUT" class="border-secondary" id="user-form" form-success="redirect" destino="/admin/usuarios/listar">
+            <?php endif; ?>
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Formulario de usuario</h3>
+                </div>
                 <div class="card-body">
                     <div class="form-group row">
                         <label for="username" class="col-sm-3 col-md-2 col-form-label">Usuario*</label>
@@ -98,8 +89,7 @@ use Model\Rol;
                         <button type="submit" class="btn btn-primary d-block ml-auto mr-0"><i class="fas fa-save"></i> Guardar</button>
                     </div>
                     <!-- /.card-footer-->
-                </form>
-    </div>
-    <!-- /.card -->
-
+                </div>
+                <!-- /.card -->
+            </form>
 </main>

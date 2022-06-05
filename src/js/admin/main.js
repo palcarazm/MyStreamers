@@ -47,6 +47,7 @@ $(function () {
       userForm();
       profileLinksForm();
       profileStreamsForm();
+      profileChannelsForm();
       break;
     case "/admin/usuarios/editar":
       configFileIntup();

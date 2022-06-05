@@ -8,7 +8,7 @@ use Model\Api;
 use Model\Usuario;
 use Router\Router;
 use GuzzleHttp\Client;
-use GuzzleHttp\TransferStats;
+//use GuzzleHttp\TransferStats;
 
 class StreamsApi
 {

@@ -25,11 +25,16 @@ foreach ($enlacesUser as $enlace) {
     <div class="container-fluid">
         <div class="row">
             <div class="col">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Formulario de usuario</h3>
-                    </div>
-                    <form enctype="multipart/form-data" action="/api/user/v1/user<?php echo '?id=' . $usuario->getID(); ?>" method="PUT" class="border-secondary" id="user-form" form-success="redirect" destino="/admin/miperfil">
+                <form enctype="multipart/form-data" action="/api/user/v1/user<?php echo '?id=' . $usuario->getID(); ?>" method="PUT" class="border-secondary" id="user-form" form-success="redirect" destino="/admin/miperfil">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Formulario de usuario</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Colapsar">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                            </div>
+                        </div>
                         <div class="card-body">
                             <div class="form-group row">
                                 <label for="username" class="col-sm-3 col-md-2 col-form-label">Usuario*</label>
@@ -88,17 +93,22 @@ foreach ($enlacesUser as $enlace) {
                             <button type="submit" class="btn btn-primary d-block ml-auto mr-0"><i class="fas fa-save"></i> Guardar</button>
                         </div>
                         <!-- /.card-footer-->
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
             <?php if ($usuario->hasProfile()) : ?>
                 <div class="col-lg-5 col-xl-4">
                     <?php if ($usuario->hasProfile()) : ?>
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">Enlaces Públicos</h3>
-                            </div>
-                            <form enctype="multipart/form-data" action="/api/user/v1/profile/links<?php echo '?id=' . $usuario->getID(); ?>" method="PUT" class="border-secondary" id="profile-links-form">
+                        <form enctype="multipart/form-data" action="/api/user/v1/profile/links<?php echo '?id=' . $usuario->getID(); ?>" method="PUT" class="border-secondary" id="profile-links-form">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Enlaces Públicos</h3>
+                                    <div class="card-tools">
+                                        <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Colapsar">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                    </div>
+                                </div>
                                 <div class="card-body">
                                     <?php foreach (TipoEnlace::all() as $tipoEnlace) : ?>
                                         <div class="form-group row">
@@ -114,13 +124,20 @@ foreach ($enlacesUser as $enlace) {
                                     <button type="submit" class="btn btn-primary d-block ml-auto mr-0"><i class="fas fa-save"></i> Guardar</button>
                                 </div>
                                 <!-- /.card-footer-->
-                            </form>
-                        </div>
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">Emisiones en directo</h3>
                             </div>
-                            <form action="/api/user/v1/profile/streams<?php echo '?id=' . $usuario->getID(); ?>" method="PUT" class="border-secondary" id="profile-streams-form">
+                        </form>
+                        <?php endif;
+                        if ($usuario->hasProfile()) : ?>
+                        <form action="/api/user/v1/profile/streams<?php echo '?id=' . $usuario->getID(); ?>" method="PUT" class="border-secondary" id="profile-streams-form">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Emisiones en directo</h3>
+                                    <div class="card-tools">
+                                        <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Colapsar">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                    </div>
+                                </div>
                                 <div class="card-body">
                                     <div class="form-group row">
                                         <label for="twitch" class="col-auto col-form-label">Ususarios de Twitch*</label>
@@ -134,8 +151,38 @@ foreach ($enlacesUser as $enlace) {
                                     <button type="submit" class="btn btn-primary d-block ml-auto mr-0"><i class="fas fa-save"></i> Guardar</button>
                                 </div>
                                 <!-- /.card-footer-->
-                            </form>
-                        </div>
+                            </div>
+                        </form>
+                        <?php endif;
+                        if ($usuario->hasProfile()) : ?>
+                        <form action="/api/user/v1/profile/channels<?php echo '?id=' . $usuario->getID(); ?>" method="PUT" class="border-secondary" id="profile-channels-form">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Canales de YouTube</h3>
+                                    <div class="card-tools">
+                                        <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Colapsar">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <?php foreach ($usuario->getYoutubeChannels() as $iter => $channel):?>
+                                    <div class="form-group row">
+                                        <label for="canal-<?php echo $iter;?>" class="col-auto col-form-label">ID Canal</label>
+                                        <div class="col">
+                                            <input type="text" class="form-control" id="canal-<?php echo $iter;?>" name="channel" placeholder="ID de canal de YouTube" value="<?php echo $channel->getID() ?? ''; ?>" minlength="24" maxlength="24">
+                                        </div>
+                                    </div>
+                                    <?php endforeach;?>
+                                </div>
+                                <!-- /.card-body -->
+                                <div class="card-footer d-flex justify-content-between">
+                                        <button type="button" class="btn btn-success d-block ml-0 mr-auto" btn-action="add"><i class="fas fa-plus-circle"></i> Añadir</button>
+                                        <button type="submit" class="btn btn-primary d-block ml-auto mr-0"><i class="fas fa-save"></i> Guardar</button>
+                                </div>
+                                <!-- /.card-footer-->
+                            </div>
+                        </form>
                     <?php endif; ?>
                 </div>
             <?php endif; ?>
