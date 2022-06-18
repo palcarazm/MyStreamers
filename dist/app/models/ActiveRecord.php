@@ -350,11 +350,14 @@ class ActiveRecord
 
     /** Consultar un registro por su ID    
      *
-     * @param  int $id
+     * @param  int|string $id
      * @return static
      */
-    public static function find(int $id): static|null
+    public static function find(int|string $id): static|null
     {
+        if (gettype($id) == "string") {
+            $id = "'" . $id . "'";
+        }
         $query = "SELECT * FROM " . static::$table;
         if (!empty(static::$joins)) {
             foreach (static::$joins as $table => $FK) {
