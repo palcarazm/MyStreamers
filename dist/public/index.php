@@ -95,6 +95,7 @@ $router->add('GET', '/', [PublicController::class, 'index']);
 $router->add('GET', '/buscar', [PublicController::class, 'buscar']);
 $router->add('GET', '/participantes', [PublicController::class, 'participantes']);
 $router->add('GET', '/participantes/ficha', [PublicController::class, 'participante']);
+$router->add('GET', '/videos', [PublicController::class, 'videos']);
 $router->add('GET', '/mystreamers', [PublicController::class, 'mystreamers']);
 
 /* ENROUTAR */

@@ -87,3 +87,19 @@ img.img-size-large {
   transform: scale(1.2);
   filter: brightness(0.9);
 }
+.card-video{
+  margin-bottom: .7rem;
+}
+.card-video iframe, .card-video .video-img{
+  border: none;
+  width: 100%;
+  height: auto;
+  margin-bottom: .7rem;
+}
+.card-video .video-title{
+  font-weight: bold;
+  line-height: 1;
+}
+.video-widget .video-img {
+  cursor: pointer;
+}

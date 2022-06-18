@@ -15,3 +15,10 @@
         </div>
     </div>
 </main>
+<section id="archivo-video" class="row">
+        <?php 
+            foreach($videos as $video){
+                $video->printCard('FICHA');
+            }
+        ?>
+</section>

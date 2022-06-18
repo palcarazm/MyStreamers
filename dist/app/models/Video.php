@@ -9,6 +9,7 @@ class Video extends ActiveRecord
     protected static array $colDB = ['PK_id_video', 'FK_id_user', 'titulo', 'fecha'];
     protected static String $PK = 'PK_id_video';
     protected static bool $isAuto_Increment = false;
+    protected static array $searchTerm = ['titulo'];
 
     protected string $PK_id_video;
     public int $FK_id_user;
@@ -110,5 +111,15 @@ class Video extends ActiveRecord
     public function printRow(): void
     {
         include TEMPLATES_DIR . '/video/admin-row.php';
+    }
+
+    /**
+     * Imprime la tarjeta del video actual
+     *
+     * @return void
+     */
+    public function printCard($option=''): void
+    {
+        include TEMPLATES_DIR . '/video/public-card.php';
     }
 }

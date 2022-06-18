@@ -5,9 +5,19 @@ $(function () {
   switch (currentURL()) {
     case "/":
       setOnline(".offline", ".online", "#participantes", "#badge-directo");
+      videoWidget();
+      break;
+    case "/buscar":
+      videoWidget();
+      break;
+    case '/videos':
+      videoWidget();
       break;
     case "/participantes":
       setOnline("#archivo-participante", "#archivo-participante");
+      break;
+    case "/participantes/ficha":
+      videoWidget();
       break;
     default:
       break;

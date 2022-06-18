@@ -106,7 +106,7 @@ function ajaxCall(
   authorization = null
 ) {
   try {
-     if (method.toUpperCase() == "GET") {
+    if (method.toUpperCase() == "GET") {
       $.ajax({
         type: method,
         url: uri,
@@ -144,7 +144,7 @@ function ajaxCall(
                 }
               } else {
                 try {
-                      swal({
+                  swal({
                     type: "success",
                     title: "Éxito",
                     html: data.message,
@@ -164,7 +164,7 @@ function ajaxCall(
                 success();
               } else {
                 try {
-                      success(data);
+                  success(data);
                 } catch (error) {
                   success("");
                 }
@@ -231,7 +231,7 @@ function ajaxCall(
           }
         },
       });
-    } else { 
+    } else {
       $.ajax({
         type: method,
         data: JSON.stringify(data),
@@ -271,7 +271,7 @@ function ajaxCall(
                 }
               } else {
                 try {
-                      swal({
+                  swal({
                     type: "success",
                     title: "Éxito",
                     html: data.message,
@@ -291,7 +291,7 @@ function ajaxCall(
                 success();
               } else {
                 try {
-                      success(data);
+                  success(data);
                 } catch (err) {
                   success("");
                 }
@@ -434,11 +434,28 @@ function currentURL() {
 /**
  * Carga los widget de Hora
  */
-function fechaWidget(){
+function fechaWidget() {
   let fecha;
-  $('.fecha-widget').each(function(){
-    fecha = new Date($(this).attr('data-widget'));
-    $(this).html((fecha.toLocaleString()).replace(',',''));
+  $(".fecha-widget").each(function () {
+    fecha = new Date($(this).attr("data-widget"));
+    $(this).html(fecha.toLocaleString().replace(",", ""));
+  });
+}
+
+/**
+ * Carga los widget de video
+ */
+function videoWidget() {
+  $(".video-widget .video-img").on("click", function () {
+    const widget = $(this).closest(".video-widget");
+    let src =
+      "https://www.youtube.com/embed/" +
+      widget.attr("data-id") +
+      "?autoplay=1" +
+      "&modestbranding=1"+
+      "&showinfo=0" ;
+    widget.prepend($("<iframe></iframe>").attr("src", src));
+    $(this).remove();
   });
 }
 

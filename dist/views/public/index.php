@@ -36,8 +36,12 @@ use Model\Sitio;
             <h5 class="mb-0 flex-grow-1">Últimos videos</h5>
             <a class="btn btn-outline-light btn-sm" href="/videos">Ver más</a>
         </div>
-        <div class="card-body">
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Harum distinctio, eligendi unde sit facere beatae veritatis exercitationem quis omnis repudiandae fuga ducimus illo odio mollitia quia. Reiciendis tempore provident est non nam quisquam eligendi, ipsum nostrum deserunt maiores inventore impedit hic, tenetur exercitationem perferendis molestias, numquam ex ullam corrupti qui placeat? Deleniti, officia asperiores autem repudiandae tenetur explicabo nisi reprehenderit voluptate? Voluptas id sed facere quis amet. Autem, fugiat. Sequi mollitia, hic aspernatur asperiores repellat impedit ea quidem sunt architecto omnis doloribus ad, fugit nemo iure veritatis adipisci consequuntur excepturi cum in quos voluptatum earum necessitatibus beatae voluptates. Sunt, similique!
+        <div>
+            <ul class="list-group list-group-flush">
+            <?php foreach ($videos as $video):?>
+                <li class="list-group-item"><?php $video->printCard('HOME'); ?> </li>
+            <?php endforeach; ?>
+            </ul>
         </div>
     </div><!-- Videos -->
     <?php if (Sitio::isEnabled('eventos') || Sitio::isEnabled('noticias')) : ?>

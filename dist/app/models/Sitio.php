@@ -105,6 +105,6 @@ class Sitio extends ActiveRecord
      */
     public static function search(string $pattern): array
     {
-        return array_merge([], Usuario::search($pattern));
+        return array_merge([], Usuario::search($pattern), Video::search($pattern));
     }
 }

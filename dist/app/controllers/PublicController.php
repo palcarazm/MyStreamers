@@ -4,6 +4,7 @@ namespace Controllers;
 
 use Model\Rol;
 use Model\Sitio;
+use Model\Video;
 use Model\Usuario;
 use Router\Router;
 
@@ -43,7 +44,8 @@ class PublicController
     {
         $router->render('public/index', 'layout-public', array(
             'title' => 'Inicio',
-            'participantes' => Usuario::findActiveStreamProfiles()
+            'participantes' => Usuario::findActiveStreamProfiles(),
+            'videos' => Video::allLimit(5)
         ));
     }
 
@@ -114,7 +116,8 @@ class PublicController
         }
         $router->render('public/participante', 'layout-public', array(
             'title' => $usuario->username,
-            'participante' => $usuario
+            'participante' => $usuario,
+            'videos' => $usuario->getYoutubeVideos()
         ));
     }
 
@@ -132,6 +135,23 @@ class PublicController
             'archivo_descripcion' => null,
             'archivo_item' => 'participante',
             'archivo' => Usuario::findActiveProfiles()
+        ));
+    }
+
+    /**
+     * Controlador del archivo de videos
+     *
+     * @param Router $router
+     * @return void
+     */
+    public static function videos(Router $router)
+    {
+        $router->render('public/archivo', 'layout-public', array(
+            'title' => 'Videos',
+            'archivo_titulo' => 'Videos',
+            'archivo_descripcion' => null,
+            'archivo_item' => 'video',
+            'archivo' => Video::all()
         ));
     }
 
