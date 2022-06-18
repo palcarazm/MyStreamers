@@ -43,7 +43,7 @@ function setOnline(
     "{}",
     0,
     function (bodyout) {
-      let usersID = Array(Object(bodyout.content).online);
+      let usersID = Object(bodyout.content).online;
       if (usersID.length > 0) {
         if (bagdeSelector != null) {
           $(bagdeSelector).html(usersID.length);
