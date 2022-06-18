@@ -1,6 +1,6 @@
 <?php
 /* INFORMACIÓN GENERAL */
-define('VERSION','v1.0.0');
+define('VERSION','v1.0.0-beta.0');
 define('SECRET','SECRET');
 
 /* INFORMACIÓN DE LA BASE DE DATOS */
