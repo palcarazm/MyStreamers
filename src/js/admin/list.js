@@ -176,6 +176,13 @@ function videoList() {
           };
           error = null;
           break;
+        case "video-delete":
+          success = function () {
+            target.hide();
+            target.closest('tr').remove();
+          };
+          error = null;
+          break;
         default:
           break;
       }

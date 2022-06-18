@@ -51,13 +51,21 @@ class Video extends ActiveRecord
     }
 
     /**
-     * Devuelve la url de la imagen
+     * Devuelve la url de la imagen de un tamaño dado
      *
      * @return String url de la imagen
      */
-    public function getImageURL(): String
+    public function getImageURL(String $size = 'mq'): String
     {
-        return 'https://i.ytimg.com/vi/' . $this->PK_id_video . '/mqdefault.jpg';
+        $supported_size = array(
+            '' => true,
+            'mq' => true,
+            'hq' => true
+        );
+        if (!$supported_size[$size]) {
+            $size = 'mq';
+        }
+        return 'https://i.ytimg.com/vi/' . $this->PK_id_video . '/' . $size . 'default.jpg';
     }
 
     /**
@@ -92,5 +100,15 @@ class Video extends ActiveRecord
         $added = $videoTemp['added'] ?? null;
         $imagen = is_null($id) ? '' : 'https://i.ytimg.com/vi/' . $id . '/default.jpg';
         include TEMPLATES_DIR . '/video/admin-row-temp.php';
+    }
+
+    /**
+     * Imprime la fila del video actual
+     *
+     * @return void
+     */
+    public function printRow(): void
+    {
+        include TEMPLATES_DIR . '/video/admin-row.php';
     }
 }

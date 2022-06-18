@@ -6,6 +6,31 @@ $usuario = getAuthUser();
 if (!is_null($usuario)) :
 ?>
     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+        <?php if ($usuario->hasProfile()) : ?>
+            <li class="nav-item">
+                <div class="nav-link">
+                    <i class="nav-icon far fa-play-circle"></i>
+                    <p>
+                        Videos
+                        <i class="right fas fa-angle-left"></i>
+                    </p>
+                </div>
+                <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                        <a href="/admin/videos/listar" class="nav-link">
+                            <i class="nav-icon fas fa-list"></i>
+                            <p>Listar</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin/videos/crear" class="nav-link">
+                            <i class="nav-icon fas fa-plus"></i>
+                            <p>Añadir</p>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        <?php endif; ?>
         <?php if ($usuario->can(Rol::PERMS_USUARIOS)) : ?>
             <li class="nav-item">
                 <div class="nav-link">

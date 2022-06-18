@@ -6,6 +6,7 @@ use mysqli;
 use stdClass;
 use Model\Api;
 use Model\Rol;
+use Model\Video;
 use Model\Usuario;
 use Router\Router;
 use GuzzleHttp\Client;
@@ -47,16 +48,16 @@ class VideosApi
             ),
             array(
                 array(
-                'name' => 'id',
-                'required' => true,
-                'type' => 'integer',
+                    'name' => 'id',
+                    'required' => true,
+                    'type' => 'integer',
                 )
             ),
             array(API::AUTH_SELF, API::AUTH_TOKEN)
         );
 
-          // Valida campos requeridos
-          if (!$api->validate()) {
+        // Valida campos requeridos
+        if (!$api->validate()) {
             return;
         }
 
@@ -73,12 +74,65 @@ class VideosApi
         }
 
         //Guardar video
-        if (!$usuario->setYoutubeVideo($api->in['id'],$api->in['titulo'],$api->in['fecha'])) {
+        if (!$usuario->setYoutubeVideo($api->in['id'], $api->in['titulo'], $api->in['fecha'])) {
             $api->sendErrorDB($usuario->errors());
             return;
         }
 
         // Mensajes
         $api->send(201, 'El vídeo ha sido guardado.', new stdClass());
+    }
+
+    /**
+     * Api de desasociar de video de YouTube
+     *
+     * @param Router $router
+     * @return void
+     */
+    public static function deleteVideo(Router $router): void
+    {
+        $api = new Api(
+            $router,
+            'DELETE',
+            array(),
+            array(
+                array(
+                    'name' => 'id',
+                    'required' => true,
+                    'type' => 'string',
+                    'min' => 11,
+                    'max' => 11
+                )
+            ),
+            array(API::AUTH_SELF, API::AUTH_TOKEN)
+        );
+
+        // Valida campos requeridos
+        if (!$api->validate()) {
+            return;
+        }
+
+        // Buscar video filtrando varaible
+        $video = Video::find($api->query['id']);
+        if (is_null($video)) {
+            $api->send(500, 'Video no encontrado.', new stdClass());
+            return;
+        }
+
+        // Autentifica al usuario
+        if (!$api->auth(self::SCOPE, $video->FK_id_user)) {
+            return;
+        }
+
+
+
+        //Eliminar video
+        if (!$video->delete()) {
+            $api->sendErrorDB($video->errors());
+            return;
+        }
+
+        // Mensajes
+        $api->send(200, 'El vídeo ha sido eliminado.', new stdClass());
     }
 }

@@ -78,6 +78,11 @@ $(function () {
       setupTable();
       videoList();
       break;
+    case "/admin/videos/listar":
+      fechaWidget();
+      setupTable();
+      videoList();
+      break;
     default:
       break;
   }
@@ -106,15 +111,15 @@ function setupAdminMenu() {
 }
 
 function setupLogoutBtn() {
-  $('a[data-widget="logout"]').click(function(e){
+  $('a[data-widget="logout"]').click(function (e) {
     e.preventDefault();
     ajaxCall(
-      '/api/auth/v1/auth',
-      'DELETE',
-      JSON.parse('{}'),
+      "/api/auth/v1/auth",
+      "DELETE",
+      JSON.parse("{}"),
       0,
       function () {
-        window.location = '/'
+        window.location = "/";
       },
       null
     );
@@ -150,17 +155,17 @@ function configFileIntup() {
  * Configura las tablas
  */
 function setupTable() {
-  $('table.data').DataTable({
-    "paging": true,
-    "lengthChange": true,
-    "searching": true,
-    "ordering": true,
-    "info": true,
-    "autoWidth": false,
-    "responsive": true,
+  $("table.data").DataTable({
+    paging: true,
+    lengthChange: true,
+    searching: true,
+    ordering: true,
+    info: true,
+    autoWidth: false,
+    responsive: true,
     language: {
-      url: 'https://cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json'
-  }
+      url: "https://cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json",
+    },
   });
 }
 
@@ -367,14 +372,17 @@ function validatePass(password, passwordRepeat) {
  * Configura el selector de iconos
  */
 function configIconPicker() {
-  $('.icp').iconpicker({});
-  $('.icp').on('iconpickerSelected', function (e) {
-    $(this).children('span').each((ind,child)=>{
-      $(child).html('');
-    });
-    $(this).siblings('input[type="hidden"]').each((ind,sibling)=>{
-      $(sibling).val(e.iconpickerValue);
-    });
+  $(".icp").iconpicker({});
+  $(".icp").on("iconpickerSelected", function (e) {
+    $(this)
+      .children("span")
+      .each((ind, child) => {
+        $(child).html("");
+      });
+    $(this)
+      .siblings('input[type="hidden"]')
+      .each((ind, sibling) => {
+        $(sibling).val(e.iconpickerValue);
+      });
   });
-
 }

@@ -289,4 +289,29 @@ class AdminController
             'youtubeAlert' => $youtubeAlert
         ));
     }
+
+    /**
+     * Pagina de listado de video
+     *
+     * @param Router $router
+     * @return void
+     */
+    public static function videoList(Router $router)
+    {
+        $usuario = getAuthUser();
+        if (!$usuario->hasProfile()) {
+            $router->render('public/403', 'layout-admin', array('title' => 'Acceso no autorizado'));
+            return;
+        }
+      
+        $router->render('lists/admin-list', 'layout-admin', array(
+            'title' => 'Mis videos',
+            'obj_type' => array(
+                'singular' => 'video',
+                'plural' => 'videos'
+            ),
+            'header_list' => ['Imagen', 'Titulo', 'Fecha' , 'Acciones'],
+            'obj_list' => $usuario->getYoutubeVideos()
+        ));
+    }
 }
