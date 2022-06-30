@@ -17,7 +17,7 @@
   <!-- Select2 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" integrity="sha512-nMNlpuaDPrqlEls3IX/Q56H36qvBASwb3ipuo3MxeWbsQB1881ox0cRv7UPTgBlriqoynt35KjEwgGUeUXIPnw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <!-- Minimal Rich Text Editor -->
-  <link rel="stylesheet" href="/css/richtext.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/webfashionist/RichText@v.1.0.16/src/richtext.min.css">
   <!-- My Streamers Style -->
   <link rel="stylesheet" href="/css/main.min.css">
   <link rel="stylesheet" href="/css/admin.min.css">
@@ -50,7 +50,7 @@
   <!-- Select2 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <!-- Minimal RichText Editor -->
-  <script src="/js/jquery.richtext.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/webfashionist/RichText@v.1.0.16/src/jquery.richtext.min.js"></script>
   <!-- My Streamers -->
   <script src="/js/main.min.js"></script>
   <script src="/js/admin.min.js"></script>
